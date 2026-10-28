@@ -80,7 +80,11 @@ test('spoken DSH memory survives restart and enters fresh DSH/Pi sessions', {tim
     assert.equal(raw.events.length,2,'human speech and structured voice reply are both retained');
     assert.equal(raw.events[1].role,'assistant');assert.equal(raw.events[1].mode,'voice');assert.match(raw.events[1].content,/check in next time/);
     await first.dispose();handles.splice(handles.indexOf(first),1);
-    process.kill(pid,'SIGTERM');await until(()=>!existsSync(join(dir,'state/dual-memory.sock')));pid=(await promptCall('memory.dual.describe')).pid;
+    process.kill(pid,'SIGTERM');await until(()=>!existsSync(join(dir,'state/dual-memory.sock')));
+    // Endpoint removal precedes process exit and release of the ownership lock.
+    // Prove shutdown of this fixture process before testing a cold restart.
+    await until(()=>{try{process.kill(pid,0);return false;}catch(error){if(error.code==='ESRCH')return true;throw error;}});
+    pid=(await promptCall('memory.dual.describe')).pid;
     const second=await session('second','augmentor-browser-product');await say(second,'How should Mira approach the Atlas SQLite review?','resonant-voice:second');
     const chatCalls=()=>calls.filter(c=>!JSON.stringify(c.messages.filter(m=>m.role==='system')).includes('You maintain Augmentor'));
     assert.match(JSON.stringify(chatCalls().at(-1)),/Mira appreciates calm check-ins/);assert.match(JSON.stringify(chatCalls().at(-1)),/Project Atlas uses SQLite/);assert.match(JSON.stringify(chatCalls().at(-1)),/Spoken interaction/);

@@ -125,7 +125,7 @@ class DshClient:
         workspaces = self.call('workspace.list')
         saved = {s for w in workspaces.get('items', []) for s in w.get('sessionIds', [])}
         archived = set(workspaces.get('archivedSessionIds', []))
-        return [dict({k:row.get(k) for k in ('sessionId','cwd','agentPreset','updatedAt','running','blank')},
+        return [dict({k:row.get(k) for k in ('sessionId','cwd','agentPreset','updatedAt','running','blank','origin')},
                      title=row.get('projections', {}).get('values', {}).get('title') or row['sessionId'],
                      saved=row['sessionId'] in saved, archived=row['sessionId'] in archived)
                 for row in sorted(sessions, key=lambda r: r.get('updatedAt', 0), reverse=True)]
@@ -210,8 +210,12 @@ class EventStream:
                 event=None
                 if frame.get('type')=='event' and frame['event']['seq']>cursor:
                     event=frame['event'];cursor=event['seq']
+                elif frame.get('type')=='assistant-stream' and frame['frame']['type']=='start':
+                    event={'type':'assistant/start','data':{}}
                 elif frame.get('type')=='assistant-stream' and frame['frame']['type']=='chunk':
-                    event={'type':'assistant/chunk','time':frame['frame']['time'],'data':{'chunk':frame['frame']['chunk']}}
+                    event={'type':'assistant/chunk','data':{'chunk':frame['frame']['chunk']}}
+                if event and frame.get('type')=='assistant-stream' and 'time' in frame['frame']:
+                    event['time']=frame['frame']['time']
                 if event:
                     self.on_frame({'type':'server-request','method':'session/event','payload':{'sessionId':self.session,'event':event}})
                     if event['type'] in ('turn/start','turn/end'):

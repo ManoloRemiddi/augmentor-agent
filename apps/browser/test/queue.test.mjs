@@ -6,6 +6,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {JSDOM} from 'jsdom'
 import {createQueue} from '../extension/queue.mjs'
+import {createQueue as createHarnessQueue} from '../../../packages/harness-ui/src/queue-view.js'
 
 function fixture(t,send){
   const dom=new JSDOM('<div id="queue"></div><textarea></textarea>')
@@ -62,4 +63,39 @@ test('typing immediately after Steer waits for the action acknowledgment',async 
   f.input.value='Next';const submission=f.queue.submit();await Promise.resolve()
   assert.equal(calls.length,1);assert.equal(calls[0][0],'queue/action')
   release();await Promise.all([action,submission]);assert.equal(calls[1][0],'queue/prompt')
+})
+test('Pi queue shows unknown action receipts after confirmed delivery and never enables replay or steering',async t=>{
+ const calls=[],f=fixture(t,async(...args)=>{calls.push(args);return {accepted:true}})
+ f.state.harness='pi';f.state.running=false
+ f.queue.update({...f.state,entry:{sessionId:'one',event:{type:'user/message',data:{source:{kind:'user',rpcId:'id'}}}}})
+ f.update([{...f.item(),canResolve:true,canSteer:false,canRemove:false,stateLabel:'Interrupted — check the action outcome'}])
+ assert.equal(f.container.children.length,1)
+ await f.queue.act('id','remove');await f.queue.act('id','steer');assert.equal(calls.length,0)
+ await f.queue.act('id','acknowledge');assert.equal(calls[0][1].action,'acknowledge')
+ f.update([],2);assert.equal(f.container.children.length,0)
+})
+test('Harness clears rapid initial inputs, keeps request IDs and resumes only an explicit idle Send',async t=>{
+ const dom=new JSDOM('<div></div><textarea></textarea>');t.after(()=>dom.window.close())
+ const container=dom.window.document.querySelector('div'),input=dom.window.document.querySelector('textarea'),calls=[];let release
+ const queue=createHarnessQueue({container,input,allowIdle:true,send:async(method,payload)=>{calls.push(payload);if(calls.length===1)await new Promise(r=>release=r);return {accepted:true}}})
+ assert.doesNotThrow(()=>queue.update({harness:'pi',capabilities:{queue:false},sessionId:null,phase:'ready',queue:null}))
+ queue.update({harness:'pi',capabilities:{queue:true},sessionId:'one',phase:'ready',running:false})
+ input.value='First';const first=queue.submit();input.value='Second';const second=queue.submit();await Promise.resolve();release();await Promise.all([first,second])
+ assert.equal(input.value,'');assert.deepEqual(calls.map(call=>call.text),['First','Second']);assert.deepEqual(calls.map(call=>call.resumeQueue),[true,false]);assert.notEqual(calls[0].requestId,calls[1].requestId)
+ assert.equal(container.children.length,2)
+})
+
+test('Harness submits an edited text snapshot without clearing a newer composer draft',async t=>{
+ const dom=new JSDOM('<div></div><textarea></textarea>');t.after(()=>dom.window.close());const container=dom.window.document.querySelector('div'),input=dom.window.document.querySelector('textarea'),calls=[]
+ const queue=createHarnessQueue({container,input,allowIdle:true,send:async(method,payload)=>{calls.push(payload);return {accepted:true}}})
+ queue.update({harness:'pi',capabilities:{queue:true},sessionId:'child',phase:'ready',running:false});input.value='Newer draft';assert(await queue.submitText('Edited snapshot'));assert.equal(input.value,'Newer draft');assert.equal(calls[0].text,'Edited snapshot');assert.equal(calls[0].sessionId,'child');assert.equal(calls[0].resumeQueue,true)
+})
+
+for(const [label,create] of [['Browser',createQueue],['Harness',createHarnessQueue]])test(`${label} inherited receipts cannot consume a child's reused request identity`,async t=>{
+ const dom=new JSDOM('<div></div><textarea></textarea>');t.after(()=>dom.window.close());const container=dom.window.document.querySelector('div'),input=dom.window.document.querySelector('textarea')
+ const queue=create({container,input,send:async()=>({accepted:true})}),state={harness:'pi',capabilities:{queue:true},sessionId:'child',phase:'ready',running:true}
+ queue.update(state);input.value='Child submission';await queue.submit();const id=container.firstElementChild.dataset.queueId
+ const delivery=origin=>({...state,entry:{sessionId:'child',event:{type:'user/message',data:{source:{kind:'user',sessionId:origin,rpcId:id}}}}})
+ queue.update(delivery('parent'));assert.equal(container.children.length,1);assert.match(container.textContent,/Child submission/)
+ queue.update(delivery('child'));assert.equal(container.children.length,0)
 })

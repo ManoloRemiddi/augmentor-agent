@@ -1,0 +1,186 @@
+{
+  "schema": "augmentor-harness-linux-ci-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX/Linux CI prerequisites and authored test driver corrections; no runtime or installed application change",
+  "baseSourceRef": "6c0c21e892de3c55680168a3d8db965245d1cf47",
+  "applicationCodeChanged": false,
+  "installedApplicationChanged": false,
+  "inputsSha256": {
+    ".github/workflows/validate.yml": "628c09f932084431c6f866df161685f6b2b17cc166edf251d419def17b097c9c",
+    "tests/harness-local-model-route-chromium.test.mjs": "944ad6f32e94b7ed4cd2d60718c33ac309d7c7d0e8dd69ffa5d006fe6e77faca",
+    "tests/harness-mcp-original-chromium.test.mjs": "3589ab0e7b92d496a2bd97fdb03475cddc2536136e9e4d9bdb9814c1afbb104d",
+    "tests/harness-metafolder-navigation-chromium.test.mjs": "60ff2708a6ada67e09e740a27e06c0c848f69f8496f90b73e7415fc982ed89e4",
+    "tests/pi-response-metrics.test.mjs": "abb8c90db3447a12740e82031738891e63f2f61d1e9265f6fd694ead4be8c41b"
+  },
+  "observedHostedFailure": {
+    "sourceRef": "d8f95b52a22db87eb0e75c86bb11e1108ae07048",
+    "job": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39006303358/job/117319648472",
+    "state": "completed/failure",
+    "tests": 2145,
+    "pass": 2037,
+    "fail": 64,
+    "skip": 44,
+    "failureFiles": 14,
+    "stage": "Build and verify SDK contracts; later Debian stages not reached"
+  },
+  "corrections": {
+    "debianExecutables": [
+      "zstd",
+      "desktop-file-validate"
+    ],
+    "debianPackages": [
+      "zstd",
+      "desktop-file-utils"
+    ],
+    "explicitCiExecutablePreflight": true,
+    "historicalSourceCodecAndDesktopValidationPolicyUnchanged": true,
+    "mcp": "Wait for the newly rendered Disable server control before reading its disabled property; do not dereference an absent transient element.",
+    "metafolders": "Use the real Workspace folders switch on the Plugins overview; the old detail-only Metafolders selector is absent there.",
+    "responseMetrics": "The authored provider now advertises its exact model through the existing localRouteMode fixture, allowing the declared llama.cpp adapter guard to qualify each request. Two-step probes are counted; removing the declaration adds no probes.",
+    "composer": "Require an editable composer, actual focus and the exact saved draft before one Send. The former presence-only selector could target the intentional cold-draft input gate.",
+    "timeoutsAndSecurityExpectationsWeakened": false,
+    "mutationReplayAdded": false
+  },
+  "localQualification": {
+    "priorFourFileReproduction": {
+      "tests": 14,
+      "pass": 11,
+      "fail": 3,
+      "skip": 0,
+      "failures": [
+        "MCP absent disabled property",
+        "obsolete Metafolders selector",
+        "metrics provider missing model advertisement"
+      ],
+      "localRouteBeforeCorrection": "Passed locally; the disabled Send failure was observed in hosted CI. Its precise timing was not reproduced; the missing ready/editable/focus/draft preconditions are now explicit."
+    },
+    "correctedTargeted": {
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "skip": 0,
+      "files": 4,
+      "concurrency": 2
+    },
+    "affectedCohort": {
+      "tests": 133,
+      "pass": 133,
+      "fail": 0,
+      "skip": 0,
+      "files": [
+        "tests/dsh-deferred-settlement-runtime.test.mjs",
+        "tests/dsh-deferred-settlement.test.mjs",
+        "tests/dsh-historical-project-runtime.test.mjs",
+        "tests/dsh-historical-project.test.mjs",
+        "tests/dsh-inherited-settlement-runtime.test.mjs",
+        "tests/dsh-inherited-settlement.test.mjs",
+        "tests/dsh-legacy-family.test.mjs",
+        "tests/harness-dsh-family-chromium.test.mjs",
+        "tests/harness-dsh-historical-closures-chromium.test.mjs",
+        "tests/harness-local-model-route-chromium.test.mjs",
+        "tests/harness-mcp-original-chromium.test.mjs",
+        "tests/harness-metafolder-navigation-chromium.test.mjs",
+        "tests/harness-plugin-controls.test.mjs",
+        "tests/harness-plugin-directory-chromium.test.mjs",
+        "tests/harness-plugin-switches-chromium.test.mjs",
+        "tests/harness-review-runtime.test.mjs",
+        "tests/local-model-route-runtime.test.mjs",
+        "tests/local-model-route-workers.test.mjs",
+        "tests/local-model-route.test.mjs",
+        "tests/pi-response-metrics.test.mjs"
+      ],
+      "concurrency": 2,
+      "includesAll14HostedFailureFiles": true,
+      "includesPluginSwitchAndDirectoryAndLocalRouteGuardTests": true
+    },
+    "workflowYamlParsed": true,
+    "realLocalExecutablesPresent": true,
+    "freshDebianImageNotRunLocally": true,
+    "wholeRepositorySuiteNotClaimed": true,
+    "ownerDataUsed": false,
+    "ownerModelRequests": 0,
+    "additionalRealProjectTransfers": 0
+  },
+  "installedReview": {
+    "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+    "releaseId": "20261017-071945-90183f89",
+    "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+    "change": "none"
+  },
+  "hostedCorrectionStatus": "Correction validated on d531ba6c: full root/browser/native and desktop stages pass. Public Debian packaging refuses the pre-existing unqualified Office exact engine source/rebuild; no gate relaxation or whole-workflow acceptance.",
+  "remaining": [
+    "Observe normal validation on the newer queue-control implementation; see its separate installed qualification.",
+    "Public Office exact-source/rebuild qualification; no binary publishing or gate bypass.",
+    "Owner pilot feedback before further project transfers; voice/later OS deferred."
+  ],
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      },
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 14,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "observedHostedCorrection": {
+    "sourceRef": "d531ba6cac125203aed79eb8751e5a761ca782d3",
+    "job": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39008117625/job/117324921621",
+    "jobConclusion": "failure",
+    "failingStep": "Build Debian packages with binary notices",
+    "root": {
+      "tests": 2145,
+      "pass": 2101,
+      "fail": 0,
+      "skip": 44
+    },
+    "browser": {
+      "tests": 128,
+      "pass": 128,
+      "fail": 0,
+      "skip": 0
+    },
+    "native": {
+      "tests": 1052,
+      "result": "OK",
+      "skip": 45
+    },
+    "declaredToolsPreflight": "success",
+    "dshSetupApprovalsBranching": "success",
+    "runtimeRecovery": "success",
+    "promptEditorAndX11DesktopFlows": "success",
+    "publicOfficeRebuildQualified": false,
+    "publicPackagingGatePreserved": true,
+    "installedPackageAndPackagedBrowserJobs": "skipped after packaging refusal"
+  }
+}

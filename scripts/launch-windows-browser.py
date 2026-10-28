@@ -45,12 +45,14 @@ def main():
         sys.stderr = stream
         try:
             from lifecycle.lease import hold
-            from windows_supervisor import ensure
+            from windows_supervisor import ensure, restore_selected
             from platform_adapters.processes import OwnedProcess
             from platform_adapters.paths import runtime_directory
             from lifecycle.browser_control import BrowserControlServer
             from lifecycle.windows_startup import native_ready
             hold('runtime'); ensure(ROOT)
+            try:restore_selected(ROOT)
+            except (OSError,ValueError) as error:print('The selected managed DSH could not be restored:',error,file=sys.stderr)
             environment = {**os.environ}
             environment.pop('NODE_OPTIONS', None); environment.pop('NODE_PATH', None)
             started=threading.Event(); child=None

@@ -1,0 +1,102 @@
+{
+  "schema": "augmentor-harness-shared-launch-package/1",
+  "date": "2026-10-17",
+  "applicationRef": "22103e61915b18e49926c463f8348a7fd9735509",
+  "releaseId": "20261017-151405-6c6b7080",
+  "artifactSha256": "63ea2dd8c66ec8f6d521aa3a57616ca456fd781b17618ca259a9ec9d50da5c08",
+  "baseArtifactSha256": "abba662e06ec8c711d89605fa969f39c9318f088436123ea6163729faecd36ce",
+  "inventoryEntriesVerified": 24759,
+  "compiledFilesVerified": 1143,
+  "scope": "Fresh immutable private MX candidate; no selected owner bootstrap, shared-data binding or project transfer",
+  "qualification": {
+    "sourceNodePass": 29,
+    "ordinaryNodePass": 29,
+    "exactSealedNodePass": 29,
+    "sourcePythonPass": 77,
+    "ordinaryPythonPass": 77,
+    "exactSealedPythonPass": 77,
+    "exactSealedDeclaredInterpreterBindingPass": 11,
+    "declaredInterpreterCasesOverlap77": true,
+    "fail": 0,
+    "skip": 0,
+    "nodeFiles": 7,
+    "workers": 2,
+    "actualGeneratedBrowserHostHandshakeTargetOnlyWriteBusyGateAndReopen": true,
+    "actualCliUsesAuthoredPreflightImportLifetimeStubs": true,
+    "nativeMobileExecMocked": true,
+    "testsAndFixturesExternal": true,
+    "sealedBytesReverifiedAfterTests": true,
+    "productionNodeDependenciesComponentsAndNoticesUnchanged": true,
+    "compiledBytesMatchCurrentSource": true
+  },
+  "activated": false,
+  "installedBootstrapChanged": false,
+  "ownerDataCopied": false,
+  "ownerModelRequests": 0,
+  "ownerProjectsTransferred": 0,
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "runtimeCi": {
+    "run": 39035553761,
+    "head": "22103e61915b18e49926c463f8348a7fd9735509",
+    "event": "pull_request",
+    "statusObserved": "in_progress",
+    "conclusionUnproven": true,
+    "sourceBoundaryHomeAndHandyPass": true,
+    "noDuplicateDispatched": true
+  },
+  "publicOfficeRedistributionQualified": false,
+  "remaining": [
+    "Version-matched installed owner Native/Browser and fixed-source mobile/custom/review entrypoint adoption",
+    "Fresh full cold backup/export/consolidation of authoritative existing stores",
+    "Actual existing banks/person/settings/history/charges and busy-work/restart/reboot/rollback acceptance",
+    "Owner pilot feedback before any further real project transfer; excluded project stays DSH",
+    "Full accepted parity and public redistribution remain open; voice/later OS deferred"
+  ],
+  "privateEvidenceLogSha256": {
+    "harness-shared-launch-ordinary-node-20261017.log": "58acd6fd40a5b0a72191d70f03c08e87dd188bca4d1508a70b5fdd28f2dcf47f",
+    "harness-shared-launch-ordinary-python-20261017.log": "7aea7693bef1c1c2951c748109431a658907cc50ce142d26ca856285690797e1",
+    "harness-shared-launch-sealed-node-20261017.log": "79deb16219caf9e58e7cf2e4d6555162750d848af0ea882d9a7cd62a165a208c",
+    "harness-shared-launch-sealed-python-20261017.log": "9fc73615e289427345ff7caf92c70a3cd1ca839241b2c365207cd5d5a4e1a0e7",
+    "harness-shared-launch-sealed-declared-python-20261017.log": "3203d3b0ab2238b37a8199e8f9fc4068884180abac3d5a4ae73aefd9e510d77c",
+    "harness-shared-launch-package-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  }
+}

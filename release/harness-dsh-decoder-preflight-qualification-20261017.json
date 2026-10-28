@@ -1,0 +1,110 @@
+{
+  "schema": "augmentor-dsh-decoder-preflight-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX Linux source/operator-tool and Debian runtime dependency correction; installed reviews unchanged",
+  "sourceEvidenceBaseRef": "6241c278ce2c0c28958394be9d262e4e86c834f0",
+  "behaviour": {
+    "runtimeDependency": "zstd",
+    "cliPreflightBeforeDshClient": true,
+    "directCapturePreflightBeforeSourceIndexAndStage": true,
+    "existingZstdDecoderRetained": true,
+    "missingDecoderAutomaticInstall": false,
+    "formatOrNormalizedProducerChanged": false
+  },
+  "qualification": {
+    "pythonTests": 52,
+    "pythonPass": 52,
+    "pythonFail": 0,
+    "pythonSkip": 0,
+    "nodeTests": 90,
+    "nodePass": 90,
+    "nodeFail": 0,
+    "nodeSkip": 0,
+    "pythonFiles": [
+      "test_dsh_legacy_family.py",
+      "test_dsh_legacy_source_fetch.py",
+      "test_dsh_legacy_assets.py",
+      "test_codex_packaging.py",
+      "test_office_engine_packaging.py"
+    ],
+    "nodeFiles": [
+      "dsh-legacy-family.test.mjs",
+      "dsh-legacy-assets.test.mjs",
+      "dsh-legacy-descriptor.test.mjs"
+    ],
+    "missingDecoder": {
+      "actualCliSubprocess": true,
+      "emptyExecutableSearchPath": true,
+      "loopbackListenerConnections": 0,
+      "exitCode": 2,
+      "actionableError": true,
+      "traceback": false,
+      "sourceBytesUnchanged": true,
+      "outputOrStageCreated": false,
+      "directCaptureIndexOrValidationCallbackCalled": false
+    },
+    "actualGeneratedRuntimeControlIncludesZstd": true,
+    "officePublicPackagingRefusalStillTested": true,
+    "installerBuiltOrInstalled": false
+  },
+  "retainedBaselineFailure": {
+    "sourceRef": "6241c278ce2c0c28958394be9d262e4e86c834f0",
+    "negativeCases": 2,
+    "failures": 2,
+    "cliBaselineProbe": "Malformed remote syntax; previous CLI reaches Remote instead of decoder preflight",
+    "correctedCliProbe": "Valid authored loopback listener; zero connections",
+    "failedLogsRetained": true
+  },
+  "sourceFilesSha256": {
+    "scripts/capture-dsh-legacy-family.py": "aa12df1ad94a058674d8dd1240e0f42410921c54f24c21286ef4f057fd226e2a",
+    "scripts/dsh_legacy_family.py": "c55baa5adfc28b32be477603bd847d33688f45e86fc8e3772255db02ca561792",
+    "scripts/package-debian.py": "60b66193b95f803efd3015ec4be300ef9766c3e2206047c2a5e333ee4e051171",
+    "tests/test_dsh_legacy_family.py": "7df0f27a156e2a19f8f396823be06bbd77cd292478878d66b19538ad7f0fdf27"
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      },
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 16,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "remaining": [
+    "Source correction is not a new installed artifact; both MX owners remain on fcf9d32a.",
+    "New-source hosted validation is separate from the completed installed-source Linux result.",
+    "Public Office source/rebuild/notice qualification remains open; no public installer or release.",
+    "Owner pilot feedback still gates further real migration; voice and later platforms stay deferred."
+  ]
+}

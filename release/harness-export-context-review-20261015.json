@@ -1,0 +1,277 @@
+{
+  "schema": "augmentor-session-export-context-mx-review/1",
+  "observedAtUtc": "2026-10-15T19:24:32.292822+00:00",
+  "releaseId": "20261015-211446-7474ddb2",
+  "publicSourceRef": "681a85819bd83329c01cdd9761d048f96cc65093",
+  "testedApplicationRef": "8c159cb719f56a8a76aabd2e694db72717822464",
+  "testedCohortSourceRef": "49e23de492609bad9f22ef54e023584ff54b53bf",
+  "productVersion": "0.2.13",
+  "piSdk": "1.1.0",
+  "artifactSha256": "fba675c05c8e40dd1b8b01dd96ac517930fa79a0f205fdf9592230374810c31d",
+  "inventoryEntries": 24468,
+  "scope": {
+    "privateUnselectedMxOwnerReviewReady": true,
+    "installedSelectionChanged": false,
+    "publicBinaryPublished": false,
+    "merged": false,
+    "ownerDataCopied": false,
+    "profile": "fresh Read Only/keyless/local payload capture; existing loopback Qwen declaration only, with no conversations/credentials/memory/voice/MCP/custom-skill configuration imported",
+    "ownerInitialQaIsHistorical": true,
+    "physicalOwnerAcceptanceEstablished": false,
+    "fullP0P1MigrationQualified": false
+  },
+  "included": [
+    "original MIT DSH session download Header/menu/modal/controller and /export on verified Pi originals, diagnostics, children and authorized declared uploads",
+    "late Context provenance arrival without rereading an unchanged request or accepting retired results",
+    "original skill/Permission/Trajectory/Context controls and large JSON viewer",
+    "thicker animated Augmentor marks; black Light flare, retained Dark flare and theme text inheritance"
+  ],
+  "provenance": {
+    "baseSourceRef": "a0db6ea1f6e019f31e14f8152443bfc4a87838d5",
+    "baseArtifactSha256": "17c82a5e372fe1ad72e8c26b795da09cdf6bc6f9feab422d76199d7db2d7d851",
+    "baseInventoryEntries": 24440,
+    "selectedPublicArtifactFiles": 30,
+    "compiledFiles": 1045,
+    "harnessSourceFiles": 820,
+    "allCompiledAndHarnessSourceBytesMatch": true,
+    "productionNpmInstances": 151,
+    "dependencyNodeComponentBytesUnchanged": true,
+    "guiSupplierInputs": 615,
+    "noticeFiles": 911,
+    "noticeAssemblyWrittenFiles": 40,
+    "verifiedSearchSourceRecords": 52,
+    "preferredOfficeSourcesRetained": true,
+    "publicOfficeEngineRedistributionQualified": false
+  },
+  "sourceAndOrdinary": {
+    "portableRecord": "release/harness-session-export-qualification.json",
+    "source": {
+      "tests": 656,
+      "pass": 654,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "todo": 0
+    },
+    "ordinary": {
+      "tests": 656,
+      "pass": 654,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "todo": 0
+    },
+    "testFiles": 116,
+    "harnessChromiumFiles": 53,
+    "workersPerCohort": 2,
+    "boundsUnchanged": true
+  },
+  "sealedTarget": {
+    "tests": 656,
+    "pass": 654,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 2,
+    "logSha256": "6c592e22e0c2fbd9dd045fb1a09b682eccd4ef7b99182b732b6f4506de441c0c",
+    "testFiles": 116,
+    "harnessChromiumFiles": 53,
+    "workers": 2,
+    "rosterRecord": "release/harness-session-export-qualification.json"
+  },
+  "exactSealedGui": {
+    "result": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "762cf2a0ba49d9fa4dcf6c7e728dc7697d12e4a708b7ced7974b8aade0004986"
+    },
+    "originalExportActualBrowserZipAndHashes": true,
+    "parentChildAndUploadOriginalBytesVerified": true,
+    "failedExportAndNewerDraftPreserved": true,
+    "lightAndDarkOriginalDialogs": true,
+    "lateRealProvenanceFramesAndRetiredReadsVerified": true,
+    "originalSkillNativeSdkAndLiteralProviderLinks": true,
+    "largeOriginalJsonViewerVerified": true,
+    "fullCausalProvenanceEstablished": false,
+    "screenshotsInspected": true,
+    "screenshotsSha256": {
+      "export-light": "2a2c2bdf49a3a068ef682019568cfb6258ed53ccfd2eae7a9dadd6981f89ee0b",
+      "export-dark": "f5997772de328ca0755353e87a352db3b1a9f4728e238756fcd1a994a3e08285",
+      "light": "b55cd3538afb2ac924aea181c95b1f5f7018d65bbcb375b2d09804ccb0cee84b",
+      "dark": "fed4ccfdff90bc32b57314a8092a4d904a3d9273c14aa648bff7f3c6ee9c66c6",
+      "managed-context-light": "f68d8332532264a166f98e110be530224382807b544762bdd8cdbc60c2c1466f",
+      "managed-context-dark": "38cd5a6b915f0a931eb2617b6464c1178b47fcb5843fd55f422cc456533effee"
+    }
+  },
+  "initialOwnerQa": {
+    "passed": true,
+    "checks": {
+      "exactRuntimeAndProfile": true,
+      "product": "0.2.13",
+      "piSdk": "1.1.0",
+      "sessions": 0,
+      "activeTurns": 0,
+      "unsentDrafts": 0,
+      "readOnly": true,
+      "keylessSearch": true,
+      "localCapture": true,
+      "originalStartPage": true,
+      "planModeCapability": true,
+      "currentPermissionCapability": true,
+      "skillReferencesCapability": true,
+      "sessionExportCapability": true,
+      "newChatPermissionDefaultRow": true,
+      "twoAugmentorMarks": true,
+      "composerDisabledUntilNewSession": true,
+      "settingsAvailable": true,
+      "browserErrors": 0,
+      "failedResponses": 0,
+      "noModelOrToolWorkSubmitted": true
+    },
+    "themes": {
+      "Light": {
+        "stroke": "2px",
+        "color": "rgb(0, 0, 0)",
+        "background": "rgba(0, 0, 0, 0)",
+        "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.396), rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))",
+        "settingsText": "rgb(15, 17, 21)",
+        "bodyText": "rgb(15, 17, 21)",
+        "animations": [
+          "brand-shape",
+          "brand-flow",
+          "brand-breath"
+        ]
+      },
+      "Dark": {
+        "stroke": "2px",
+        "color": "rgb(249, 250, 251)",
+        "background": "rgba(0, 0, 0, 0)",
+        "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(180, 160, 255, 0.396), rgba(0, 0, 0, 0) 50%, rgba(122, 174, 255, 0.5), rgba(0, 0, 0, 0))",
+        "settingsText": "rgb(249, 250, 251)",
+        "bodyText": "rgb(249, 250, 251)",
+        "animations": [
+          "brand-shape",
+          "brand-flow",
+          "brand-breath"
+        ]
+      }
+    },
+    "permissionControls": {
+      "futureDefaultReadOnly": true,
+      "fullConfirmationOpenedAndCancelled": true,
+      "unacknowledgedAcceptanceDisabled": true,
+      "currentCapability": true,
+      "noModeWrite": true
+    },
+    "accountControls": {
+      "registeredProviders": 9,
+      "storedCredentials": 0,
+      "originalConfirmationOpenedAndClosed": true,
+      "sdkLoginAdmitted": false
+    },
+    "finiteDialogTransitionsSettled": true,
+    "ownedQaBrowserTerminal": true,
+    "allFiveScreenshotStatesInspected": true,
+    "qaLogSha256": "831c5c2229eda7e6a55021d77b833f8464d74d5de3a3c3d94cf71f1752bcdd6e",
+    "screenshotsSha256": {
+      "start": "d34e457a17870d4e06a191b1dc3f4f2c4821305a4945d947c3e9e5456e8b1b1e",
+      "light": "fd0d7bbbe3e35eb1600193a83e0a5fac87ca40b3b87353cffeb2ae5e18c56a33",
+      "dark": "24dc58635884794f8062e2f1b640f8348600dba0a7f11ad9afcc45e60dbaac52",
+      "permission-confirmation": "27966567f3ab7239b63d5f687145d8eaeaedba48420acd4ddecff2f05336d70d",
+      "accounts": "b08b9aa4448bee70412c1d52e8daf4a29a406c2ad2774e93ca3229f2cd6028aa"
+    }
+  },
+  "exactSealedLiveProof": {
+    "passed": true,
+    "phase": "qualified",
+    "contextWindow": 262144,
+    "maxTokens": 8192,
+    "ownerDataUsed": false,
+    "modelSpeechGpuSettingsChanged": false,
+    "appHostSha256": "46272c0ba3b9a3b14bb199fa2b81d9db8483d6acaa4eb1ffea597d962bad7257",
+    "appGuiSha256": "897653fd4e9e2e077233cd470d95339833678e847fec8d88410d7b000bc808cb",
+    "driverSha256": "086e8e9b7cb46e39ee5446c2d5bce4739fb7e2b3c47a5b55a4eeee79298ebdaf",
+    "environmentCredentialsInherited": false,
+    "memoryInferenceConfigurationImported": false,
+    "livePlanContainsReadMarker": true,
+    "monitoredPageDestinationsLocalOnly": true,
+    "actualOutputLimit": 8192,
+    "providerRequests": 3,
+    "toolCalls": 2,
+    "toolNames": [
+      "read",
+      "exit_plan_mode"
+    ],
+    "planWaitingWithoutForegroundDeadline": true,
+    "requestChangesConcludesWithoutApproval": true,
+    "bareModeOffInference": false,
+    "toolCatalogUnchanged": true,
+    "readOnly": true,
+    "workspaceNoteUnchanged": true,
+    "nativeSha256": "a1a9cdd402c865a2a18e1685f0918c6a80c8783976ea9296becd6aa21c8bdcf0",
+    "coldNativeAndDisplayExact": true,
+    "coldSavedPlanReopensWithoutInference": true,
+    "browserErrors": 0,
+    "failedResponses": 0,
+    "providerHealthOnly": false,
+    "allOwnedActorsTerminal": true,
+    "ownedActors": 5,
+    "scope": "isolated actual-Qwen synthetic plan/read/mode-off/cold-history fixture; not owner-profile activity"
+  },
+  "preservation": {
+    "tenSealedInventoriesVerified": true,
+    "elevenReviewProcessesPresent": true,
+    "selectedConfigurationSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalWorkingTreeChanges": 38,
+    "modelSpeechGpuConfigurationBytesPreserved": true,
+    "speechOrGpuServiceMutationsThisCheckpoint": false,
+    "priorReviewsUnchanged": true,
+    "newReviewHttpStatus": 200
+  },
+  "speech": {
+    "qwenCatalogHttpStatus": 200,
+    "breezeState": "failed",
+    "voiceState": "inactive",
+    "readinessRecord": "release/harness-speech-readiness-20261015.json",
+    "liveVoiceQualified": false
+  },
+  "hostedSdk": {
+    "runId": 38792023760,
+    "sourceRef": "681a85819bd83329c01cdd9761d048f96cc65093",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38792023760",
+    "status": "completed",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "contracts (macos-14)",
+        "status": "completed",
+        "conclusion": "success",
+        "failedSteps": []
+      },
+      {
+        "name": "contracts (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success",
+        "failedSteps": []
+      },
+      {
+        "name": "contracts (windows-2025)",
+        "status": "completed",
+        "conclusion": "failure",
+        "failedSteps": [
+          "Verify session archive selection, one-use downloads and ZIP lifecycle"
+        ]
+      }
+    ],
+    "windowsFailureEvidence": "47 pass/two fail/one POSIX-symlink skip in the 50-case export step; both actual Host fixtures time out settling a prompt before export preparation. Root cause unproven; no timeout increase, skip, rerun-to-hide or Windows artifact promotion."
+  },
+  "remainingGates": [
+    "physical MX owner feedback/refinement and guarded installed adoption",
+    "current shared Windows prompt-settlement failures and later Windows/macOS/other Linux artifacts",
+    "complete causal provenance and global skill analytics",
+    "representative remaining plugin/companion, memory, live voice, OAuth/MCP, Office and Home acceptance",
+    "full P0/P1 migration, public release and DSH retirement"
+  ]
+}

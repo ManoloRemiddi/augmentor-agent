@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/vectorize-io/hindsight",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2025 Vectorize AI, Inc.",
+  "upstreamFixRef": "022583d43b3ae460233c9df880040c0770f24e0b",
+  "upstreamFixPath": "hindsight-api-slim/hindsight_api/engine/memory_engine.py",
+  "baseRef": "5d46f9c8c8eb4fb96f549aa63abe1191b82a7840",
+  "baseGitBlob": "df43b37f0093fb5d3c3037858126620f9e5b4790",
+  "baseImage": "ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b",
+  "containerPath": "/app/api/hindsight_api/engine/memory_engine.py",
+  "baseSha256": "770ea9011dec620c6c6584f8889ccf73740f9489586e5745fd0164fd636eafba",
+  "resultSha256": "dd82621a04fc20f3535be823d3a6a2712572928e54ac9fa73541cdb463ecf4f0",
+  "patchSha256": "229dd6019362cabf8bca9b126babe22a6aa15d98d05b0bf37c81bc4b54a0cbcc",
+  "licenseSha256": "01fde0bedf83bdc185065d7af524a61690efe576a67f922eaff3a1280c17b63a",
+  "adaptation": "Only the upstream refresh budget constant, per-refresh selection and explicit Reflect argument are backported into the exact 0.10.0 image source; shortened comment/context adapted. Newer API/UI/CLI/schema/config-option changes are not selected.",
+  "scope": "Opt-in isolated proof overlay only; configured max iterations remains two and existing job/call/time/token/output/concurrency/model settings remain unchanged."
+}

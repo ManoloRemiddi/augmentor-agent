@@ -1,0 +1,125 @@
+[
+  [
+    "Calibri",
+    "Carlito"
+  ],
+  [
+    "Calibri Light",
+    "Carlito",
+    "Calibri"
+  ],
+  [
+    "Cambria",
+    "Caladea"
+  ],
+  [
+    "宋体",
+    "SimSun",
+    "NSimSun",
+    "Songti SC",
+    "STSong",
+    "Noto Serif CJK SC",
+    "Noto Serif SC",
+    "Source Han Serif SC"
+  ],
+  [
+    "黑体",
+    "SimHei",
+    "Heiti SC",
+    "STHeiti",
+    "Noto Sans CJK SC",
+    "Noto Sans SC",
+    "Source Han Sans SC"
+  ],
+  [
+    "微软雅黑",
+    "Microsoft YaHei",
+    "Microsoft YaHei UI",
+    "PingFang SC",
+    "Noto Sans CJK SC",
+    "Noto Sans SC"
+  ],
+  [
+    "楷体",
+    "KaiTi",
+    "Kaiti SC",
+    "STKaiti",
+    "LXGW WenKai"
+  ],
+  [
+    "仿宋",
+    "FangSong",
+    "STFangsong",
+    "Songti SC",
+    "Noto Serif CJK SC"
+  ],
+  [
+    "sans-serif",
+    "Arial",
+    "Liberation Sans",
+    "Helvetica",
+    "DejaVu Sans",
+    "Calibri",
+    "Calibri Light",
+    "Carlito",
+    "Microsoft YaHei",
+    "Microsoft YaHei UI",
+    "微软雅黑",
+    "PingFang SC",
+    "Noto Sans CJK SC",
+    "Noto Sans SC",
+    "Source Han Sans SC",
+    "SimHei",
+    "黑体",
+    "Heiti SC",
+    "STHeiti"
+  ],
+  [
+    "serif",
+    "Times New Roman",
+    "Liberation Serif",
+    "Times",
+    "DejaVu Serif",
+    "Cambria",
+    "Caladea",
+    "SimSun",
+    "NSimSun",
+    "宋体",
+    "Songti SC",
+    "STSong",
+    "Noto Serif CJK SC",
+    "Noto Serif SC",
+    "Source Han Serif SC"
+  ],
+  [
+    "monospace",
+    "Courier New",
+    "Liberation Mono",
+    "DejaVu Sans Mono",
+    "Menlo",
+    "Monaco",
+    "Courier",
+    "NSimSun",
+    "Noto Sans Mono CJK SC",
+    "Microsoft YaHei",
+    "Microsoft YaHei UI",
+    "微软雅黑",
+    "PingFang SC",
+    "Noto Sans CJK SC",
+    "Noto Sans SC",
+    "Source Han Sans SC",
+    "SimHei",
+    "黑体",
+    "Heiti SC",
+    "STHeiti"
+  ],
+  [
+    "Symbol",
+    "Standard Symbols PS",
+    "Symbola",
+    "Segoe UI Symbol",
+    "Apple Symbols",
+    "FreeSerif",
+    "DejaVu Sans"
+  ]
+]

@@ -1,0 +1,78 @@
+{
+  "schema": "augmentor-tablet-bottom-composer-evidence/1",
+  "date": "2026-10-25",
+  "sourceRef": "ab7f1665",
+  "supersedesLayoutIn": "tablet-dictation-installed-20261025.json",
+  "productVersion": "0.2.13",
+  "installed": {
+    "review": "pilot",
+    "releaseId": "20261025-191212-2ea08039",
+    "artifactSha256": "d91c30a1df5613e1b2ea4b1b20ada639a52e09aa52ea61cd075c52fc779db6e4",
+    "selectedAndRunningMatch": true,
+    "matchingPrivateMobileAssets": true
+  },
+  "behavior": {
+    "originalInputCount": 1,
+    "editorRemainsInsideOriginalCard": true,
+    "threeButtonsBelowCardAtBottom": true,
+    "focusFloatsEditorOrButtons": false,
+    "emptyChatsAlsoUseBottomPlacement": true,
+    "dictationAndExplicitSendUnchanged": true
+  },
+  "validation": {
+    "buildCohort": {
+      "passed": 82,
+      "failed": 0,
+      "skipped": 0
+    },
+    "exactSealedPackage": {
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0
+    },
+    "physicalLenovo": {
+      "portrait": {
+        "oneOriginalInput": true,
+        "editorStaysInOriginalCard": true,
+        "buttonsStayBelowCard": true,
+        "verticalFocusShiftPx": 0.0,
+        "bottomGapPx": 37.636,
+        "noFixedOrAbsoluteEditor": true,
+        "controlRowNormalFlow": true
+      },
+      "landscape": {
+        "oneOriginalInput": true,
+        "editorStaysInOriginalCard": true,
+        "buttonsStayBelowCard": true,
+        "verticalFocusShiftPx": 0.0,
+        "bottomGapPx": 37.727,
+        "noFixedOrAbsoluteEditor": true,
+        "controlRowNormalFlow": true
+      }
+    },
+    "typedDraftPreservedAcrossRotation": true,
+    "testHumanMessages": 0,
+    "priorChatsRetained": 135,
+    "allPriorChatsRetained": true,
+    "testDraftCleared": true,
+    "addedVerificationChatArchived": true,
+    "desktopPageRefreshed": true
+  },
+  "cleanup": {
+    "devicePreferencesRestored": true,
+    "inspectionForwardRemoved": true,
+    "managedScratchRetained": false,
+    "additionalMobileCandidatesRetained": 2
+  },
+  "localScreenshotSha256": {
+    "lenovo-bottom-portrait.png": "4ea6c1da578143653c1166b15fda7b3dc1793b5c7d59f178dbb07a52300da54b",
+    "lenovo-bottom-landscape.png": "a97cc1ba7b20a296bfd4bb0b4c00f4575107c1c3860dc54bc8525ba2512be850"
+  },
+  "scope": "MX pilot shared UI; physical Lenovo Android 16/Chrome; existing model, voice and profile configuration retained",
+  "remainingQualification": [
+    "installed macOS/Windows",
+    "Pixel on this build",
+    "device-local recognizer",
+    "owner feedback on conversational speech/reply smoothness"
+  ]
+}

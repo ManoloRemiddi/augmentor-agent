@@ -1,0 +1,573 @@
+{
+  "schema": "augmentor-hindsight-installation-qualification/1",
+  "date": "2026-10-16",
+  "observedAtUtc": "2026-10-16T04:06:43.735407+00:00",
+  "functionalInstallerSourceRef": "60fa55f4e6089ddd017ede74ae89898a1571f3f6",
+  "privateRollbackConfigurationFixRef": "d6361bd1bd3a36e9dd787c08ccb7569dcb0b18e8",
+  "runtimeAndGuiSourceRef": "b7e0afaa86db9e76e3422583f5e9c4a77cbdf314",
+  "productVersion": "0.2.13",
+  "piSdkVersion": "1.1.0",
+  "scope": "Linux source/fresh ordinary and actual offline-cache pinned Docker installation, full Pi/Hindsight/Qwen scenario, nonempty-volume restart/replacement and separate archive restoration; synthetic banks only; owner engine/review/selection preserved",
+  "installerContract": {
+    "pinnedEngineVersion": "0.10.0",
+    "sourceSelection": "Exact existing MIT refresh-default backport, explicit choice and read-only mount",
+    "sourceAcquisition": "Never-started exact-image container; exact original/result/patch/license hashes; owned cleanup before artifact use",
+    "savedChoicesPreservedOnOmission": [
+      "backport",
+      "thinking",
+      "ports",
+      "name",
+      "volume",
+      "restartPolicy",
+      "publicModelCache"
+    ],
+    "runningChangedEngineReplaced": false,
+    "stoppedReplacement": "Exact-ID named-volume backup, archive validation/fsync/hash and private rollback configuration before rename; old instance retained without restart",
+    "inspectErrorsTreatedAsAbsence": false,
+    "lostCreationAcknowledgement": "Explicit private-receipt recovery verifies matching instance without replaying creation or replacement",
+    "configurationAndBackupManifestPermissions": "0600, private credential-bearing state",
+    "sourceArtifactsRepairedInPlace": false,
+    "telemetryOptOutsIncludedAndChecked": true,
+    "automaticArchiveProcessingAuthorized": false,
+    "gatewayOrModelBudgetGrantedByInstall": false
+  },
+  "tests": {
+    "sourcePython60fa": {
+      "pass": 61,
+      "fail": 0,
+      "skipped": 0
+    },
+    "ordinaryPython60fa": {
+      "pass": 61,
+      "fail": 0,
+      "skipped": 0
+    },
+    "sourcePythonRollbackFix": {
+      "pass": 61,
+      "fail": 0,
+      "skipped": 0
+    },
+    "ordinaryPythonRollbackFix": {
+      "pass": 61,
+      "fail": 0,
+      "skipped": 0
+    },
+    "freshOrdinaryMemoryNode": {
+      "pass": 31,
+      "fail": 0,
+      "skipped": 0,
+      "workers": 2
+    },
+    "unchangedSourceMemoryNode": {
+      "pass": 31,
+      "sourceRef": "b7e0afaa86db9e76e3422583f5e9c4a77cbdf314",
+      "nodeRuntimeAndInputsUnchanged": true
+    },
+    "sourceLicenseBoundary": {
+      "pass": 25,
+      "fail": 0,
+      "skipped": 0
+    },
+    "privateConfigurationNegativeControl": {
+      "baseRef": "60fa55f4e6089ddd017ede74ae89898a1571f3f6",
+      "failsAsExpected": true,
+      "failure": "Previous private configuration absent from the backup manifest",
+      "sameFinalPositiveAssertionPasses": true
+    },
+    "existingBoundsWorkersSkipsChanged": false
+  },
+  "frozenInputs": {
+    "functionalTracked": 3415,
+    "rollbackTracked": 3415,
+    "compiled": 1063,
+    "nodeExecutables": 1,
+    "dependencyInputs": 20702,
+    "functionalAndRollbackBeforeAfterUnchanged": true,
+    "compiledAndProductionDependenciesUnchangedFromPriorReview": true,
+    "inventorySha256": {
+      "dist": "d46cc2a135506b52bca0787fc11fcde0a090c90f5793d4c1d089bcf251a8f934",
+      "node": "7cf49748be9dfbbd046a98a2769dfc8b8366eeb661a450827711c5094a9b5a24",
+      "node_modules": "0704a733803a7dabae4dd66e7726e15cd750c0b6d29d552c604ba7dd331b4bab"
+    }
+  },
+  "fullActualMemoryResult": {
+    "passed": true,
+    "scenario": "full",
+    "phase": "qualified",
+    "applicationHostSha256": "6b05f2eed32ac17e558f464b8494b991ffc80c42ce55d780312cce056d865a78",
+    "driverSha256": "87d025929a4bc17333e96437681b9f10e40a7084787a3cfee61fd3c229d68d95",
+    "memoryThinkingMode": "off",
+    "baselineMemoryThinkingMode": "default",
+    "explicitMemoryModeOverride": true,
+    "seed": {
+      "relationshipSha256": "7784b60e3cb4a07e7a63aadf36bdf4932cf7a96852e59ffbcdb57841d2b41a02",
+      "workSha256": "dd5ec6334b08ade7c61404e406ba6183695172291ecae3c79ba9addbc4ece726"
+    },
+    "recall": {
+      "nativeBriefSha256": "6f35d3cd114272ede436231d957ed20daf31cb3d781159bd51c5b25ce92a1c8d",
+      "actualProviderContext": true,
+      "actualAnswer": true
+    },
+    "personProjectIsolation": true,
+    "updatedMemorySha256": "7d4e1d69b50ea8aa86bdc66de9df2721abf5ddc1320b473ab380cfa0f8418fb7",
+    "historicalBranch": {
+      "originalBriefSha256": "6f35d3cd114272ede436231d957ed20daf31cb3d781159bd51c5b25ce92a1c8d",
+      "noFreshRecall": true,
+      "parentUnchanged": true
+    },
+    "coldBranchAndMemoryRestart": true,
+    "pause": {
+      "chatAvailable": true,
+      "captureAndRecallSuppressed": true
+    },
+    "memoryOutage": {
+      "ordinaryChat": true,
+      "emptyManagedBrief": true,
+      "durableCaptureRecoveredOnce": true,
+      "modelOrToolReplay": false
+    },
+    "authoredToolExecutions": 2,
+    "conversationRequests": 10,
+    "memoryRpcCalls": 1600,
+    "providerOutputLimitsPreserved": true,
+    "engineStopped": true,
+    "allOwnedActorsTerminal": true
+  },
+  "actualMemoryTransportReceipts": [
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2817
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3734
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2329
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2763
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1307
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1062
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1433
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2045
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1996
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1920
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2525
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2914
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2614
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3363
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1636
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2013
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1381
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2832
+    }
+  ],
+  "completedJobs": [
+    {
+      "phase": 6,
+      "status": "completed",
+      "attempt": 0
+    },
+    {
+      "phase": 6,
+      "status": "completed",
+      "attempt": 0
+    }
+  ],
+  "completedJobBudgets": [
+    {
+      "remainingSeconds": 102.50271952501498,
+      "remainingTokens": 37527,
+      "calls": 8,
+      "failures": 0,
+      "status": "pending"
+    },
+    {
+      "remainingSeconds": 96.80082896503154,
+      "remainingTokens": 26853,
+      "calls": 10,
+      "failures": 0,
+      "status": "pending"
+    }
+  ],
+  "nativeNonemptyVolumeLifecycle": {
+    "passed": true,
+    "sourceRef": "60fa55f4e6089ddd017ede74ae89898a1571f3f6",
+    "fullProofPassed": true,
+    "phases": [
+      {
+        "phase": "restart-same-instance",
+        "nativeStateExactlyPreserved": true,
+        "sameInstance": true,
+        "volumePreserved": true,
+        "archiveBackupVerified": false,
+        "originalEngineIdentityPreserved": true
+      },
+      {
+        "phase": "replace-with-pinned-base",
+        "nativeStateExactlyPreserved": true,
+        "sameInstance": false,
+        "volumePreserved": true,
+        "archiveBackupVerified": true,
+        "originalEngineIdentityPreserved": true
+      },
+      {
+        "phase": "restore-reviewed-backport",
+        "nativeStateExactlyPreserved": true,
+        "sameInstance": false,
+        "volumePreserved": true,
+        "archiveBackupVerified": true,
+        "originalEngineIdentityPreserved": true
+      }
+    ],
+    "ownerDataUsed": false,
+    "baseline": {
+      "banks": 2,
+      "documents": 6,
+      "facts": 15,
+      "pages": 2,
+      "sha256": "a4158de57d27eb114237737e3bcd7e14af4c175058b326e9fe610e0273d3f525"
+    },
+    "finalEngineStopped": true,
+    "allCreatedEngineInstancesTerminal": true,
+    "sourceJournalUnchanged": true
+  },
+  "archiveRestoration": {
+    "passed": true,
+    "sourceRef": "60fa55f4e6089ddd017ede74ae89898a1571f3f6",
+    "backupSha256": "d22224ed56ab7583cb7c8cfef2a40b360a491b048b3b3fa1d79123b4ab10af2d",
+    "sourceVolumeMutated": false,
+    "transferContainerRemoved": true,
+    "nativeStateExactlyRestored": true,
+    "banks": 2,
+    "documents": 6,
+    "facts": 15,
+    "pages": 2,
+    "nativeCanonicalSha256": "a4158de57d27eb114237737e3bcd7e14af4c175058b326e9fe610e0273d3f525",
+    "emptyNewVolumeConfirmed": true,
+    "oldDatabaseNeverMounted": true,
+    "oldEngineIdentityPreserved": true,
+    "restoredEngineStopped": true
+  },
+  "privateConfigurationLiveFollowup": {
+    "passed": true,
+    "sourceRef": "d6361bd1bd3a36e9dd787c08ccb7569dcb0b18e8",
+    "initialFullInstallerRef": "60fa55f4e6089ddd017ede74ae89898a1571f3f6",
+    "previousPrivateConfigurationExactlyPreserved": true,
+    "privateConfigurationManifestMode": "0600",
+    "nativeStateExactlyPreserved": true,
+    "archiveHashVerified": true,
+    "sourceChoiceDeliberatelyChanged": true,
+    "ownerDataUsed": false,
+    "engineStopped": true
+  },
+  "followupChangeScope": "The d636 fix adds only the previous configuration to the private backup manifest. Full inference/three-stage lifecycle run at 60fa; source/ordinary tests and actual stopped replacement/native preservation verify the exact one-field followup.",
+  "nativeComparisonScope": "Complete documents/list, every document detail, all facts/list, page tree and every page response; no fields or list entries filtered. Baseline taken after first installer restart, before the deliberately tested same-instance stop/start and both replacements.",
+  "sourceJournalUnchanged": true,
+  "upstreamBackport": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "license": "MIT",
+    "copyright": "Copyright (c) 2025 Vectorize AI, Inc.",
+    "upstreamFixRef": "022583d43b3ae460233c9df880040c0770f24e0b",
+    "upstreamFixPath": "hindsight-api-slim/hindsight_api/engine/memory_engine.py",
+    "baseRef": "5d46f9c8c8eb4fb96f549aa63abe1191b82a7840",
+    "baseGitBlob": "df43b37f0093fb5d3c3037858126620f9e5b4790",
+    "baseImage": "ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b",
+    "containerPath": "/app/api/hindsight_api/engine/memory_engine.py",
+    "baseSha256": "770ea9011dec620c6c6584f8889ccf73740f9489586e5745fd0164fd636eafba",
+    "resultSha256": "dd82621a04fc20f3535be823d3a6a2712572928e54ac9fa73541cdb463ecf4f0",
+    "patchSha256": "229dd6019362cabf8bca9b126babe22a6aa15d98d05b0bf37c81bc4b54a0cbcc",
+    "licenseSha256": "01fde0bedf83bdc185065d7af524a61690efe576a67f922eaff3a1280c17b63a",
+    "adaptation": "Only the upstream refresh budget constant, per-refresh selection and explicit Reflect argument are backported into the exact 0.10.0 image source; shortened comment/context adapted. Newer API/UI/CLI/schema/config-option changes are not selected.",
+    "scope": "Opt-in isolated proof overlay only; configured max iterations remains two and existing job/call/time/token/output/concurrency/model settings remain unchanged."
+  },
+  "processingLimits": {
+    "jobAndAbsoluteToolWindowSeconds": 120,
+    "jobTokens": 65536,
+    "callSeconds": 45,
+    "callOutputTokens": 4096,
+    "reflectContextTokens": 8000,
+    "configuredRefreshIterations": 2,
+    "memoryConcurrency": 1,
+    "contextWindow": 262144,
+    "conversationOutputTokens": 8192,
+    "sourceIdsDatesAndScopesPreserved": true,
+    "modelGpuServerOrVoiceSettingsChanged": false
+  },
+  "ownedCleanup": {
+    "allTestEngineInstancesTerminal": 5,
+    "neverStartedSourceContainersRemoved": 2,
+    "archiveTransferContainerRemoved": 1,
+    "cacheInputsPreservedEach": 43,
+    "originalEngineIdentityPreserved": true,
+    "sourceOverlaysVerified": true,
+    "privateLogs": {
+      "engine-instance-3-private.log": {
+        "bytes": 11153,
+        "sha256": "e8ceef7cc9d0cee25d92fc8d56fae7f7bd5cfd08dde52a6d64e9a1e0c5416a49",
+        "published": false
+      },
+      "engine-instance-2-private.log": {
+        "bytes": 11149,
+        "sha256": "d9944fc9592298c672097a92a42f377ef180ab07a165c6e5e8d592b0195d8373",
+        "published": false
+      },
+      "engine-instance-1-private.log": {
+        "bytes": 11159,
+        "sha256": "c68430ea9b981859726497cb117bee61529581d9ce3c951c681225f2cf3e77bd",
+        "published": false
+      },
+      "engine-instance-0-private.log": {
+        "bytes": 83900,
+        "sha256": "5945da450184808c50387ebebe65898e173845f51386b0ab9285f37927983839",
+        "published": false
+      }
+    }
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 12,
+    "reviewProcessesPresent": 13,
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "privateCompanionPreexistingDirtyFiles": 4,
+    "modelSpeechGpuConfigurationFilesPreserved": 6,
+    "currentMxReviewHttpStatus": 200,
+    "newMxReviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "recognitionReviewProcessPresent": true,
+    "originalMemoryEngineIdentityPreserved": true,
+    "newReviewSealedInventoryPreserved": true,
+    "speechOrGpuServiceMutationsThisCheckpoint": false,
+    "newArtifactStaged": false,
+    "newArtifactActivated": false,
+    "privateSpeechSourceCopied": false
+  },
+  "retainedPreparationFailures": [
+    "Initial existing setup fixtures lacked real identity/mount fields required by the new guard",
+    "Expanded fixture initially omitted the services import path",
+    "Authored Docker peer initially intercepted the real patch subprocess; corrected to forward non-Docker tools",
+    "Initial native snapshot observer used legacy ready=1 instead of all actual banks; no baseline captured by that failed attempt",
+    "Pre-fix rollback assertion fails because the old backup manifest lacks configuration; fixed and independently checked live"
+  ],
+  "localEvidenceDigests": {
+    "harness-memory-install-backup-restore-20261016.log": {
+      "bytes": 923,
+      "sha256": "03c91b5a569587c69ec8e3bfa0a355c7984a0056ce2aceec3192b9cdce4f2da5"
+    },
+    "harness-memory-install-boundary-source-20261016.log": {
+      "bytes": 5070,
+      "sha256": "dd45f267cb227a10caa9a003e2fa34005d860ca882e64efd79799e4344bcd037"
+    },
+    "harness-memory-install-engine-initial-20261016.log": {
+      "bytes": 188,
+      "sha256": "e36204850543a1ae5290251a4483347482b4eca79b4815d9a9c5a68510be0bfd"
+    },
+    "harness-memory-install-final-postflight-20261016.log": {
+      "bytes": 1977,
+      "sha256": "49401716e2fa71016eee719b426af0bdfd7d535fc37419d4187e4fab7350a53b"
+    },
+    "harness-memory-install-lifecycle-20261016.log": {
+      "bytes": 1667,
+      "sha256": "d616d9bbee20b1417a7125296e947b91bf8c84a77433fd95746f18c6e2cbab8f"
+    },
+    "harness-memory-install-live-prepare-20261016.log": {
+      "bytes": 277,
+      "sha256": "0fbb6e8e0904485375764152fd91d6012edcd1a2d05ede2adc29766902275760"
+    },
+    "harness-memory-install-live-proof-20261016.log": {
+      "bytes": 803,
+      "sha256": "62095eee3a39f003bad6cfafc6b46e54a46bcacee1fdc2f98e7b0177ed7652d8"
+    },
+    "harness-memory-install-node-ordinary-20261016.log": {
+      "bytes": 3515,
+      "sha256": "73d4bb8599e5454fcf43c6780bafb3b0b2065756002975d0f8a3fcf785df6645"
+    },
+    "harness-memory-install-postflight-20261016.log": {
+      "bytes": 1977,
+      "sha256": "61500ef7a4293341c391be8de998b4b37cef5be240a08034133238a5ffca031c"
+    },
+    "harness-memory-install-private-config-live-20261016.log": {
+      "bytes": 547,
+      "sha256": "de95ab207eaa82860c28a91e65cfe6530f5a414c77a210a4d19d944f565e0ecc"
+    },
+    "harness-memory-install-python-ordinary-20261016.log": {
+      "bytes": 11298,
+      "sha256": "7d5c6cdf9da5a4ff182a72eb650256feea13ef2a45ce8e1a79e9b323b2b95370"
+    },
+    "harness-memory-install-python-source-initial-20261016.log": {
+      "bytes": 11298,
+      "sha256": "7886f5351d379fb5a428ca392ff1ede5d3bfc5844ff2430c72e44fd0490184ad"
+    },
+    "harness-memory-install-rollback-negative-20261016.log": {
+      "bytes": 1163,
+      "sha256": "329fdaf0313b1deda26d92996c8ab560b814f3a11e60f53b45603ffa9502143d"
+    },
+    "harness-memory-install-rollback-python-ordinary-20261016.log": {
+      "bytes": 11298,
+      "sha256": "e9ca3d07cc4a3af326592e1099be6feafb5ee621b3d8dd1c6672718ed30ca892"
+    },
+    "harness-memory-install-rollback-python-source-20261016.log": {
+      "bytes": 11298,
+      "sha256": "96d0c431df232597b403d2c1fddb2c4ec0ebd67d3f0da74a11cb149e4bf266c2"
+    },
+    "harness-memory-install-snapshot-before-20261016.log": {
+      "bytes": 1111,
+      "sha256": "4463c4c22938c6c70760fb7a3a9a938536d54b090542af7ef0e9c5d00353496f"
+    },
+    "harness-memory-install-tests-expanded-followup-20261016.log": {
+      "bytes": 27680,
+      "sha256": "fb5038c5fe57ce8bcdd1a25a1c3bc4cd452b72a8a21ae9216d0c0d6535eec49f"
+    },
+    "harness-memory-install-tests-expanded-initial-20261016.log": {
+      "bytes": 5125,
+      "sha256": "e1b5f90e4b9c82d404635ef483e2f024fcffec36b9b695a0d6a1103ed54e6e26"
+    },
+    "harness-memory-install-tests-followup-20261016.log": {
+      "bytes": 4291,
+      "sha256": "aecc1edc9eb7ed5b24312f7cdbec94c7ba091486a54eac7a4849a42c64bf7ad5"
+    },
+    "harness-memory-install-tests-initial-20261016.log": {
+      "bytes": 8383,
+      "sha256": "05dc9fd06d5b0d68809736c9853bff976fb8b1446f0137d482a2cd4c66674a98"
+    },
+    "harness-memory-install-tests-recovery-followup-20261016.log": {
+      "bytes": 5997,
+      "sha256": "ff0499a20ed527dbbceca34cb947f7c971812bf7897cb2b681a6db0f00fbf565"
+    },
+    "harness-memory-install-tests-recovery-initial-20261016.log": {
+      "bytes": 31630,
+      "sha256": "db9754b1c105b97594c70916848a6b4544ffc3fef49261e28efa6b44030354c7"
+    }
+  },
+  "priorMxReviewRecord": "harness-memory-settings-review-20261016.json",
+  "retainedDefaultModeFailures": "harness-pi-memory-page-qualification-20261016.json",
+  "remaining": [
+    "Owner physical MX feedback and guarded installed adoption; no personal-bank migration performed",
+    "Larger/older/uncached/provider workloads and further interruption/rename/rollback recovery boundaries",
+    "Default-mode timing and broader memory semantics/load",
+    "Full voice/component distribution; Breeze GPU prerequisite still unmet",
+    "Remaining plugin/Home/Office/migration and later OS release qualification"
+  ],
+  "originalProductionEngineUpdated": false,
+  "ownerMxReviewUpdated": false,
+  "publicBinaryPublished": false,
+  "merged": false,
+  "wholeHarnessGoalComplete": false
+}

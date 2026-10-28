@@ -1,0 +1,246 @@
+{
+  "schema": "augmentor-harness-wiki-ingest-live-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Actual sealed MX original GUI, approved Wiki ingest skill and local Qwen; independently authored vault; state/receipts and one explicitly disclosed fixture edit refusal are qualified separately",
+  "documentationBaseRef": "d8f95b52a22db87eb0e75c86bb11e1108ae07048",
+  "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+  "releaseId": "20261017-071945-90183f89",
+  "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+  "runtimeGuiDependencyOrInstalledSettingsChanged": false,
+  "inputsSha256": {
+    "packages/runtime/src/wiki.ts": "f06d4ca3b29326e378f5b79aec3088c83cebfad29687275bc072c9f4be06aca6",
+    "packages/runtime/src/wiki-fs.ts": "77d98389df5128babfbf5036d828458890c39cc68e0e63428fe56ef29d4a57e3",
+    "packages/runtime/src/wiki-receipts.ts": "c0843382dcb3bc16de120cac2d35049f168dedfa73e12bcb4be9e4281c870702",
+    "packages/runtime/src/managed-skill-provenance.ts": "4a12c439b469739a0bf5e577b59548845d7dcc7b11c7a35fa3cd219982b91424",
+    "packages/runtime/vendor/dsh-plugin-wiki-tools/index.js": "172a8823d8ba79f8efdd074af55740d6a7ea8ec0c70619e39032e576e0fdbb7b",
+    "packages/runtime/vendor/dsh-plugin-wiki-tools/lib/vault.js": "958f61235c3eb57a4ea73a3958bdc4e7661ddb29464ca2271f35994dde7cc423",
+    "packages/runtime/vendor/dsh-plugin-wiki-skills/skills/wiki-ingest/SKILL.md": "b0c833a6a228c64a0903a5ece46609cfdc9d3aaa8b562545e4b4d5d109f77f5d"
+  },
+  "liveDriverSha256": "632d15bc40fa1333197ccd8843bda0646790ed3ddd5b3456be35417e7b5aca8a",
+  "postflightDriverSha256": "964ecb642ba8dfe900a62a464e77a64b9eb66e1944595527a579b1b7c0d80a81",
+  "fixtureScope": {
+    "freshAuthoredVault": true,
+    "ownerKnowledgeOrConversationContentSentToQwen": false,
+    "providerDefinitionOnlyCopiedIntoPrivateProfile": true,
+    "allNineOriginalSkillsAvailable": true,
+    "selectedSkill": "wiki-ingest",
+    "scaffoldSetupOutsideAgentTurn": true,
+    "additionalPublicSdkToolGuard": "Only two named native wiki pages, ordinary write to its exact hot cache and reads of the temporary vault/approved selected skill resources; no shell/network/other writes",
+    "permissionMode": "Ask before actions",
+    "guiApprovals": 3,
+    "eachApprovalMatchedSavedNativeArguments": true
+  },
+  "workflowQualification": {
+    "targetStateVerified": true,
+    "cleanAllToolsSuccessDriverPass": false,
+    "authoredUserTurns": 1,
+    "toolCalls": [
+      "read",
+      "wiki_query",
+      "wiki_write",
+      "wiki_write",
+      "edit",
+      "read",
+      "write",
+      "wiki_query",
+      "read",
+      "read"
+    ],
+    "toolResults": [
+      {
+        "name": "read",
+        "isError": false
+      },
+      {
+        "name": "wiki_query",
+        "isError": false,
+        "outcome": "completed"
+      },
+      {
+        "name": "wiki_write",
+        "isError": false,
+        "outcome": "completed"
+      },
+      {
+        "name": "wiki_write",
+        "isError": false,
+        "outcome": "completed"
+      },
+      {
+        "name": "edit",
+        "isError": true
+      },
+      {
+        "name": "read",
+        "isError": false
+      },
+      {
+        "name": "write",
+        "isError": false
+      },
+      {
+        "name": "wiki_query",
+        "isError": false,
+        "outcome": "completed"
+      },
+      {
+        "name": "read",
+        "isError": false
+      },
+      {
+        "name": "read",
+        "isError": false
+      }
+    ],
+    "successfulNativeWikiWrites": 2,
+    "successfulHotCacheWrites": 1,
+    "sourceAndConceptPagesAdded": 2,
+    "fixtureRefusedEdits": 1,
+    "nativeWikiToolFailures": 0,
+    "runtimeErrors": 0,
+    "browserErrors": 0,
+    "pageHttpFailures": 0,
+    "postflightNewInputsSubmitted": 0,
+    "checks": {
+      "twoLinkedPagesSourceFactsAndMarkerVerified": true,
+      "frontmatterMasterAndFolderIndexesLogVerified": true,
+      "rawSourceAndManifestHashVerified": true,
+      "hotCacheVerifiedAfterThreeGuiApprovals": true,
+      "deniedEditHadNoEffectBeforeSeparateWrite": true,
+      "modelDisclosedRefusalAndCorrectFallback": true,
+      "actualSkillSourceFingerprintExact": true,
+      "twoCompletedWikiReceiptsNoUncertainty": true,
+      "coldNativeDisplayObservationAndVaultBytesExact": true,
+      "noInferenceOrMutationOnColdInspection": true,
+      "gracefulOwnColdHostShutdown": true,
+      "ownerModelConfigurationUnchanged": true,
+      "frontmatterAndBothFolderIndexesIndependentlyParsed": true,
+      "onlyTwoRequestedPagesAdded": true
+    },
+    "addedVaultFiles": [
+      "wiki/concepts/Dispatch Ledger.md",
+      "wiki/sources/Dispatch Ledger Source.md"
+    ],
+    "changedVaultFiles": [
+      ".raw/.manifest.json",
+      "wiki/concepts/_index.md",
+      "wiki/hot.md",
+      "wiki/index.md",
+      "wiki/log.md",
+      "wiki/sources/_index.md"
+    ],
+    "nativeReceipts": {
+      "total": 2,
+      "states": [
+        "completed",
+        "completed"
+      ],
+      "blocked": false
+    },
+    "sourceFactsReview": "Source and both produced pages retain requested action, confirmed result, explicitly unverified unresolved outcomes, Friday and the exact authored marker; two pages mutually link",
+    "meaning": "One edit proposal was refused before effect by the test guard. A read proved the old hot-cache hash unchanged; a separately approved write succeeded. The final answer discloses both. The blanket no-tool-errors driver assertion remains failed; no completed mutation or model input was repeated to replace that result."
+  },
+  "coldQualification": {
+    "sameAuthoredProfileReopened": true,
+    "nativeDisplayObservationAndVaultBytesExact": true,
+    "newInferenceOrAgentDispatch": false,
+    "newModelInputs": 0
+  },
+  "preliminaryDriverEvidence": [
+    {
+      "issue": "History read raced first event-file creation",
+      "modelRequests": 0,
+      "vaultHashSetExact": true,
+      "hostTerminalVerified": true
+    },
+    {
+      "issue": "Approval reader expected tool name inside an arguments-only card",
+      "writesApproved": 0,
+      "vaultHashSetExact": true,
+      "writeOutcome": "refused before dispatch when the test closed",
+      "hostTerminalVerified": true
+    },
+    {
+      "issue": "Strict all-results-success assertion rejected an explicitly refused fixture edit despite completed ingest",
+      "rawDriverRetainedAsFailed": true,
+      "readOnlyPostflightCompletedWithoutProducerReplay": true
+    }
+  ],
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      },
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 14,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "ownerWikiPreservation": {
+    "scope": "The sixteen recorded owner wiki-subtree files, using their original absolute identity keys; other personal archive folders are outside this inventory",
+    "ownerWikiFileSetAndHashesExact": true,
+    "ownerWikiFilesVerified": 16,
+    "ownerWikiModelRequests": 0,
+    "ownerWikiMutations": 0
+  },
+  "cleanup": {
+    "authoredProfilesAudited": 8,
+    "remainingMatchingActors": 0,
+    "scope": "Exact recorded temporary profile HOME/home and shared-state; same UID; not a whole-machine process audit",
+    "earlierMemoryActorObserved": true,
+    "earlierMemoryActorNowTerminal": true,
+    "servicesTerminatedByCleanup": 0
+  },
+  "retention": {
+    "authoredVaultsNativeHistoriesProviderObservationsReceiptsAndDriverFailures": "Retained privately; no public prompt bodies, credentials, owner paths or operator links"
+  },
+  "inheritedChecks": {
+    "record": "harness-interrupted-context-qualification-20261017.json",
+    "nodeCasesPerSourceOrdinarySealed": 229,
+    "pythonCasesPerSourceOrdinarySealed": 41,
+    "rerunForThisEvidenceOnlyChange": false
+  },
+  "documentationPublication": {
+    "docsAndAggregateJsonOnly": true,
+    "newWorkflowDispatchSkipped": true,
+    "reason": "Preserve already running d8f95b52 validation; product source and installed bytes are unchanged",
+    "requiredNewHeadAndMergeAcceptanceNotClaimed": true,
+    "githubReference": "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs"
+  },
+  "limits": [
+    "This is one constrained native Wiki ingest and explicit write fallback; it does not qualify every skill, larger/concurrent corpora, optional companion CLI/transport/git/DragonScale workflows or native hot-cache edit",
+    "A test-only public SDK guard limits this producer; it is not a claim that the default product is an OS filesystem sandbox",
+    "Original pointer/typing/Allow once controls are driven in headless Chromium; physical use remains separate",
+    "Owner reviews stay on ee80c054; no owner model request, personal-vault mutation, further project transfer, voice or later-OS rollout"
+  ]
+}

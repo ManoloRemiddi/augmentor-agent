@@ -1,0 +1,106 @@
+{
+  "schema": "augmentor-harness-native-provider-retention/1",
+  "date": "2026-10-17",
+  "scope": "Restore existing Native provider behavior before a matching-client update; no voice expansion or installed change",
+  "publicSources": {
+    "voice_provider.py": {
+      "commit": "c1b2279a2267850e6c52be72e632479ac916a031",
+      "blob": "b20e6a58b44cd649912235aff5f489af0034605c",
+      "sha256": "8669572dcd766f80e88f64bb945e426282e9c26ba9e6b183f8325eebcbe1db00"
+    },
+    "voice_live.py": {
+      "commit": "512725304a16a62a3f24acb0e3bfbdd1f8b16235",
+      "blob": "c3e2390d19d7ab5f90f504333ebe0f55b88e6eac",
+      "sha256": "59f62d31266ddc52664efffa1e6123e5962df91b1289c32670712e915c9de754"
+    },
+    "live_dialogue.py": {
+      "commit": "512725304a16a62a3f24acb0e3bfbdd1f8b16235",
+      "blob": "2992d2b84b9b63acf72071b2d0399d4c37d92db5",
+      "sha256": "02ddf42d268e8a2be2ff1470a8b9dadf8d8bf45c6af087fa2de690798864965c"
+    },
+    "voice_settings.py": {
+      "commit": "512725304a16a62a3f24acb0e3bfbdd1f8b16235",
+      "blob": "0a6deb297fe65e46fa2047d0c933d6d24785feae",
+      "sha256": "68254e6ddbe8b8e3b85d3d1f8152bd166b048c244e8cdc74b607b5dc63575f6c"
+    }
+  },
+  "sourceQualification": {
+    "pythonPass": 201,
+    "newAdaptationCases": 8,
+    "fail": 0,
+    "skip": 0,
+    "qtVersion": "6.8.2.1",
+    "transportVersion": "1.8.0",
+    "repeatWithPinnedTransport": true,
+    "readOnlyFilesystemIsolatedNetwork": true,
+    "syntheticProviderSocketAudioAndVaultOnly": true,
+    "physicalVoiceOrExternalApiQualified": false,
+    "typeCheckPass": true,
+    "initialDevelopmentTransportVersion": "1.9.0",
+    "finalLockedQualificationTransportVersion": "1.8.0",
+    "initialDevelopmentGroupPass": 200
+  },
+  "retainedCurrentGuards": [
+    "Pi local ticket opening identity, cancellation and remote retirement",
+    "Explicit spoken input instead of classifying typed request names",
+    "Originating cloud submission receipts and rejection uncertainty without replay",
+    "Provider polling respects maintenance and resets after admission race",
+    "Provider settings jobs block maintenance until settled"
+  ],
+  "storage": {
+    "reserveGiB": 64,
+    "managedSingleScratch": true,
+    "newFullAppCopies": 0,
+    "newImmutableArtifact": false
+  },
+  "installedAppChanged": false,
+  "privateSourceCopied": false,
+  "ownerModelRequests": 0,
+  "ownerProjectsTransferred": 0,
+  "remaining": [
+    "Matching client/bootstrap adoption",
+    "One actual cold checkpoint coupled to selection and durable finalization/reverse",
+    "One combined immutable qualification and owner continuation",
+    "Pilot feedback before further project transfers; deferred voice expansion and other OS stay deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-native-provider-final-20261017.log": "af645cb0a4c54c31baf0f4e8667bf6ab5842a27da145abbce346e6cabc1bec0e",
+    "harness-native-provider-locked-final-20261017.log": "d28095daca54c8eef4f88247626b25e1ef86a5cc97fb452f64d09edfdc88d021",
+    "harness-native-provider-public-base-private-20261017.json": "ac3812e819a3e20208735518d5bc3c445c314e1e807a6fcb34499d62bb3d9d69",
+    "harness-native-provider-public-health-private-20261017.json": "a82bfd02c9f17248df1400162b3351d3eb5d0806b96fd41ae21e571a9cb1b7e7",
+    "harness-native-provider-typecheck-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-native-provider-owner-preservation-private-20261017.json": "acf53d4011a65907df767aa48a21ec466940a61979f0c42523bf54c0322b4730",
+    "harness-startup-write-map-private-20261017.json": "a75f05dcd9cb7ccb99b2e4e4ccf25c26267d0257983c3a798819f57045009a44",
+    "harness-startup-write-coverage-private-20261017.json": "ef456c515b573e98fe7aa80e87b8520574339176c678aca0b6f3cc35f6e272cb",
+    "harness-native-provider-ci-terminal-private-20261017.json": "561acc9dd51b006d97b2021657ea81141c3b1850f1e90f7126e6f630d4ce1c4b",
+    "harness-native-provider-ci-native-201-private-20261017.log": "06259af35c0aa4764d917137058b75f014d4b637eb625fc64aa1979c94f78f22",
+    "harness-native-provider-final-owner-preservation-private-20261017.json": "acf53d4011a65907df767aa48a21ec466940a61979f0c42523bf54c0322b4730"
+  },
+  "ownerPreservation": {
+    "mainPilotPidsAnd36ProtectedSetsExact": true,
+    "registryRevision": 18,
+    "sharedStoresSettingsMenusAndServicesExact": true,
+    "recheckedAfterTerminalSdk": true
+  },
+  "runtimeRef": "2c7bb68b81c6c7503e61d868d78fe989b41ed2a9",
+  "linuxSdk": {
+    "run": 39065133516,
+    "ref": "2c7bb68b81c6c7503e61d868d78fe989b41ed2a9",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39065133516",
+    "nativePass": 201
+  },
+  "bootstrapAdvisory": {
+    "currentSelectedStartupFiles": 26,
+    "wouldChangeContent": 19,
+    "knownLauncherFiles": 35,
+    "knownFilesOutsideBuilderInventory": 22,
+    "desktopServiceUnitContentChanges": false,
+    "onlyCurrentSelectedPlanNotCandidateBinding": true,
+    "ownerWrites": 0,
+    "serviceCommands": 0,
+    "existingBrowserIdentityMatchesCandidate": true,
+    "loadedBrowserVersionVerified": false
+  }
+}

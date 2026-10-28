@@ -1,0 +1,61 @@
+{
+  "schema": "augmentor-quickjs-build/1",
+  "npmVersion": "3.6.2",
+  "piVersion": "1.1.0",
+  "expectedWasmSha256": "79505123d7f65bd01202f41b40c2166952454950573402ef23b0bbf557775c82",
+  "originalNpmWasmSha256": "d4c9375f2b1ca4dc95f72c8aa2982a7a9951ac8011490d79c6582df732b4bbd9",
+  "sources": {
+    "quickjs-wasi": {
+      "url": "https://codeload.github.com/vercel-labs/quickjs-wasi/tar.gz/5a7a0eeda87c99542f8cf3095b6d61ecfa755977",
+      "sha256": "cb3a2e58fd7187104b9294962e205c28433ecb7653d75771a35ef98dfdfb8484",
+      "commit": "5a7a0eeda87c99542f8cf3095b6d61ecfa755977"
+    },
+    "quickjs-ng": {
+      "url": "https://codeload.github.com/quickjs-ng/quickjs/tar.gz/6d46d07d04041b40f4f49eaa7fdebe44c314c699",
+      "sha256": "a62cf1ff7d6d2f82b90a2d247a57e9eb56b81c03feb1f372a53923426e358cb0",
+      "commit": "6d46d07d04041b40f4f49eaa7fdebe44c314c699"
+    },
+    "wasi-libc": {
+      "commit": "2fc32bc81b9f07f8d9525edea59bfbaf760c06d6",
+      "url": "https://codeload.github.com/WebAssembly/wasi-libc/tar.gz/2fc32bc81b9f07f8d9525edea59bfbaf760c06d6",
+      "sha256": "d12a1568d9394e693e6b189277ba70446f96b81a4790c515427865a0d5412372"
+    }
+  },
+  "wasiSdk": {
+    "version": "32.0",
+    "url": "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-32/wasi-sdk-32.0-x86_64-linux.tar.gz",
+    "sha256": "55fc523ebfbc98f69d1034fcfcb83d1ff5610cd9ab7eceef6cd097a30ba4ef93"
+  },
+  "llvmBuiltins": {
+    "repository": "https://github.com/llvm/llvm-project.git",
+    "commit": "4434dabb69916856b824f68a64b029c67175e532",
+    "paths": [
+      "LICENSE.TXT",
+      "compiler-rt/LICENSE.TXT",
+      "compiler-rt/lib/builtins"
+    ],
+    "archiveSha256": "56a18a20ccd53c978dedf39eb34011338853d5d4bcf6e41a7db5c6586b15ea06"
+  },
+  "binaryen": {
+    "version": "130.0.0",
+    "url": "https://registry.npmjs.org/binaryen/-/binaryen-130.0.0.tgz",
+    "sha256": "127c4c2f06d4b802f5e507d6822d31bde1792d5af89a7d7e2444ef9c7899510b",
+    "integrity": "sha512-XDrb+zql0RbFPKgj7MuH9zOc78R3Fa/P/VSGnnpdwYsvNZPWjcMYMdAkKCOQEL2A7yqgjSMTDRFp6gfSDW+/QQ==",
+    "gitCommit": "cb55d05caf7c33bc267d6281c197befe54e4dd54"
+  },
+  "build": {
+    "target": "wasm32-wasip1",
+    "optimization": "-Oz",
+    "lto": true,
+    "engineSourceModified": false,
+    "scope": "Engine only; no optional QuickJS WASM extensions",
+    "sdkLibrariesIndependentlyRebuilt": false
+  },
+  "excludedAssets": {
+    "extensions/crypto/crypto.so": "fa26b6fafda251c3b1442dcc4c876b3ac73689639519f4ddfc2c410ebdb5b7c2",
+    "extensions/encoding/encoding.so": "d501aa2a8410ee07c196103f0d169b226ec61c922883713510fd723fe14036c3",
+    "extensions/headers/headers.so": "42c847104d6aa8d4666fa41bb74d324c2ee9a4d15c2492fca013b1631232b011",
+    "extensions/structured-clone/structured-clone.so": "0ac5a36c0545c659ba6f9f8de5af11862df84546d151d0f15ec5184c95fd6cb3",
+    "extensions/url/url.so": "af780a79f1fb131b5e6fa1d6fedc481e265420cf2f254fe966255230f4c1bc62"
+  }
+}

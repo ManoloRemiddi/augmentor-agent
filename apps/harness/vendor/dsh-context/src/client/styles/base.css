@@ -1,0 +1,74 @@
+/* Imported FIRST of the plugin's sheets: later sheets re-tint the shared chrome at equal specificity, so this order is load-bearing. */
+.lc-root { padding: 16px 20px 32px; overflow-y: auto; height: 100%; box-sizing: border-box; color: var(--dsw-alias-label-primary); font-size: 13px; }
+/** The right-column panel keeps its own scroller: the supported shell wraps the tab in a definite-height body whose `overflow: hidden` would otherwise clip a grown root.
+ */
+[data-sidebar-right-open] .lc-root,
+[data-sidebar-right-float-host] .lc-root { padding: 12px; }
+.lc-title-icon { flex: none; }
+/* 30px is dockkit `.tabTitle`'s own mask lead-in; re-check if that mask moves. */
+.lc-title-label { padding-right: 30px; }
+.lc-card { background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l2); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+/* Every tab card is the `lc-card` inline-size query container; it must stay BEFORE the `.lc-cols`/`.lc-col` margin-zeroing rules below, and border-box is required by the `min-w-[min(360px,100%)]` floor the cards ride. */
+.lc-root .lc-card { box-sizing: border-box; padding: 7px 8px; margin-bottom: 7px; container: lc-card / inline-size; }
+.lc-root .lc-cols { gap: 7px; margin-bottom: 7px; }
+.lc-card-title { font-weight: 600; margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+/* A title carrying ONLY text keeps one line: its right-hand chip carries step-scoped text that changes length with the
+   selection (longest in English), so a wrapped title resized the card — and the page below it — on every scrub. The
+   chip ellipsizes instead. Titles that carry toggle groups keep the wrap they need (`lc-trend-ctl`, `lc-kinds`). */
+.lc-card-title:not(:has(.lc-gran, .lc-kinds)) { flex-wrap: nowrap; }
+.lc-card-title-text { flex: none; white-space: nowrap; }
+/* The right-hand chip yields rather than wrapping, so a title's line count never depends on its text's length. */
+.lc-card-sub, .lc-card-rate { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-gran, .lc-kinds { margin-left: auto; display: flex; gap: 2px; background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l2); border-radius: 6px; padding: 1px; }
+/* A title carrying two toggle groups wraps them so the row keeps a single auto-margin push. */
+.lc-trend-ctl, .lc-heat-ctl { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.lc-trend-ctl .lc-gran, .lc-heat-ctl .lc-gran { margin-left: 0; }
+.lc-heat-ctl .lc-card-sub { margin-left: 0; }
+.lc-trend-mods { margin-left: 0; flex: none; }
+.lc-gran-btn { border: 0; background: transparent; color: var(--dsw-alias-label-secondary); font-size: 11px; line-height: 1; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-family: inherit; transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-gran-btn:hover { color: var(--dsw-alias-label-primary); }
+.lc-gran-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.lc-gran-btn:disabled:hover { color: var(--dsw-alias-label-secondary); }
+.lc-gran-on, .lc-gran-on:hover { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); }
+.lc-kind-n { margin-left: 4px; font-variant-numeric: tabular-nums; opacity: 0.65; }
+.lc-gran-on .lc-kind-n { opacity: 0.85; }
+/* Shared tooltip chrome: pair with the owner's own tip class, then position locally; new tips never re-declare it. */
+.lc-tip { position: absolute; z-index: 6; width: max-content; background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l1); border-radius: 6px; padding: 6px 10px; font-size: 12px; color: var(--dsw-alias-label-primary); box-shadow: var(--dsw-shadow-lv3, 0 2px 8px rgba(0, 0, 0, 0.18)); pointer-events: none; opacity: 0; transition: opacity var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-events, .lc-fa-list { display: flex; flex-direction: column; gap: 2px; height: 320px; overflow-y: auto; }
+/* An empty or pending lane holds the height of the list it stands in for: the file card's activity re-scopes on every
+   step (and is empty until the first read), so a lane that collapsed to its one-line note moved the whole page below
+   it by 265px mid-turn. Mirrored by the 320px above. */
+.lc-lane { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 320px; box-sizing: border-box; }
+/* The `.lc-cols` row owns the vertical rhythm; cards drop their own bottom margin so every section boundary measures one gap whichever way the flex wraps. */
+.lc-cols { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.lc-cols > .lc-card { margin-bottom: 0; }
+.lc-col > .lc-card:last-child { margin-bottom: 0; }
+.lc-col-browser { display: flex; flex-direction: column; }
+.lc-col-browser > .lc-card { flex: 1; }
+/** Head band: TWO rows — the session's shape at a 3:1 split beside the plugin
+ * card (context / plugin), then the two donut cards together (token /
+ * timing). The rows are `.lc-cols` flex-wrap rows and the cards ride the
+ * shared column idiom (`min-w-[min(360px,100%)]` in the components): the
+ * stats card's `flex-[3]` against the plugin card's `flex-1` thirds the row,
+ * and the min-width floor is the fold — below (360 + 240)px + gap of row
+ * width the 3:1 pair wraps onto full-width lines, below 2 x 360px + gap the
+ * equal donut pair does (~360px being where the donut cards' ring+legend
+ * single-line and the count grid both start to cramp, issue #48; the plugin
+ * card's 240px floor leans on its rows' ellipsis + hover recovery). Cards
+ * under that end of the band sit under their own lc-card reflows (stats.css:
+ * the ring stacks over its legend, the cell grid folds), so the two-card
+ * line is the trade this floor buys. Engines without container queries keep
+ * the wide layout. The right Sidebar's panel renders only the donut row (it
+ * drops the context stats / plugin info row — see contextView.tsx); the same wrap then stacks the pair in the narrow pane. */
+/* The context card's flow diagram stretches to the plugin card's height, so the row reads as one level band. */
+.lc-head > .lc-card:has(.lc-stats) { display: flex; flex-direction: column; }
+.lc-head .lc-stats { flex: 1; }
+.lc-empty { color: var(--dsw-alias-label-secondary); padding: 18px 0; text-align: center; }
+.lc-error { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; }
+.lc-error-msg { font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 12px; color: var(--dsw-alias-state-error-primary); background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l1); border-radius: 6px; padding: 4px 8px; max-width: 100%; overflow-wrap: anywhere; }
+.lc-error-retry { border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; padding: 4px 14px; border-radius: 6px; cursor: pointer; transition: border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-foot { color: var(--dsw-alias-label-secondary); font-size: 12px; margin-top: 4px; }
+/* Hides the composer while a plugin surface owns the pane, but keeps it for approval/question/plan-review prompts. */
+[data-conversation-scroll]:has(.lc-root) > [data-composer-seat]:not(:has([data-approval-key], [data-question-key], [data-plan-review-key])) { display: none; }
+/* The harness's transcript-width drag handles are FOLLOWING SIBLINGS of the shared scroller, so `~` is required — a descendant combinator matches nothing (issue #50). Hidden while `.lc-root` or `.lc-modal-backdrop` is mounted, because they would drag through the pane and hover above the modal mask. */
+[data-conversation-scroll]:has(.lc-root, .lc-modal-backdrop) ~ [data-width-handle] { display: none; }

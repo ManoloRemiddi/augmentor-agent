@@ -1,0 +1,28 @@
+{
+  "schema": "augmentor-public-brand-selection/1",
+  "repository": "https://github.com/ManoloRemiddi/augmentoragent.com",
+  "ref": "68a59fd7c485a12d5d7befc448b5692343901f64",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Manolo Remiddi",
+  "files": [
+    {
+      "path": "brand-orb.css",
+      "upstreamPath": "assets/brand-orb.css",
+      "sha256": "844e724bec3543782b55ccd9e449e0a8beacba474f00a4ac4d1602fbe5bab4ac",
+      "upstreamSha256": "844e724bec3543782b55ccd9e449e0a8beacba474f00a4ac4d1602fbe5bab4ac"
+    },
+    {
+      "path": "favicon.svg",
+      "upstreamPath": "assets/redesign-icon.svg",
+      "sha256": "41bb6c11631877faca0a19ac87628b1ace1d7d825445f8ded0f6e6510db0fe61",
+      "upstreamSha256": "41bb6c11631877faca0a19ac87628b1ace1d7d825445f8ded0f6e6510db0fe61"
+    },
+    {
+      "path": "LICENSE",
+      "upstreamPath": "LICENSE",
+      "sha256": "deed36d28283e9cd6fa78b50e729d83026fbeaae6f5dd44eadbedf9d92d07b91",
+      "upstreamSha256": "deed36d28283e9cd6fa78b50e729d83026fbeaae6f5dd44eadbedf9d92d07b91"
+    }
+  ],
+  "scope": "Verbatim website motion and companion favicon. Authored wrapper fits the original DSH sidebar/hero brand slots with a thicker outline, uses black outline/smoke in Light, retains the Dark flare, and releases only brand-row clipping without changing actions."
+}

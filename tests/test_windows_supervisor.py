@@ -81,6 +81,48 @@ class SupervisorSafetyTests(unittest.TestCase):
         self.assertIs(supervisor.child,child)
 
 
+class SelectedRuntimeRestoreTests(unittest.TestCase):
+    def test_only_an_existing_owned_selected_home_is_restored(self):
+        with tempfile.TemporaryDirectory() as temporary,patch.dict(os.environ,{'XDG_DATA_HOME':temporary}):
+            state=owner.managed_directory();self.assertTrue(state.is_relative_to(Path(temporary)));root=Path(temporary)/'installed';agent=owner.ManagedAgent(root,state)
+            with patch('dsh.setup.current',return_value={}),patch.object(owner,'request') as request:
+                self.assertIsNone(owner.restore_selected(root));request.assert_not_called()
+            selected={'home':str(state/'home')}
+            with patch('dsh.setup.current',return_value=selected),patch.object(owner,'request') as request:
+                self.assertIsNone(owner.restore_selected(root));request.assert_not_called()
+            private_directory(state);owner.atomic_json(agent.path,agent.identity);before=agent.path.read_bytes()
+            with patch('dsh.setup.current',return_value=selected),patch.object(owner,'request') as request:
+                self.assertIsNone(owner.restore_selected(root));request.assert_not_called()
+            private_directory(state/'home')
+            with patch('dsh.setup.current',return_value=selected),patch.object(owner,'request',return_value={'dsh':{'running':True}}) as request:
+                self.assertEqual(owner.restore_selected(root),{'dsh':{'running':True}});request.assert_called_once_with('start-dsh',root=root)
+            self.assertEqual(agent.path.read_bytes(),before)
+            for selection in [{},{'home':str(state/'external')},{'home':str(root/'unrelated')}]:
+                with self.subTest(selection=selection),patch('dsh.setup.current',return_value=selection),patch.object(owner,'request') as request:
+                    self.assertIsNone(owner.restore_selected(root));request.assert_not_called()
+    def test_mismatched_owner_and_failed_start_preserve_the_profile(self):
+        with tempfile.TemporaryDirectory() as temporary,patch.dict(os.environ,{'XDG_DATA_HOME':temporary}):
+            state=owner.managed_directory();self.assertTrue(state.is_relative_to(Path(temporary)));root=Path(temporary)/'installed';private_directory(state/'home');agent=owner.ManagedAgent(root,state);selected={'home':str(state/'home')}
+            owner.atomic_json(agent.path,{'unrecognized':'preserve'});before=agent.path.read_bytes()
+            with patch('dsh.setup.current',return_value=selected),patch.object(owner,'request') as request:
+                with self.assertRaisesRegex(ValueError,'different background'):owner.restore_selected(root)
+                request.assert_not_called()
+            self.assertEqual(agent.path.read_bytes(),before);owner.atomic_json(agent.path,agent.identity);before=agent.path.read_bytes()
+            with patch('dsh.setup.current',return_value=selected),patch.object(owner,'request',side_effect=owner.MaintenanceBusy('prepared')):
+                with self.assertRaises(owner.MaintenanceBusy):owner.restore_selected(root)
+            self.assertEqual(agent.path.read_bytes(),before)
+
+    @patch.object(owner,'managed_directory',return_value=Path('/authored/unused-data'))
+    def test_malformed_selection_is_reported_without_any_start(self,_directory):
+        for value in [None,[],42]:
+            with self.subTest(value=value),patch('dsh.setup.current',return_value=value),patch.object(owner,'request') as request:
+                with self.assertRaisesRegex(ValueError,'invalid'):owner.restore_selected(Path('/authored/root'))
+                request.assert_not_called()
+        with patch('dsh.setup.current',side_effect=AttributeError('outer metadata is not an object')),patch.object(owner,'request') as request:
+            with self.assertRaisesRegex(ValueError,'invalid'):owner.restore_selected(Path('/authored/root'))
+            request.assert_not_called()
+
+
 @unittest.skipUnless(sys.platform == 'win32', 'requires real Windows named-pipe ownership')
 class WindowsSupervisorTests(unittest.TestCase):
     def test_companions_have_one_owner_and_die_with_it(self):

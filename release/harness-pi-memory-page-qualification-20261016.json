@@ -1,0 +1,429 @@
+{
+  "schema": "augmentor-pi-memory-page-qualification/1",
+  "date": "2026-10-16",
+  "runtimeSourceRef": "a8f49ced0a86ec6256cc129e058815d59679593b",
+  "applicationFreezeAndExternalDriverRef": "03fb703958b161fc491498f510dd7e59d689dadf",
+  "productVersion": "0.2.13",
+  "piSdkVersion": "1.1.0",
+  "hindsightBaseVersion": "0.10.0",
+  "upstreamBackport": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "license": "MIT",
+    "copyright": "Copyright (c) 2025 Vectorize AI, Inc.",
+    "upstreamFixRef": "022583d43b3ae460233c9df880040c0770f24e0b",
+    "upstreamFixPath": "hindsight-api-slim/hindsight_api/engine/memory_engine.py",
+    "baseRef": "5d46f9c8c8eb4fb96f549aa63abe1191b82a7840",
+    "baseGitBlob": "df43b37f0093fb5d3c3037858126620f9e5b4790",
+    "baseImage": "ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b",
+    "containerPath": "/app/api/hindsight_api/engine/memory_engine.py",
+    "baseSha256": "770ea9011dec620c6c6584f8889ccf73740f9489586e5745fd0164fd636eafba",
+    "resultSha256": "dd82621a04fc20f3535be823d3a6a2712572928e54ac9fa73541cdb463ecf4f0",
+    "patchSha256": "229dd6019362cabf8bca9b126babe22a6aa15d98d05b0bf37c81bc4b54a0cbcc",
+    "licenseSha256": "01fde0bedf83bdc185065d7af524a61690efe576a67f922eaff3a1280c17b63a",
+    "adaptation": "Only the upstream refresh budget constant, per-refresh selection and explicit Reflect argument are backported into the exact 0.10.0 image source; shortened comment/context adapted. Newer API/UI/CLI/schema/config-option changes are not selected.",
+    "scope": "Opt-in isolated proof overlay only; configured max iterations remains two and existing job/call/time/token/output/concurrency/model settings remain unchanged."
+  },
+  "scope": "Isolated Linux source/fresh ordinary app and fresh actual Pi/Hindsight/default-Qwen test; no installed adoption or owner review update",
+  "pagePolicy": {
+    "revision": 3,
+    "requestedWords": 120,
+    "existingPageTokenTarget": 768,
+    "existingPageIdentityAndContentPreservedUntilNormalRefresh": true
+  },
+  "processingLimits": {
+    "configuredReflectIterations": 2,
+    "effectiveDocumentRefreshIterationsBefore": 1,
+    "effectiveDocumentRefreshIterationsAfter": 2,
+    "jobAndAbsoluteToolWindowSeconds": 120,
+    "jobTokens": 65536,
+    "callSeconds": 45,
+    "callOutputTokens": 4096,
+    "reflectContextTokens": 8000,
+    "modelConcurrency": 1,
+    "stageRetryPerformed": false,
+    "limitsRaisedForQualification": false,
+    "detail": "The upstream default fix uses MID within the configured two iterations. Source setup already explicitly uses the accepted 45-second call ceiling; original installed engine leaves LLM_TIMEOUT unset and is unchanged."
+  },
+  "providerLimits": {
+    "contextWindow": 262144,
+    "conversationOutputTokens": 8192,
+    "thinkingChoice": "default",
+    "serverContextConcurrencyPrecisionOrGpuChanged": false
+  },
+  "qualification": {
+    "sourcePythonRuntimeMatchesFinal": {
+      "pass": 43,
+      "fail": 0,
+      "skipped": 0
+    },
+    "sourceNode": {
+      "pass": 31,
+      "fail": 0,
+      "skipped": 0,
+      "workers": 2
+    },
+    "freshOrdinaryPython": {
+      "pass": 43,
+      "fail": 0,
+      "skipped": 0
+    },
+    "freshOrdinaryNode": {
+      "pass": 31,
+      "fail": 0,
+      "skipped": 0,
+      "workers": 2
+    },
+    "sourceLicenseBoundary": {
+      "pass": 12,
+      "fail": 0,
+      "skipped": 0
+    },
+    "existingBoundsWorkersSkipsChanged": false,
+    "frozenTrackedInputs": 3400,
+    "compiledInputs": 1060,
+    "nodeExecutables": 1,
+    "dependencyInputs": 20702,
+    "allFrozenInputsUnchangedAfterUse": true,
+    "frozenInventorySha256": {
+      "dist": "e772c7ae5cc6d6f26e44c7dac00a3d3ab576dbb2a80e92b5ac181ee47ac52ae1",
+      "node": "7cf49748be9dfbbd046a98a2769dfc8b8366eeb661a450827711c5094a9b5a24",
+      "node_modules": "0704a733803a7dabae4dd66e7726e15cd750c0b6d29d552c604ba7dd331b4bab"
+    },
+    "allFrozenInputsUnchangedAfterFocusedOutage": true
+  },
+  "retainedExperiments": [
+    {
+      "kind": "upstream backport with original page query",
+      "sourceRef": "3af7f3c62480bcc1f30aa0d5ae49df6addaada87",
+      "result": {
+        "passed": false,
+        "phase": "actual-sdk-tool-window-and-retain",
+        "error": "Error: Controlled memory stopped a job; no retry or budget extension was attempted."
+      },
+      "jobs": [
+        {
+          "phase": 5,
+          "status": "stopped",
+          "reason": "Stage failed (InternalServerError); inspect before an explicit retry."
+        }
+      ],
+      "budgets": [
+        {
+          "remainingSeconds": 7.207280749920756,
+          "remainingTokens": 16640,
+          "calls": 9,
+          "failures": 0,
+          "status": "pending"
+        }
+      ],
+      "allOwnedActorsTerminal": true,
+      "engineStopped": true,
+      "originalEngineIdentityUnchanged": true,
+      "cacheInputsUnchanged": 43,
+      "sourceOverlayUnchanged": true,
+      "thinkingChoice": "default",
+      "privateEngineLog": {
+        "bytes": 43717,
+        "sha256": "668b2cd02f38d500cafce801ad99fbe6a475b6bb9a65e26c58f64b239886517d",
+        "published": false
+      }
+    },
+    {
+      "kind": "concise pages with premature recovery observation",
+      "sourceRef": "a8f49ced0a86ec6256cc129e058815d59679593b",
+      "result": {
+        "passed": false,
+        "phase": "memory-outage-without-chat-replay",
+        "seed": {
+          "relationshipSha256": "7be409cbccfe28745c98d5bbf3cdcd08c2621e99b0c5087d1e7b951d68b24e15",
+          "workSha256": "f006d59b9b75f62e37ccd611c6267186d8adbb7be08fc12325e0eb975eb3d5b7"
+        },
+        "recall": {
+          "nativeBriefSha256": "4ef3032dcc3114edff957c49672c947c40895e28bb3a9c309c741055aa6c570f",
+          "actualProviderContext": true,
+          "actualAnswer": true
+        },
+        "personProjectIsolation": true,
+        "updatedMemorySha256": "70eafc4ad883fe25e56448ec1c5e0edbfb8f85ba0d7430b240748bb702dbbdf7",
+        "historicalBranch": {
+          "originalBriefSha256": "4ef3032dcc3114edff957c49672c947c40895e28bb3a9c309c741055aa6c570f",
+          "noFreshRecall": true,
+          "parentUnchanged": true
+        },
+        "coldBranchAndMemoryRestart": true,
+        "pause": {
+          "chatAvailable": true,
+          "captureAndRecallSuppressed": true
+        },
+        "error": "Error: Memory session is not bound"
+      },
+      "jobs": [
+        {
+          "phase": 6,
+          "status": "completed",
+          "reason": ""
+        },
+        {
+          "phase": 6,
+          "status": "completed",
+          "reason": ""
+        }
+      ],
+      "budgets": [
+        {
+          "remainingSeconds": 46.081965812074486,
+          "remainingTokens": 30094,
+          "calls": 8,
+          "failures": 0,
+          "status": "pending"
+        },
+        {
+          "remainingSeconds": 24.40684739901917,
+          "remainingTokens": 19748,
+          "calls": 10,
+          "failures": 0,
+          "status": "pending"
+        }
+      ],
+      "allOwnedActorsTerminal": true,
+      "engineStopped": true,
+      "originalEngineIdentityUnchanged": true,
+      "cacheInputsUnchanged": 43,
+      "sourceOverlayUnchanged": true,
+      "thinkingChoice": "default",
+      "privateEngineLog": {
+        "bytes": 62801,
+        "sha256": "5a6854b651ec4cdb81b37c5f7099515c2880a087d707f8354177ec2b5bfb7b43",
+        "published": false
+      }
+    },
+    {
+      "kind": "concise pages and bounded recovery observation",
+      "sourceRef": "03fb703958b161fc491498f510dd7e59d689dadf",
+      "result": {
+        "passed": false,
+        "phase": "current-memory-update",
+        "seed": {
+          "relationshipSha256": "d181ac152010dda9ac2736460db87d91747e020caeebe0fa13628e34a0a6d2f1",
+          "workSha256": "d298607a1ebcb4da0fb4ad54f4373bc31049d3fdd551a659a13e24fe53ab91a8"
+        },
+        "recall": {
+          "nativeBriefSha256": "678979009aaeb5b3e217c8e50f0f1c3e986fbdb5af4610e3e2b81457c15249e1",
+          "actualProviderContext": true,
+          "actualAnswer": true
+        },
+        "personProjectIsolation": true,
+        "error": "Error: Controlled memory stopped a job; no retry or budget extension was attempted."
+      },
+      "jobs": [
+        {
+          "phase": 6,
+          "status": "completed",
+          "reason": ""
+        },
+        {
+          "phase": 5,
+          "status": "stopped",
+          "reason": "Stage failed (InternalServerError); inspect before an explicit retry."
+        }
+      ],
+      "budgets": [
+        {
+          "remainingSeconds": 45.13616992300376,
+          "remainingTokens": 29292,
+          "calls": 8,
+          "failures": 0,
+          "status": "pending"
+        },
+        {
+          "remainingSeconds": 6.8702041920041665,
+          "remainingTokens": 0,
+          "calls": 10,
+          "failures": 0,
+          "status": "stopped"
+        }
+      ],
+      "allOwnedActorsTerminal": true,
+      "engineStopped": true,
+      "originalEngineIdentityUnchanged": true,
+      "cacheInputsUnchanged": 43,
+      "sourceOverlayUnchanged": true,
+      "thinkingChoice": "default",
+      "privateEngineLog": {
+        "bytes": 60132,
+        "sha256": "6990808e5de1ba0d0c793eeff0b7676e9551cfa9598816065a9acce95de1b2c0",
+        "published": false
+      }
+    }
+  ],
+  "preparationFailure": {
+    "processObservedTerminal": true,
+    "engineRecordContainerOrCacheCreated": false,
+    "rawLogBytes": 0,
+    "countedAsLiveEvidence": false
+  },
+  "localEvidenceDigests": {
+    "harness-memory-refresh-backport-source-python-20261016.log": {
+      "bytes": 7626,
+      "sha256": "c27cd0a1aab8c246b7c15da71ce40baae4699438f84e1355bfe6d28003ecf6f1"
+    },
+    "harness-memory-refresh-ordinary-python-20261016.log": {
+      "bytes": 7626,
+      "sha256": "51845d2faf04e1408ecacc7c902b9598ef8ba20fa7ed4a8c23ccbe7cbe199dce"
+    },
+    "harness-memory-refresh-ordinary-node-20261016.log": {
+      "bytes": 3406,
+      "sha256": "424589287b37c717e7e1d59b08609d8e93e3933d1adaad96f6d93191dc6e3d16"
+    },
+    "harness-memory-concise-source-python-20261016.log": {
+      "bytes": 7626,
+      "sha256": "583b0ef41e4376d2ebf2631655ad661316498ba50522b123f01c28ee10669314"
+    },
+    "harness-memory-concise-ordinary-python-20261016.log": {
+      "bytes": 7626,
+      "sha256": "be4cb9ba87be05027820eb2aa4ad2ea14d6e957ab1c19a9cd90a09cc2d924bb6"
+    },
+    "harness-memory-concise-ordinary-node-20261016.log": {
+      "bytes": 3403,
+      "sha256": "a8e6579a482e4fc8ab53d5752c1284053e169ae4624ff6f25a28b4ac3d5010db"
+    },
+    "harness-memory-recovery-node-source-20261016.log": {
+      "bytes": 3516,
+      "sha256": "77b9fbdc1e42e509b2810a7a54744a29ad01b71ac79e2a80bb90a4716974cd74"
+    },
+    "harness-memory-recovery-ordinary-python-20261016.log": {
+      "bytes": 7626,
+      "sha256": "efbb85c6bbc6625986830a2977fef2a2047190fa0e14de6bef5d820591737ce0"
+    },
+    "harness-memory-recovery-ordinary-node-20261016.log": {
+      "bytes": 3517,
+      "sha256": "5ce2c7d14e135ea19cb45a58102302672a917a4ce672daa1b787d1404061831e"
+    },
+    "harness-memory-refresh-boundary-20261016.log": {
+      "bytes": 2253,
+      "sha256": "0641458f080e593983b9af4f313ff8a34abcd55f4130f6bd0724b7abdada9420"
+    },
+    "harness-memory-refresh-live-proof-20261016.log": {
+      "bytes": 1986,
+      "sha256": "23ada19bf85a91b3e0c5cacab386d90eaca3ad693ce6ce9cc0dfcf5429dc2590"
+    },
+    "harness-memory-concise-live-proof-20261016.log": {
+      "bytes": 2224,
+      "sha256": "11ecdbe4491e8ba80ed0b357dbc8baa0f0f3fd564576c7280bb3820f6618e316"
+    },
+    "harness-memory-recovery-live-proof-20261016.log": {
+      "bytes": 2168,
+      "sha256": "b98af19765d96949178ea2912bf732441bf02c42f65514ca4fe331187e8641bf"
+    },
+    "harness-memory-outage-live-proof-20261016.log": {
+      "bytes": 319,
+      "sha256": "dbd7204f52c8c1824e469e92a0866da96c527febcc9f27ceda219829acd69400"
+    },
+    "harness-memory-outage-engine-20261016.log": {
+      "bytes": 228,
+      "sha256": "f0ae81771092df02f4cea1052e1d9b2bf1d4231710a0519eebdd864d1f491b39"
+    }
+  },
+  "deployment": {
+    "productionInstallerChanged": false,
+    "installedEngineChanged": false,
+    "installedSelectionChanged": false,
+    "ownerMxReviewChanged": false,
+    "privateSpeechSourceCopied": false,
+    "ownerConversationOrCredentialImported": false,
+    "publicBinaryPublished": false,
+    "merged": false
+  },
+  "remaining": [
+    "Repeatable full default-mode acceptance within unchanged processing windows and token budgets",
+    "Owner physical MX feedback and updated review adoption",
+    "Production memory backport distribution/install/restart and existing-bank migration acceptance",
+    "Broader memory semantics/load and provider modes",
+    "Full voice/shared dependency distribution and remaining Harness migration",
+    "Windows/macOS/other Linux release qualification"
+  ],
+  "wholeHarnessGoalComplete": false,
+  "focusedOutageQualification": {
+    "scenario": "outage",
+    "passed": true,
+    "fullScenarioQualifiedByThis": false,
+    "externalDriverRef": "50c8f2afe8fc1284b9e70c60b46abdce60a97595",
+    "externalDriverSha256": "8f0d17560971c0d61850574a3ab6c7f40581f8de0031be3fd7ad73a8632df51e",
+    "applicationRef": "03fb703958b161fc491498f510dd7e59d689dadf",
+    "ordinaryChat": true,
+    "emptyManagedBrief": true,
+    "sourceRoles": {
+      "assistant": 1,
+      "user": 1
+    },
+    "conversationRequests": 1,
+    "sdkToolExecutions": 0,
+    "memoryInferenceBudgets": 0,
+    "durableCaptureRecoveredExactlyOnce": true,
+    "modelOrToolReplay": false,
+    "providerOutputLimitsPreserved": true,
+    "allOwnedActorsAndEngineTerminal": true,
+    "sourceOverlayAndPublicCacheUnchanged": true,
+    "privateEngineLog": {
+      "bytes": 28258,
+      "sha256": "bfc78a08e27e158c40ebd5a3e8fb58fe2cbcddb146a35a36910869a5945bfd3b",
+      "published": false
+    }
+  },
+  "runtimeInputSha256": {
+    "services/memory/gateway.py": "42ab674345d7b0acc870a3fdc084b5f8611cac983df6dd640cb8b6ad04a26955",
+    "services/memory/hindsight.py": "60b3c9950ef24e636ab0ae76866c6814ea40bd6daa6ed203614e8b45a5339a85",
+    "services/memory/hindsight_backport.py": "787c6c6993b4fafae4aa1f91de92e90521ba65c80a757fa452ce504fd83400e4",
+    "dist/runtime/src/host.js": "05d4d7b04989c1d85e8d3ff46eec2295fa22b7bad2d471fbbdcd460719baf270"
+  },
+  "engineEnvironmentReadOnlyComparison": {
+    "LLM_TIMEOUT": {
+      "original": null,
+      "proof": "45"
+    },
+    "LLM_MAX_CONCURRENT": {
+      "original": "1",
+      "proof": "1"
+    },
+    "RETAIN_MAX_CONCURRENT": {
+      "original": "1",
+      "proof": "1"
+    },
+    "CONSOLIDATION_LLM_PARALLELISM": {
+      "original": "1",
+      "proof": "1"
+    },
+    "REFLECT_MAX_ITERATIONS": {
+      "original": "2",
+      "proof": "2"
+    },
+    "REFLECT_MAX_CONTEXT_TOKENS": {
+      "original": "8000",
+      "proof": "8000"
+    },
+    "REFLECT_SOURCE_FACTS_MAX_TOKENS": {
+      "original": "1200",
+      "proof": "1200"
+    },
+    "REFLECT_MAX_COMPLETION_TOKENS": {
+      "original": "4096",
+      "proof": "4096"
+    },
+    "LLM_MAX_RETRIES": {
+      "original": "0",
+      "proof": "0"
+    }
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 11,
+    "reviewProcessesPresent": 12,
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "modelSpeechGpuConfigurationFilesPreserved": 6,
+    "privateCompanionPreexistingDirtyFiles": 4,
+    "currentMxReviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "recognitionReviewProcessPresent": true,
+    "newArtifactActivated": false
+  }
+}

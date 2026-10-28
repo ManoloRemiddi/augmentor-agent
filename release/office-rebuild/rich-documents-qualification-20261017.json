@@ -1,0 +1,519 @@
+{
+  "schema": "augmentor-rich-office-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Private MX Linux original-provider comparison and original-GUI rich DOCX using the existing ThinLTO engine; no installed/default engine update",
+  "sourceEvidenceBaseRef": "90dd25ef4ca427d9e6b9e2f78d9f7523767a94c3",
+  "currentApplicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+  "sourceFilesSha256": {
+    "release/office-rebuild/rich-office-fixtures.py": "3c90b0b768f4e5303a4c60aa5744ae308e8deb30a2237abcaf3ed9a951b43574",
+    "release/office-rebuild/compare-rich-candidate.mjs": "14677baca065db2b555ac46fa899a6159b7fd2f102adaebf6407db797a96c3f8",
+    "release/office-rebuild/rich-office-gui-probe.mjs": "a440ad2da8cb30dc06deef1c3982f05453cdb5458f202cf6a91cc8485bf4a58f",
+    "release/office-rebuild/source-entry-probe.mjs": "1406455d526a84cf6e79c1abfe15167c25e2ef4e218a7d8c2f823bce6959c41a",
+    "release/office-rebuild/native-sandbox-probe.py": "63d6a0e91c6ce65290df1978d50093d14440f531f2e66fa94abca4ddfceee72b",
+    "tests/harness-office-chromium.test.mjs": "9bfa5370254b465620a7190be158515763237b8f3b9f3a49e3f6b745f82b5249"
+  },
+  "engines": {
+    "thinEntry": "0.1.3-augmentor.thin.1",
+    "thinEngine": "@augmentor/office-engine-wasm@0.1.5-augmentor.thin.1",
+    "baselineEntry": "0.1.3-augmentor.1",
+    "baselineEngine": "@deepseek-ai/libreoffice-kit-wasm@0.1.5"
+  },
+  "fixtures": {
+    "formats": 6,
+    "authoredOnly": true,
+    "nativeGeneratorIsIsolatedFixtureProducerNotApplicationFallback": true,
+    "ownerDocumentsUsed": false,
+    "formatResults": [
+      {
+        "extension": "doc",
+        "kind": "writer",
+        "inputSha256": "f9ca57bb3effbc2d3c1b95757342ada8fd539a1a5a44b53dcd45066cf7db4323",
+        "pages": 3,
+        "images": 3,
+        "requiredTextVerified": [
+          "AUGMENTOR_AUTHORED_NATIVE",
+          "RICH_WRITER_PAGE_1",
+          "RICH_WRITER_PAGE_3",
+          "RICH_HEADER_PRESERVED",
+          "RICH_FOOTER_PRESERVED",
+          "ROW_2_4_3",
+          "RICH_FONT_FALLBACK"
+        ],
+        "absentTextVerified": [],
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "missingFonts": [],
+        "sourceUnchanged": true,
+        "ownedCacheBytes": true,
+        "thinPdfSha256": "51856cac6dc471b604896b4209bf079444a94ce773dd9d9ee9cc36db5129ee8d",
+        "baselinePdfSha256": "0d51013a725bb4770db176a2d18f93827e42ba8f95b439a8fdb6816303549c2d"
+      },
+      {
+        "extension": "docx",
+        "kind": "writer",
+        "inputSha256": "43b094b327ace4ffb4eae8f178e59befed9771dd8649d0a260356a082e9a4704",
+        "pages": 3,
+        "images": 3,
+        "requiredTextVerified": [
+          "AUGMENTOR_AUTHORED_NATIVE",
+          "RICH_WRITER_PAGE_1",
+          "RICH_WRITER_PAGE_3",
+          "RICH_HEADER_PRESERVED",
+          "RICH_FOOTER_PRESERVED",
+          "ROW_2_4_3",
+          "RICH_FONT_FALLBACK"
+        ],
+        "absentTextVerified": [],
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "missingFonts": [
+          "Augmentor Authored Missing Font"
+        ],
+        "sourceUnchanged": true,
+        "ownedCacheBytes": true,
+        "thinPdfSha256": "8eaf7542a7c4fc1d1795b7e93de33fb54ee6fdfc11085d0f1084780dd35124df",
+        "baselinePdfSha256": "79f58859568c611ac203520af36f8d0820edabe1b0e1fd4379b2507cca08eb71"
+      },
+      {
+        "extension": "xls",
+        "kind": "calc",
+        "inputSha256": "b21380eb055919260012af432b6b706fb9a2c2cbee5503a7fc4d730b453a72fc",
+        "pages": 2,
+        "images": 0,
+        "requiredTextVerified": [
+          "AUGMENTOR_AUTHORED_NATIVE",
+          "RICH_ITEM_ALPHA",
+          "RICH_TOTAL",
+          "83.00",
+          "RICH_SECOND_SHEET",
+          "41.50",
+          "=2+2 is literal text"
+        ],
+        "absentTextVerified": [
+          "RICH_HIDDEN_SHOULD_NOT_RENDER"
+        ],
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "missingFonts": [],
+        "sourceUnchanged": true,
+        "ownedCacheBytes": true,
+        "thinPdfSha256": "814a0f4d380d84ef75b7caf4190767c3a4eac26734858b35c78837445031a1a3",
+        "baselinePdfSha256": "4eb19691b944ec040891d52cae7d946c3ed6bec291ef0cf9b05c5c95942b8eb3"
+      },
+      {
+        "extension": "xlsx",
+        "kind": "calc",
+        "inputSha256": "9f6e8786e0253552fbf5aac6d6d25f880a6e7bb8d0491c45d1d0f90cc473c38d",
+        "pages": 2,
+        "images": 0,
+        "requiredTextVerified": [
+          "AUGMENTOR_AUTHORED_NATIVE",
+          "RICH_ITEM_ALPHA",
+          "RICH_TOTAL",
+          "83.00",
+          "RICH_SECOND_SHEET",
+          "41.50",
+          "=2+2 is literal text"
+        ],
+        "absentTextVerified": [
+          "RICH_HIDDEN_SHOULD_NOT_RENDER"
+        ],
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "missingFonts": [],
+        "sourceUnchanged": true,
+        "ownedCacheBytes": true,
+        "thinPdfSha256": "f436fc997af6872c6cf9b553999efd13cc5253ab0a6dec6769f5e2998e6c86ba",
+        "baselinePdfSha256": "85636aae0c3d831ff407eb74bbbc7b5f364ca9dd8769671b3192214d95b85644"
+      },
+      {
+        "extension": "ppt",
+        "kind": "deck",
+        "inputSha256": "5996cb6440b1cf0d1ba682e97bf88007339e1b501f7c116aba653aacf0696c8d",
+        "pages": 3,
+        "images": 3,
+        "requiredTextVerified": [
+          "AUGMENTOR_AUTHORED_NATIVE",
+          "RICH_DECK_PAGE_1",
+          "RICH_DECK_PAGE_3",
+          "RICH_RIGHT_COLUMN",
+          "RICH_SLIDE_FOOTER_3"
+        ],
+        "absentTextVerified": [
+          "RICH_NOTES_SHOULD_NOT_RENDER"
+        ],
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "missingFonts": [],
+        "sourceUnchanged": true,
+        "ownedCacheBytes": true,
+        "thinPdfSha256": "7d7708eb579db81444608d2f7a218615ab37a6300c1395a70935dbab6fcc7a57",
+        "baselinePdfSha256": "edfb13cac13f9563ccab4da785b4e863953d43a31cd54d23b5a2380d82ad7437"
+      },
+      {
+        "extension": "pptx",
+        "kind": "deck",
+        "inputSha256": "a12daf04419c2fc976df157eda93a97dda8854aa9d6a49befd47c415e41eb585",
+        "pages": 3,
+        "images": 3,
+        "requiredTextVerified": [
+          "AUGMENTOR_AUTHORED_NATIVE",
+          "RICH_DECK_PAGE_1",
+          "RICH_DECK_PAGE_3",
+          "RICH_RIGHT_COLUMN",
+          "RICH_SLIDE_FOOTER_3"
+        ],
+        "absentTextVerified": [
+          "RICH_NOTES_SHOULD_NOT_RENDER"
+        ],
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "missingFonts": [],
+        "sourceUnchanged": true,
+        "ownedCacheBytes": true,
+        "thinPdfSha256": "52436a6b5f16ed384a5415357dd6a90a63da410bb444c65597ef495218f77ab4",
+        "baselinePdfSha256": "6b7376c0f58f2884f2c439af2775b2b045b67999f1a3500bc1f47a4562a6c42e"
+      }
+    ]
+  },
+  "rendering": {
+    "pages": 16,
+    "rasterDpi": 96,
+    "identicalRawPixelsAllPages": true,
+    "pagePixels": [
+      {
+        "name": "doc-1.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "63e26e01b79646a26ab3258f5174cf490878a56daa82385a5c15ca56c8fa85f2",
+        "identical": true
+      },
+      {
+        "name": "doc-2.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "d70f2775ebf6de4bbc93b2683a2688783c5ff8844492105cac9a77f0ad91f447",
+        "identical": true
+      },
+      {
+        "name": "doc-3.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "4428e1d5931b638681bf46297541e8d7238b0819675a4641fa3704763dd17bdc",
+        "identical": true
+      },
+      {
+        "name": "docx-1.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "63e26e01b79646a26ab3258f5174cf490878a56daa82385a5c15ca56c8fa85f2",
+        "identical": true
+      },
+      {
+        "name": "docx-2.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "d70f2775ebf6de4bbc93b2683a2688783c5ff8844492105cac9a77f0ad91f447",
+        "identical": true
+      },
+      {
+        "name": "docx-3.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "4428e1d5931b638681bf46297541e8d7238b0819675a4641fa3704763dd17bdc",
+        "identical": true
+      },
+      {
+        "name": "xls-1.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "ff865f5feec05a3cc9775287c9e00e0a0b2cd55fd0eb4cc72130abcd4955e4d3",
+        "identical": true
+      },
+      {
+        "name": "xls-2.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "0289b530e8a7caaf760a08dc512dcca694f5c841b37a275fdb21c0f07429da9b",
+        "identical": true
+      },
+      {
+        "name": "xlsx-1.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "52393726f3543b6ae7a64872863a291fab054fb0d9045bea12473d1ce3f70f2e",
+        "identical": true
+      },
+      {
+        "name": "xlsx-2.png",
+        "format": "raw",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 2674986,
+        "rawPixelSha256": "8c99457143ea07b1124240308386ae850783ff9a4404eb56e9891397093a51bc",
+        "identical": true
+      },
+      {
+        "name": "ppt-1.png",
+        "format": "raw",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 1893492,
+        "rawPixelSha256": "aae6cd31161d33614b37ce7244f75ed7bb9396d92b395bb0ddf4930e849bbddc",
+        "identical": true
+      },
+      {
+        "name": "ppt-2.png",
+        "format": "raw",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 1893492,
+        "rawPixelSha256": "54ecb60a101c0a38a5056902e2438926725ed1b1ef9cdade2f6a46f4be7b4c88",
+        "identical": true
+      },
+      {
+        "name": "ppt-3.png",
+        "format": "raw",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 1893492,
+        "rawPixelSha256": "86778465f8eab9999d46b7843151554c05cec02e48772d36f9d07acd1167dd5d",
+        "identical": true
+      },
+      {
+        "name": "pptx-1.png",
+        "format": "raw",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 1893492,
+        "rawPixelSha256": "3b3f3ac2c864d68f5ff1f2fe18612ec457774123b9370312f0c96da58597d568",
+        "identical": true
+      },
+      {
+        "name": "pptx-2.png",
+        "format": "raw",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 1893492,
+        "rawPixelSha256": "89014704a3c723e2eda7a9c017c8603ba481650841cc140dc4a5457cd4f58bb8",
+        "identical": true
+      },
+      {
+        "name": "pptx-3.png",
+        "format": "raw",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "depth": "uchar",
+        "premultiplied": false,
+        "hasAlpha": false,
+        "size": 1893492,
+        "rawPixelSha256": "a823691a5b38ba8932d6ed2596d5328075bff518879a00550cf142dcb81247f5",
+        "identical": true
+      }
+    ],
+    "sampleVisualInspection": [
+      "DOCX page 1",
+      "XLSX page 1",
+      "PPTX page 1",
+      "Actual original GUI rich DOCX screenshot"
+    ],
+    "rawPdfByteIdentityClaimed": false
+  },
+  "resources": {
+    "sequentialEngineProbes": true,
+    "thinObservedProbeMs": 9554.68241,
+    "baselineObservedProbeMs": 7569.035835000001,
+    "performanceOrAggregateMemoryAcceptanceClaimed": false,
+    "scope": "Single sequential diagnostic pair, not benchmark or resource/security acceptance"
+  },
+  "originalGui": {
+    "schema": "augmentor-rich-office-gui/1",
+    "inputSha256": "43b094b327ace4ffb4eae8f178e59befed9771dd8649d0a260356a082e9a4704",
+    "initialRichPages": 3,
+    "headerFooterVisibleInTextLayer": true,
+    "originalFontDetails": true,
+    "zoomReloadMalformedRetryRecovery": true,
+    "narrowFullscreenAndClose": true,
+    "originalGuiAndCurrentThinHost": true,
+    "nativeHistoryAndRequestLogUnchanged": true,
+    "realProviderInference": false,
+    "syntheticSeedUsed": true,
+    "documentContentSentToModel": false,
+    "browserErrors": 0,
+    "unexpectedHttpDestinations": 0,
+    "engineBuildsStarted": 0,
+    "installedChanges": 0,
+    "publicRedistributionQualified": false,
+    "chromiumCases": 1,
+    "pass": 1,
+    "fail": 0,
+    "skip": 0,
+    "dimensions": [
+      {
+        "width": 1280,
+        "height": 800
+      },
+      {
+        "width": 513,
+        "height": 715
+      }
+    ],
+    "richCalcOrImpressGuiClaimed": false,
+    "screenshotSha256": "699c6b3fc11b758c23ab7ed58bf683ae7f2beb5b73669489c016bcf110a257b0",
+    "kernelEngineEvidence": {
+      "scope": "Own rich-GUI operator descendants only; successful openat file descriptors and paired unfinished calls",
+      "thinSuccessfulOpens": 4,
+      "driverIdentityHashReads": 1,
+      "converterDescendantOrThreadOpens": 3,
+      "defaultSuccessfulOpens": 0,
+      "unresolvedTargetCalls": 0,
+      "traceSha256": "8496fde7f624e96bdb2cd9eae04922a95922a88e4da9def2f12341188eeb6b59",
+      "wholeMachineOrNetworkAudit": false
+    }
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      },
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 16,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "engineBuildsStarted": 0,
+  "installedChanges": 0,
+  "publicRedistributionQualified": false,
+  "remaining": [
+    "Rich Calc/Impress GUI and wider/custom-font/corpus compatibility.",
+    "Bounded resource/security qualification; this pair is not performance acceptance.",
+    "Complete source-delivery/rebuild/third-party coverage and public packaging review.",
+    "Installed candidate promotion/rollback and owner pilot feedback before more real migration."
+  ],
+  "hosted": {
+    "sourceRef": "90dd25ef4ca427d9e6b9e2f78d9f7523767a94c3",
+    "linuxSdk": {
+      "run": 39013782450,
+      "job": 117341573514,
+      "conclusion": "success"
+    },
+    "debian": {
+      "run": 39013782461,
+      "job": 117341843619,
+      "lastObservedStatus": "in_progress",
+      "lastObservedStep": "Build and verify SDK contracts"
+    },
+    "operatorOnlyPublicationPreservesTheseRunsWithCiSkip": true,
+    "compiledRuntimeGuiOrAutomaticTestsChanged": false,
+    "newHeadOrWholeWorkflowPassClaimed": false
+  }
+}

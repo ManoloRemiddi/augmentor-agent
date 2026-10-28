@@ -1,0 +1,155 @@
+{
+  "schema": "augmentor-harness-cold-backup-qualification/1",
+  "date": "2026-10-17",
+  "sourceRef": "a0f1f16dac3e493201867863382bdf38b2f6b5b3",
+  "scope": "Internal Linux cold data capture and verification; no installed owner snapshot or activation",
+  "sourcePythonPass": 143,
+  "newBackupCases": 10,
+  "backupCasesOverlap143": true,
+  "managedLauncherNodePass": 4,
+  "fail": 0,
+  "skip": 0,
+  "backupSchema": "augmentor-cold-data-backup/1",
+  "coverage": {
+    "wholeDshHomeNoSymlinkTraversal": true,
+    "deploymentSelectionAndPreviousJson": true,
+    "allGuardedPairsThreeDbAndOptionalEngineJson": true,
+    "explicitAdditionalProfileTreesRequired": true,
+    "namedDataSubtreeInsideMixedStorageAllowed": true,
+    "wholeMixedAppRootAndReleaseTreesRefused": true,
+    "externalSymlinkTargetsCopied": false
+  },
+  "archive": {
+    "format": "PAX tar",
+    "ordinaryModesUidGidNanosecondMtimeRecorded": true,
+    "originalHardlinksWithinCoverageRetained": true,
+    "equalContentDoesNotCreateNewHardlinkRelationships": true,
+    "perFileAndManifestAndArchiveSha256Verified": true,
+    "sourceMetadataSelectionAndSharedCutsRechecked": true,
+    "currentCutGuardBinding": true,
+    "validOldBackupIsNotAutomaticallyCurrent": true,
+    "automaticActiveDataRestore": false
+  },
+  "limits": {
+    "reserveGiB": 64,
+    "fileGiB": 2,
+    "logicalDataGiB": 16,
+    "archiveGiB": 20,
+    "metadataMiB": 128,
+    "entries": 500000
+  },
+  "failureHandling": {
+    "sourceAndLateTreeChangesRefused": true,
+    "sqliteJournalsRefused": true,
+    "incompleteDoesNotPublishSuccess": true,
+    "foreignReplacedFilesPreserved": true,
+    "completedOrUnknownCommitOutcomePreserved": true,
+    "ownBulkFilesRemovedOnCaughtFailure": true,
+    "abruptDeathCanLeaveUncommittedArchive": true,
+    "outerRecoveryMustInspectPartialBeforeRetry": true
+  },
+  "authoredFixtureSpaceIsSimulated": true,
+  "actualPublicProfile": {
+    "scope": "Real public fresh integration, immutable incoming artifact and actual candidate Native adapter on authored isolated data",
+    "ownerProfileUsed": false,
+    "ownerModelRequests": 0,
+    "incomingArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
+    "initialPublicInstall": true,
+    "entryBoundInStage": true,
+    "coldBackup": {
+      "verifiedForSameColdCut": true,
+      "real64GiBReserveChecked": true,
+      "entries": 46,
+      "bytes": 543420,
+      "bothSharedDatabaseSetsRestoredOffline": true,
+      "explicitNativeHistoryRestoredOffline": true,
+      "wholeCurrentDshHomeRegularFilesRestoredOffline": true,
+      "backupDoesNotAuthorizeActivation": true,
+      "ownerDataUsed": false
+    },
+    "replacement": {
+      "productVersion": "0.2.13",
+      "homeIdentityMatches": true,
+      "personalPresetsRegistered": true,
+      "catalogGroups": 1,
+      "modelRequests": 0
+    },
+    "candidateClient": {
+      "candidateNativeAdapterMatched": true,
+      "candidateClientPidNamespace": true,
+      "physicalGuiAcceptance": false,
+      "modelRequests": 0
+    },
+    "staleInheritedNativeEndpointOverriddenOnlyForProbe": true,
+    "configurationMutationWhileProbingRefused": true,
+    "normalNamespaceTeardownJoined": true,
+    "successfulPreflightDoesNotClearFence": true,
+    "mixedOriginalModesExact": true,
+    "originalConfigurationRestored": true,
+    "bothSharedDatabaseSetsExact": true,
+    "immutableIncomingStillVerified": true
+  },
+  "testedTools": {
+    "python": "3.13.5",
+    "gnuTarOfflineProof": "1.35",
+    "gnuTarBundledDependency": false
+  },
+  "ownerReadOnlyAdvisory": {
+    "specialModeCount": 0,
+    "foreignOwnerEntries": 0,
+    "filesOver2GiB": 0,
+    "observationErrors": [],
+    "coldSnapshot": false,
+    "ownerDataCopied": false,
+    "liveHomeInventoryFitsBounds": true,
+    "inventoryEntriesIncludingRoot": 198115,
+    "logicalBytesIncludingHardlinks": 8030948652,
+    "conservativeMetadataBytes": 77500142,
+    "readSourceBodies": false
+  },
+  "ownerPreservation": {
+    "bothReviewPidsAnd36ProtectedSetsExact": true,
+    "registryRevision": 18,
+    "sharedRowsEngineConfigMenusSelectionsExact": true,
+    "modelGpuVoiceServicesExact": true
+  },
+  "newApplicationCopies": 0,
+  "newImmutableArtifact": false,
+  "installedChanged": false,
+  "ownerProjectsTransferred": 0,
+  "ownerModelRequests": 0,
+  "rootFreeGiB": 98.52,
+  "previousQualifiedArtifactDoesNotContainThisChange": true,
+  "previousQualifiedArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
+  "linuxSdk": {
+    "run": 39057936198,
+    "head": "c3a6adae35c98d0f49095980652f8e01fa03379e",
+    "runtime": "a0f1f16dac3e493201867863382bdf38b2f6b5b3",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "previousLinuxSdk": {
+    "run": 39055975304,
+    "head": "beaa1b2f17d0b306e7d09ec804f3f416d83fccf0",
+    "runtime": "e58a72b90aea23cbbc758da1680bf608e8ef58c3",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "remaining": [
+    "Review all actual Native/Harness data roots and real caller quiescence, then capture the owner cold checkpoint",
+    "Couple receipt to matching-client selection and durable finalization/reverse orchestration",
+    "One combined immutable candidate and actual owner continuation; no additional projects before pilot feedback",
+    "Native source provenance decisions, public Office packaging gate; voice/later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-cold-backup-source-python-20261017.log": "ee321625db70e7b846a742b7b976de565c4408d3080b9ecd53efae78522c8db2",
+    "harness-cold-backup-source-node-20261017.log": "46703c4c55727ab1505e0e43b9dd1846b86b59d187e5bac72badf7d820696d2c",
+    "harness-cold-backup-real-summary-20261017.log": "aadfc5a3cf56e59f4c92131a4027af7a83669220ff1a6723fcddaa908c83e2b1",
+    "harness-cold-backup-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "nativePublicProvenanceFollowUp": {
+    "canonicalRepoPublicVerified": true,
+    "twoHistoricalDependencyBlobsMatchInstalledAndAreGithubVerified": true,
+    "privateSettingsBaselineNotCopiedOrClassifiedAsPublic": true
+  }
+}

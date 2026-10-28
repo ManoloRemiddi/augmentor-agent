@@ -10,8 +10,8 @@ test('macOS advertises input only when its native helper is installed',()=>{
  assert.equal(c.text,'Unicode');assert.equal(c.requiresUserConsent,true);
  assert.equal(desktopCapabilities('darwin',{AUGMENTOR_PI_LINUX_TOOLS:'0'},()=>true).available,false);
 });
-test('deferred Windows backend is unavailable and Linux retains its restrictions',()=>{
- assert.equal(desktopCapabilities('win32',{},()=>true).available,false);
+test('Windows advertises native input and Linux reports selected portal streams',()=>{
+ assert.equal(desktopCapabilities('win32',{},()=>true).available,true);
  const c=desktopCapabilities('linux',{});
- assert.equal(c.backend,'kde-wayland-portal');assert.equal(c.text,'ASCII');assert.equal(c.monitors,1);
+ assert.equal(c.backend,'kde-wayland-portal');assert.equal(c.text,'ASCII');assert.equal(c.monitors,'selected-portal-streams');
 });

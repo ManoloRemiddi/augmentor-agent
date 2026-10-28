@@ -316,7 +316,7 @@ def recover(client, harness, emit):
     try:
         try: fcntl.flock(fd, fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: raise RecoveryError('Recovery is already running in another window.')
-        emit('Checking '+('DSH' if harness == 'dsh' else 'Pi')+'…')
+        emit('Checking '+('DSH' if harness == 'dsh' else 'Augmentor Harness' if harness == 'ah' else 'Pi')+'…')
         if harness == 'dsh':
             try: client.call('host.describe')
             except Exception as error:
@@ -332,6 +332,9 @@ def recover(client, harness, emit):
                     try: client.call('host.describe'); error = None; break
                     except Exception as exc: error = exc; time.sleep(.5)
                 if error: raise error
+        elif harness == 'ah':
+            client.ensure_running()
+            client.call('host.describe')
         elif harness == 'pi':
             from augmentor_linux.runtime_start import ensure_running
             ensure_running('pi')

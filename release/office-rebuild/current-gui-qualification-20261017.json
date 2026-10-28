@@ -1,0 +1,181 @@
+{
+  "schema": "augmentor-office-current-gui-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Unselected private Linux x64 current-GUI/Host diagnostic reusing the completed source-built ThinLTO engine; no installed engine or default dependency change",
+  "sourceEvidenceBaseRef": "f055c1ac42c3959c9925887a70623022e2894a7b",
+  "currentApplicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+  "currentBaseArtifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+  "upstreamQualification": "thin-engine-qualification.json",
+  "engine": {
+    "entry": "@augmentor/office-entry@0.1.3-augmentor.thin.1",
+    "engine": "@augmentor/office-engine-wasm@0.1.5-augmentor.thin.1",
+    "declaredLicense": "MPL-2.0; original entry/engine notices retained",
+    "originalGuiAndProviderLicense": "MIT",
+    "coreCommit": "bce0998afefdbc355585ca324285661a2170ba77",
+    "existingFinalProducerCurrentlyVerified": "exited / code 0 / OOMKilled false",
+    "existingRuntimeAssetsHashVerified": 5,
+    "coreAndEmsdkHeadsExact": true,
+    "rawAndSupplierTrimmedSourceDiffExact": true,
+    "resourceReceiptExact": true,
+    "newEngineBuildsStarted": 0
+  },
+  "assembly": {
+    "currentCompiledGuiAndRuntimeCopiedToNewUnselectedTree": true,
+    "onlyOfficeEntryCompiledFilesDiffer": true,
+    "existingHashedThinEntryAndEngineReused": true,
+    "remainingCompiledPathsAndBytesExact": true,
+    "selectedBuildAndExistingEngineFilesUnchanged": true,
+    "ownerProfilesCopied": 0,
+    "privatePreparationHelperSha256": "6d0b40e6b614716f76bb96cd145b3dcc3c738b1cd6b55e1491b44d5af95a31cd",
+    "originalPublicTestAndUiProofSourcesUnmodified": true
+  },
+  "qualification": {
+    "officeTests": 5,
+    "officePass": 5,
+    "officeFailures": 0,
+    "officeSkipped": 0,
+    "officeChromiumTests": 1,
+    "neighbourGuiTests": 2,
+    "neighbourPass": 2,
+    "neighbourFailures": 0,
+    "neighbourSkipped": 0,
+    "concurrency": 1,
+    "officeCases": [
+      "Real DOCX conversion in original PDF viewer, two pages and selectable source text.",
+      "Original missing-font details, zoom, reload, malformed-file error, Retry and recovery.",
+      "Original queue admission/capacity, shared readers and canceled HTTP teardown.",
+      "Source-change/size/policy refusal and current-source reauthorization.",
+      "Read-only inspector and browser-only surface do not acquire a converter."
+    ],
+    "neighbourCases": [
+      "Original PDF viewer: local assets/selectable text/zoom/version reload/owned Worker teardown.",
+      "Original spreadsheet grid: isolated parsers, saved formulas/literal text, sheet controls, readonly values, limits and lifecycle."
+    ],
+    "neighbourScope": "Compatibility of separate neighbouring viewers/parsers, not extra engine-format evidence",
+    "nativeHistoryAndRequestLogUnchangedAcrossDocumentPreviews": true,
+    "documentContentSentToModel": false,
+    "syntheticSeedInputUsed": true,
+    "realProviderInference": false,
+    "ownerDataUsed": false,
+    "kernelFileOpenEvidence": {
+      "sourceBuiltWasmSuccessfulOpens": 5,
+      "defaultSupplierWasmSuccessfulOpens": 0,
+      "nonnegativeDescriptorsRequired": true,
+      "unfinishedCallsJoinedByTracedThread": true,
+      "unresolvedTargetOpens": 0,
+      "scope": "Own test descendant file opens only; not a whole-machine or network audit",
+      "traceSha256": "0e01cddd8dfdeeb2f57b9130cf6b4cf971b8c8f9a273c2c71ef92f4006118b3e",
+      "testCohort": "Five Office cases only; two neighbouring GUI cases ran separately."
+    },
+    "officeElapsedSecondsWithFileTracing": 14.458383964025415,
+    "maximumReportedChildRssBytes": 2712043520,
+    "resourceCoverage": "Largest reported child RSS, not aggregate tree memory acceptance",
+    "visualOrNewPixelComparisonClaimed": false
+  },
+  "testInputsSha256": {
+    "tests/harness-office-preview.test.mjs": "1bda3f68a7a3fc9788300f8905aa2b1eaddfc44ed1ee37816b79533b8181e9e6",
+    "tests/harness-office-chromium.test.mjs": "9bfa5370254b465620a7190be158515763237b8f3b9f3a49e3f6b745f82b5249",
+    "tests/harness-spreadsheet-chromium.test.mjs": "2dc5a668e7718202629a5237490c42d389f5e3fc127f46525f897036c6dfbd13",
+    "tests/harness-pdf-chromium.test.mjs": "8804a6c28a0e9d4f7a117651c46ce9e98c5bb8f5e1e004e48c59c175f46ae19e",
+    "scripts/harness-ui-proof.mjs": "a5c38bba1dc00734c3cd6444b0d5af68d67df84c49095d880d0d4f8d13cd70de"
+  },
+  "retainedInitialFailure": {
+    "cause": "Isolated copy omitted scripts/fixtures/context-provider-http.mjs; GUI fixture stops before Host startup.",
+    "correction": "Copy the unchanged public scripts/fixtures directory into the private copy.",
+    "productEngineOrPublicTestChanges": false,
+    "failureAndCorrectedLogsRetained": true
+  },
+  "resourceCleanup": {
+    "removed": "Three completed ordinary/external-test copies from the preceding queue-control qualification",
+    "logicalBytesRemoved": 547453111,
+    "diskBytesRecovered": 635830272,
+    "selectedAndRollbackSealsBackupsLogsFailuresAndOfficeCachesRetained": true,
+    "registeredProfilesOrDeploymentsReferenceRemovedTrees": false,
+    "matchingProcessesBeforeRemoval": 0,
+    "ownerProfilesDeleted": 0
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      },
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 16,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "hostedCurrentImplementation": {
+    "sourceRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+    "linuxSdk": "success",
+    "linuxSdkJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39009796340/job/117329692236",
+    "debianJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39009796321/job/117329966949",
+    "root": {
+      "tests": 2146,
+      "pass": 2102,
+      "fail": 0,
+      "skip": 44
+    },
+    "browser": {
+      "tests": 128,
+      "pass": 128,
+      "fail": 0,
+      "skip": 0
+    },
+    "native": {
+      "tests": 1052,
+      "result": "OK",
+      "skip": 45
+    },
+    "prePackagingTestAndDesktopStages": "success",
+    "debianConclusion": "failure at unchanged public Office source/rebuild gate",
+    "publicPackagingGateRelaxed": false,
+    "installedPackageAndPackagedBrowserJobs": "skipped"
+  },
+  "publicRedistributionQualified": false,
+  "installedEngineChanged": false,
+  "limits": [
+    "One current-GUI DOCX workflow plus bounded real/policy cases; not all-format or representative complex-document acceptance.",
+    "Earlier six-format/ten-page pixel parity is inherited, not rerun as this GUI test.",
+    "No new screenshot or pixel comparison, full font corpus, aggregate resource/performance or broad parser-security claim.",
+    "Complete corresponding-source/external-source/third-party notice distribution remains open.",
+    "Source-built candidate remains unselected; installed/default original engine, owner data, models and services stay unchanged.",
+    "Physical owner acceptance and later operating systems remain separate."
+  ],
+  "publication": {
+    "scope": "Documentation and aggregate JSON only; no tracked runtime/test/workflow or dependency change",
+    "implementationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+    "skipInstruction": "[skip ci]",
+    "reason": "Record completed unchanged-source qualification without repeating its full platform matrix",
+    "newHeadOrWholeWorkflowAcceptanceClaimed": false
+  }
+}

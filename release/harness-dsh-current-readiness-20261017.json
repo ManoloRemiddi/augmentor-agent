@@ -1,0 +1,139 @@
+{
+  "schema": "augmentor-harness-dsh-readiness/2",
+  "date": "2026-10-17",
+  "scope": "Fresh full source catalogue and exact-sealed read-only preparation; current standard exports plus retained v3 archives with independently refreshed complete physical-source/asset witnesses; no owner transfer or native destination",
+  "applicationRef": "d157ffe190bdd91c600b8f76c2a2e3c2bd6a0e52",
+  "releaseId": "20261017-045822-6b886151",
+  "artifactSha256": "02b597295bb93dd9764d3f34e3ddb5f431b055d83306af549cd36e1d0d616bbe",
+  "summary": {
+    "projects": 30,
+    "parentConversations": 107,
+    "preparationAcceptedProjects": 28,
+    "preparationAcceptedConversations": 106,
+    "readyArchivedChildLogs": 48,
+    "standardSourceCutsRevalidated": 78,
+    "standardSourceCutsExact": true,
+    "currentHistoricalPhysicalLogsVerified": 77,
+    "currentHistoricalHeaderWitnessStable": true,
+    "workspaceMembershipAndOrganizationStable": true,
+    "allCurrentRootsIdle": true,
+    "imports": 0,
+    "modelRequests": 0,
+    "assessedSealedInputsVerified": 24679
+  },
+  "categories": {
+    "working-folder-unavailable": {
+      "projects": 1,
+      "parentConversations": 1
+    },
+    "preparation-accepted": {
+      "projects": 28,
+      "parentConversations": 106
+    },
+    "empty-workspace": {
+      "projects": 1,
+      "parentConversations": 0
+    }
+  },
+  "routes": {
+    "standardV2PreparedProjects": 23,
+    "historicalV3PreparedProjects": 5,
+    "historicalV3PreparedParents": 42,
+    "historicalPhysicalLogsFreshlyVerified": 77,
+    "historicalStoredImagesFreshlyVerified": 28,
+    "retainedArchivesMatchCurrentMembershipOrganizationAndCompleteBytes": true,
+    "standardSourceCutsRevalidatedAtEnd": 78,
+    "newOwnerTargetsCreated": 0
+  },
+  "currentModelConfiguration": [
+    {
+      "review": "main",
+      "providers": 10,
+      "models": 431,
+      "credentialAvailableModels": 430,
+      "defaultPresent": true,
+      "defaultCredentialAvailable": true,
+      "pinned": 10,
+      "hidden": 1,
+      "sessions": 1,
+      "runningSessions": 0,
+      "pidUnchanged": true,
+      "modelRequests": 0,
+      "catalogueMeans": "Configured and credential-available metadata, not provider reachability or successful inference"
+    },
+    {
+      "review": "pilot",
+      "providers": 10,
+      "models": 431,
+      "credentialAvailableModels": 430,
+      "defaultPresent": true,
+      "defaultCredentialAvailable": true,
+      "pinned": 10,
+      "hidden": 1,
+      "sessions": 3,
+      "runningSessions": 0,
+      "pidUnchanged": true,
+      "modelRequests": 0,
+      "catalogueMeans": "Configured and credential-available metadata, not provider reachability or successful inference"
+    }
+  ],
+  "sourceToolSha256": {
+    "scripts/export-dsh-project.py": "010b71c50504a04905b0d89afc150269f7670a603c8cb19aa92fd574416ed514",
+    "scripts/dsh_legacy_family.py": "48d8ae5bbbdc3229352d6867d87a1b959b04a2c534842600599d1243185874ed",
+    "scripts/harness-review.py": "b9b4b6661764f84f953067d65292f13b5284d3785708185438ea5bb940e221b6",
+    "dist/runtime/src/dsh-project-import.js": "2f5b91d562be25521b0fb57e152ba5288e7e5a9448f9a6dffa269754ecfc4c42",
+    "dist/runtime/src/dsh-historical-project.js": "5aa82b3887565b9a3db1b1bed9cd017e40c99612a4f885acd1ce972e82bd34a3"
+  },
+  "qualificationInheritedFrom": "harness-dsh-historical-admission-qualification-20261017.json",
+  "runtimeOrGuiChanged": false,
+  "qualificationRerunForThisDataOnlyScan": false,
+  "temporaryStandardExportsRetained": false,
+  "originalSourcesModified": false,
+  "preservation": {
+    "scope": "Read-only IPC peer/build, actual sealed owner files, complete protected regular path sets and contents, registry and selections; no owner restart, update, import or model work",
+    "reviews": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "registryAndSelectedConfigurationsExact": true,
+    "newOwnerTransfers": 0,
+    "ownerRestarts": 0,
+    "candidateActivated": false
+  },
+  "limits": [
+    "Preparation admission is not continuation acceptance of every real conversation or child workflow",
+    "Catalogue counts do not identify additional transfers; DSH originals remain after the pilot",
+    "Model catalogue availability means configured credentials, not successful inference or provider reachability",
+    "Model selection remains explicit at transfer; no default or fallback was assigned to any imported conversation",
+    "Fresh backups, source cuts, folders, idle checks and guarded candidate adoption remain necessary at transfer",
+    "One unavailable working folder requires the owner choice; no empty substitute or inferred relocation",
+    "No private workspace names, IDs, paths, source-data hashes, content or credentials published"
+  ],
+  "remaining": [
+    "Owner pilot feedback before any further real project transfers",
+    "Owner decision for the unavailable working folder",
+    "Guarded adoption and representative ordinary project/model work on the exact candidate",
+    "MX Linux first; voice and other operating systems deferred"
+  ],
+  "publicationChecks": {
+    "privateBoundaryLicenseAndNoticeCasesPassed": 16,
+    "privateSourceIdentityOrContentFingerprintMatchesInStagedPublication": 0,
+    "privateSourceIdentityOrContentFingerprintStringsChecked": 428
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schema": "augmentor-pi-audio-processor-acceptance/1",
+  "date": "2026-10-16",
+  "scope": "private companion lifecycle/package acceptance and POSIX CI tooling; public application behavior/dependencies unchanged",
+  "application": {
+    "sourceRef": "4cb16513163d4f4b9ee068f9df103f3f5f600427",
+    "productVersion": "0.2.13",
+    "piSdk": "1.1.0",
+    "trackedGitBlobsVerified": 3366,
+    "compiledFilesVerified": 1057,
+    "freshPrivateArtifactEntriesBeforeAfter": 27067,
+    "inventorySha256BeforeAfter": "3ad5bf728d62f7664849814bdde78100b240599effddbd9dd0c3ba11e1c67f72",
+    "bytecodeWritesDisabledAndAbsent": true
+  },
+  "companionCandidate": {
+    "repository": "https://github.com/ManoloRemiddi/resonant-voice",
+    "private": true,
+    "draftPullRequest": "https://github.com/ManoloRemiddi/resonant-voice/pull/5",
+    "version": "0.1.21",
+    "testedSourceRef": "2d25ba0c52b42f1ed693465cc63b7d63ea0dce8d",
+    "sourceLicense": "MIT",
+    "archiveSha256": "69313b72e92c60dcf206e9322e1620dcedff2773b51588a2de407e4409780571",
+    "trackedInputsVerifiedSourceAndOrdinary": 90,
+    "packedFilesVerifiedAgainstSource": 66,
+    "ciToolSourceOrBinaryInArchive": false,
+    "publicArchivePublished": false,
+    "selectedApplicationDependency": false,
+    "currentSharedApplicationArchive": "0.1.19"
+  },
+  "runtimeOutcomes": [
+    "missing processor fails with a readable error instead of unresolved pipe backpressure",
+    "cancellation checks both raw passthrough and buffered transformed PCM",
+    "accepted input and the owned processor are joined before cleanup settles",
+    "same audio settings, agent/session ownership and scoped voice protocol; no speech replay"
+  ],
+  "localSourceAndOrdinaryEach": {
+    "node": {
+      "cases": 67,
+      "passed": 64,
+      "existingWindowsOnlySkips": 3,
+      "failed": 0,
+      "cancelled": 0
+    },
+    "python": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    "packedPiApplication": {
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "workers": 2,
+      "timeoutsUnchanged": true,
+      "actualOwnerSdkNativeAndBrowserWorkers": true,
+      "providerAsrPcmAndDevices": "synthetic"
+    },
+    "legacyDsh": "actual isolated 0.1.5-rc.1 lifecycle with synthetic provider/TTS",
+    "packedDshInstallComposeRemove": "passed in disposable profile"
+  },
+  "ciAudioTool": {
+    "version": "7.1.5",
+    "sourceUrl": "https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz",
+    "sourceSha256": "de668509caf9e35e3cd162473441fdb29538c6d96ed080292b3cf9e6fc5d558f",
+    "license": "LGPL-2.1-or-later; GPL/nonfree disabled; separate from companion MIT source",
+    "scope": "CI-only source-built PCM/WAV/tempo/volume/resampling processor; no product adoption or distribution",
+    "sourceAndOrdinaryIndependentLinuxBuildSha256": "8a56856be5c7e6d775eadf335fa597f144a286d2220fb073580c2501cf4076b1",
+    "buildWorkers": 2,
+    "pcmSmokeOutputBytes": 31616,
+    "networkAndAutodetectionDisabled": true,
+    "systemInstallOrServiceChange": false
+  },
+  "hostedComponent": {
+    "run": 38822272331,
+    "testedRef": "2d25ba0c52b42f1ed693465cc63b7d63ea0dce8d",
+    "overall": "failure retains Windows prerequisite gaps",
+    "linuxX64": {
+      "job": 116721404770,
+      "result": "success",
+      "cases": 67,
+      "passed": 64,
+      "existingWindowsOnlySkips": 3,
+      "failed": 0,
+      "cancelled": 0,
+      "toolBinarySha256": "da8b322fb0267430a96ea44f153bc08e87cbd394e4806ebd51c6df7bf3160402"
+    },
+    "macosArm64": {
+      "job": 116721404659,
+      "result": "success",
+      "cases": 67,
+      "passed": 64,
+      "existingWindowsOnlySkips": 3,
+      "failed": 0,
+      "cancelled": 0,
+      "toolBinarySha256": "322f8fc4a66b4f3a8a91b31eef879eed71e82ff09afe09a3dcc95d45cab19037"
+    },
+    "windowsX64AndArm64": "fail the existing working-FFmpeg prerequisite; no audio assertion skipped; no complete platform qualification"
+  },
+  "negativeControls": [
+    {
+      "change": "remove buffered output cancellation check in an isolated private copy",
+      "expectedFailures": 1,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    {
+      "change": "remove joined processor exit in an isolated private copy",
+      "expectedFailures": 1,
+      "cancelled": 0,
+      "skipped": 0
+    }
+  ],
+  "retainedDevelopmentEvidence": [
+    "missing executable control fails against preceding adapter with unsettled top-level await and child exit 13",
+    "first real cancellation check catches buffered PCM after abort",
+    "first minimal tool uses runtime format spelling instead of configure component names; focus 7/9, full 67/62 passed/2 failed/3 existing skips; corrected pcm_s16le recipe and required PCM smoke",
+    "preceding private hosted cancellations and FFmpeg prerequisite failures remain historical"
+  ],
+  "publicationBoundary": {
+    "privateCompanionSourceFixtureArchiveInPublicRepositoryOrCi": false,
+    "publicCloneReproductionRequiresPrivateComponentAccess": true,
+    "realInferenceDevicesOrListeningQualified": false,
+    "sourceCodeOrRuntimeChangeInPublicApplicationThisCheckpoint": false
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 10,
+    "reviewOwnersVerified": 11,
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "originalPrivateCompanionDirtyFiles": 4,
+    "modelServiceConfigurationFilesVerified": 6,
+    "review": "20261015-211446-7474ddb2",
+    "reviewApplication": "8c159cb719f56a8a76aabd2e694db72717822464",
+    "reviewHttpStatus": 200,
+    "qwenModelsHttpStatus": 200,
+    "speechUnits": {
+      "resonant-breeze.service": {
+        "MainPID": "0",
+        "ControlPID": "0",
+        "ActiveState": "failed",
+        "SubState": "failed",
+        "Job": ""
+      },
+      "resonant-voice.service": {
+        "MainPID": "0",
+        "ControlPID": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "Job": ""
+      }
+    },
+    "rtx5090FreeMiB": 2012,
+    "existingBreezeStartThresholdMiB": 2828,
+    "installedArtifactOrServiceGpuSettingMutation": false
+  },
+  "remaining": [
+    "Windows processor preparation and actual platform/app qualification",
+    "private component distribution and deliberate shared pin/adoption",
+    "original MIT DSH web microphone recognition adapter",
+    "physical CPU ASR/VAD and RTX 5090 Breeze/Qwen/listening",
+    "voice-brief upgrade/downgrade and complete migration",
+    "MX owner feedback, later OS/public release, Office notices/rebuild and application Windows gates"
+  ]
+}

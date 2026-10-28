@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
 // Loaded Chromium extension + native messaging + pinned Codex; synthetic model and page only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -6,7 +7,7 @@ import {createHash} from 'node:crypto';
 import {createServer} from 'node:http';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {mkdtemp, mkdir, readFile, writeFile, rm} from 'node:fs/promises';
+import {mkdtemp, mkdir, readFile, writeFile, rm, symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -15,6 +16,7 @@ import {CodexHost} from '../dist/codex-runtime/src/host.js';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {ProfileStore} from '../dist/codex-runtime/src/profiles.js';
 import {memoryServices} from './fixtures/codex/memory-services.mjs';
+import {useCodexTestNpmEntry} from './fixtures/codex/prerequisite.mjs';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 async function cdp(url) {
@@ -30,13 +32,16 @@ async function cdp(url) {
 }
 
 test('loaded Chromium extension executes Codex-observed typing, clicking and screenshots on an isolated page', {skip: process.platform !== 'linux', timeout: 45000}, async t => {
+  const codexCli=useCodexTestNpmEntry(t);
   const root = await mkdtemp(join(tmpdir(), 'codex-chromium-')); const sockets = [];
-  let chrome, ipc, memory; let rounds = 0; const modelInputs = [];
+  let chrome, ipc, memory, interpreterRoot; let rounds = 0; const modelInputs = [];
   let queueMode = false, queueRounds = 0, releaseQueue; const queueInputs = [];
+  const holdWorkDocument=process.env.AUGMENTOR_CODEX_WORK_DOCUMENT_HOLD==='1';let releaseWorkDocument;
   const server = createServer(async (req, res) => {
     if (req.url === '/page') {
       res.setHeader('content-type', 'text/html');
-      res.end('<!doctype html><title>Codex browser fixture</title><input id="fixture-input"><button id="fixture-button" onclick="document.body.dataset.clicks=String(Number(document.body.dataset.clicks||0)+1)">Fixture action</button>'); return;
+      const body='<!doctype html><title>Codex browser fixture</title><input id="fixture-input"><button id="fixture-button" onclick="document.body.dataset.clicks=String(Number(document.body.dataset.clicks||0)+1)">Fixture action</button>';
+      if(holdWorkDocument)releaseWorkDocument=()=>res.end(body);else res.end(body);return;
     }
     if (req.url !== '/v1/responses') {res.writeHead(404); res.end(); return;}
     let body = ''; for await (const part of req) body += part; modelInputs.push(JSON.parse(body));
@@ -73,6 +78,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
     await ipc?.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
     await memory?.close();
     await rm(root, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});
+    if(interpreterRoot)await rm(interpreterRoot,{recursive:true,force:true});
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -87,18 +93,21 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   const extensionId = createHash('sha256').update(Buffer.from(manifest.key, 'base64')).digest('hex').slice(0, 32).replace(/[0-9a-f]/g, char => String.fromCharCode(97 + parseInt(char, 16)));
   const profile = join(root, 'chromium'); await mkdir(join(profile, 'NativeMessagingHosts'), {recursive: true});
   const launcher = join(root, 'native-host');
-  const env = {AUGMENTOR_CODEX_STATE: join(root, 'host'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: join(root, 'workspace'), AUGMENTOR_WORKSPACE_PROFILE: '', AUGMENTOR_SHARED_STATE: memory.state, AUGMENTOR_SHARED_DATA: memory.data};
+  const env = {AUGMENTOR_CODEX_CLI:codexCli, AUGMENTOR_CODEX_STATE: join(root, 'host'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: join(root, 'workspace'), AUGMENTOR_WORKSPACE_PROFILE: '', AUGMENTOR_SHARED_STATE: memory.state, AUGMENTOR_SHARED_DATA: memory.data};
+  // Linux shebangs cannot quote an interpreter path containing spaces. The
+  // private alias keeps the exact selected Node binary and structured argv.
+  interpreterRoot=await mkdtemp('/tmp/augmentor-codex-node-');const interpreter=join(interpreterRoot,'node');await symlink(process.execPath,interpreter);
   // JSON strings are valid JavaScript literals; executable path and argv never pass through a shell.
-  await writeFile(launcher, '#!' + process.execPath + '\n' + `Object.assign(process.env, ${JSON.stringify(env)});import(${JSON.stringify('file://' + join(repo, 'apps/browser/native-host.mjs'))});\n`, {mode: 0o700});
+  await writeFile(launcher, '#!' + interpreter + '\n' + `Object.assign(process.env, ${JSON.stringify(env)});import(${JSON.stringify('file://' + join(repo, 'apps/browser/native-host.mjs'))});\n`, {mode: 0o700});
   await writeFile(join(profile, 'NativeMessagingHosts/com.augmentor.agent.json'), JSON.stringify({name: 'com.augmentor.agent', description: 'Isolated Codex proof', path: launcher, type: 'stdio', allowed_origins: [`chrome-extension://${extensionId}/`]}));
   const isolatedEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
   await mkdir(join(root, 'runtime'), {mode: 0o700});
-  chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--enable-unsafe-extension-debugging', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, base + '/page'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
+  chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--enable-unsafe-extension-debugging', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, 'about:blank'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
   let port;
-  for (let attempt = 0; attempt < 100; attempt++) {try {port = (await readFile(join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; break;} catch {await delay(50);}}
+  for (let attempt = 0; attempt < 100; attempt++) {try {port = await chromiumPort(profile); if (port) break; await delay(50);} catch {await delay(50);}}
   assert.ok(port, 'Isolated Chromium started');
   const targets = () => fetch(`http://127.0.0.1:${port}/json`).then(response => response.json());
-  const pageTarget = (await targets()).find(target => target.url === base + '/page'); assert.ok(pageTarget);
+  const pageTarget = (await targets()).find(target => target.type==='page'&&target.url==='about:blank'); assert.ok(pageTarget);
   const page = await cdp(pageTarget.webSocketDebuggerUrl); sockets.push(page);
   const created = await page.call('Target.createTarget', {url: `chrome-extension://${extensionId}/sidepanel.html`});
   let panelTarget;
@@ -126,6 +135,32 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   assert.match(denied, /activeTab|all_urls|permission/i, 'No screenshot grant before a toolbar action');
   const browserTarget = await fetch(`http://127.0.0.1:${port}/json/version`).then(response => response.json());
   const browserControl = await cdp(browserTarget.webSocketDebuggerUrl); sockets.push(browserControl);
+  const workNavigation=page.call('Page.navigate',{url:base+'/page'});void workNavigation.catch(()=>{});
+  // Read-only startup barrier within the existing 45-second case / 100×50ms
+  // startup allowance. A discovered target is not a committed work document.
+  // BEGIN work-document readiness
+  let workDocumentReady=false,heldDocumentObserved=false;
+  for(let attempt=0;attempt<100;attempt++){
+    const present=await panel.evaluate(`chrome.tabs.query({}).then(tabs=>tabs.some(tab=>tab.url===${JSON.stringify(base+'/page')}))`);
+    if(holdWorkDocument&&releaseWorkDocument){
+      assert.equal(present,false,'The held initial document reproduces the old absent-tab lookup');assert.equal(modelInputs.length,0);heldDocumentObserved=true;t.diagnostic('Held initial work document: old toolbar lookup absent; no model request.');const release=releaseWorkDocument;releaseWorkDocument=undefined;release();
+    }
+    if(present){try{workDocumentReady=await page.evaluate(`location.href===${JSON.stringify(base+'/page')}&&document.readyState==='complete'&&Boolean(document.querySelector('#fixture-input'))`);if(workDocumentReady)break;}catch{/* Navigation can retire the previous context; no action is retried. */}}
+    await delay(50);
+  }
+  assert.equal(workDocumentReady,true,'The authored work document and its extension tab identity must be ready before toolbar selection');if(holdWorkDocument)assert(heldDocumentObserved);
+  // END work-document readiness
+  // triggerAction resolves the target's window, then invokes the action on that
+  // window's active tab. Its targetId does not select the intended work tab;
+  // Page.bringToFront alone did not establish that precondition reliably.
+  const selectedWorkTab = await panel.evaluate(`(async () => {
+    const tab = (await chrome.tabs.query({})).find(tab => tab.url === ${JSON.stringify(base + '/page')});
+    if (!tab) throw Error('Authored toolbar work tab is absent');
+    return chrome.tabs.update(tab.id, {active: true});
+  })()`);
+  assert.equal(selectedWorkTab.url, base + '/page');
+  assert.equal(selectedWorkTab.active, true, 'Select the actual work tab before the fixture toolbar action');
+  const navigation=await workNavigation;assert.equal(navigation.errorText,undefined);
   const tabTargets = await browserControl.call('Target.getTargets', {filter: [{type: 'tab', exclude: false}]});
   const workTab = tabTargets.targetInfos.find(target => target.url === base + '/page'); assert.ok(workTab);
   await browserControl.call('Extensions.triggerAction', {id: extensionId, targetId: workTab.targetId});
@@ -140,7 +175,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   const toolOutputs = modelInputs.at(-1).input.filter(item => item.type === 'function_call_output');
   assert.equal(toolOutputs.length, 5);
   const image = toolOutputs.flatMap(item => Array.isArray(item.output) ? item.output : []).find(item => item.type === 'input_image');
-  assert.ok(image?.image_url?.startsWith('data:image/jpeg;base64,'), 'Pinned Codex forwards the actual screenshot as image input');
+  assert.ok(image?.image_url?.startsWith('data:image/jpeg;base64,'), 'Pinned Codex forwards the actual screenshot as image input; observed tool outputs: '+JSON.stringify(toolOutputs,(_key,value)=>value?.type==='input_image'?{type:'input_image',urlPresent:typeof value.image_url==='string'}:value));
   assert.ok(Buffer.from(image.image_url.split(',')[1], 'base64').length > 100, 'Actual Chromium JPEG pixels, not an image placeholder');
   assert.ok(toolOutputs.every(item => !JSON.stringify(item.output).includes('unknown outcome')));
   // Exercise actual loaded composer and row controls, rather than bypassing the panel.
@@ -183,7 +218,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
 
   // Activate actual transcript controls and continue in each exact child.
   const sourceId=(await message({type:'connect'})).sessionId;
-  await panelUntil('document.querySelector(".msg-branch")&&!document.querySelector("#send").disabled','Branch available');
+  await panelUntil('document.querySelector(".msg-branch:not(:disabled)")','Branch available');
   // Visible answer text precedes the native terminal notification. Snapshot only
   // after the authoritative ledger settles, so a late turn/end is not mistaken
   // for a mutation caused by Branch.
@@ -206,13 +241,15 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   assert.equal(queueRounds,3,'Branch does not invoke inference');
   assert.deepEqual(await host.dispatch('session.history',{sessionId:sourceId,maxMessages:100}),sourceHistory);
   await panel.evaluate(`(()=>{const input=document.querySelector('#input');input.value='BROWSER_BRANCH_CHILD';input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
-  await panelUntil('document.body.innerText.includes("Queue fixture answer 4")&&!document.querySelector("#send").disabled','child response');
+  // Queue Send is intentionally available while working. Wait for the action
+  // itself to become enabled; visible text does not establish native idle.
+  await panelUntil('document.body.innerText.includes("Queue fixture answer 4")&&document.querySelector(".msg-edit:not(:disabled)")','child response');
   assert.doesNotMatch(JSON.stringify(queueInputs[3].input),/BROWSER_QUEUE_NEXT|BROWSER_QUEUE_CORRECTION/);
   assert.equal(queueInputs[3].input.filter(item=>item.type==='function_call_output').length,5,'native tool outputs remain in child context');
   await panel.evaluate(`(()=>{document.querySelector('#input').value='BROWSER_EDIT_DRAFT';document.querySelector('.msg-edit').click();})()`);
   await panelUntil('document.querySelector("#input").value==="BROWSER_BRANCH_CHILD"','Edit loaded exact latest input');
   await panel.evaluate(`(()=>{const input=document.querySelector('#input');input.value='BROWSER_EDITED_CHILD';input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
-  await panelUntil('document.body.innerText.includes("Queue fixture answer 5")&&document.querySelector("#input").value==="BROWSER_EDIT_DRAFT"','edited child response and original draft');
+  await panelUntil('document.body.innerText.includes("Queue fixture answer 5")&&document.querySelector("#input").value==="BROWSER_EDIT_DRAFT"&&document.querySelector(".msg-edit:not(:disabled)")','edited child response and original draft');
   const editedId=(await message({type:'connect'})).sessionId;
   assert.notEqual(editedId,childId);
   assert.match(JSON.stringify(queueInputs[4].input),/BROWSER_EDITED_CHILD/);

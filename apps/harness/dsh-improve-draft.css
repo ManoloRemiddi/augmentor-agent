@@ -1,0 +1,25 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+.augmentor-improve-draft { position:absolute; right:8px; top:8px; z-index:2; display:grid; place-items:center; width:24px; height:24px; padding:0; border:0; border-radius:6px; background:transparent; color:var(--dsw-alias-label-primary); font:16px/1 var(--dsw-font-family); cursor:pointer; }
+.augmentor-improve-draft:hover:not(:disabled) { background:var(--dsw-alias-bg-hover); }
+.augmentor-improve-draft:disabled { opacity:.35; cursor:default; }
+[data-composer-card]:has(.augmentor-improve-draft) [contenteditable] { padding-right:42px; }
+[data-composer-card]:has(.augmentor-improve-draft) [data-composer-placeholder] { right:42px; }
+.augmentor-improve-status { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+/* Paint-only prompt improvement: the editable draft remains intact underneath. */
+[data-composer-card] [contenteditable].prompt-improving { color:transparent; caret-color:transparent; }
+.prompt-letter-preview { position:absolute; inset:0; pointer-events:none; overflow:hidden; white-space:pre-wrap; overflow-wrap:anywhere; border:1px solid transparent; color:var(--dsw-alias-label-primary); }
+.prompt-letter-word { display:inline-block; max-width:100%; vertical-align:top; }
+.prompt-letter-cell { display:inline-block; position:relative; vertical-align:top; height:1lh; overflow:hidden; }
+.prompt-letter-original { visibility:hidden; }
+.prompt-letter-wheel { position:absolute; inset:0; animation:prompt-letter-roll var(--roll-speed) linear var(--roll-delay) infinite; }
+.prompt-letter-wheel span { display:block; height:1lh; }
+.prompt-letter-cell:nth-child(4n) .prompt-letter-wheel { color:var(--dsw-alias-state-business-primary); }
+.prompt-letter-preview.settling .prompt-letter-wheel { animation:prompt-letter-roll var(--roll-speed) linear var(--roll-delay) infinite, prompt-letter-hide 0s var(--settle-delay) forwards; }
+.prompt-letter-preview.settling .prompt-letter-original { animation:prompt-letter-reveal 0s var(--settle-delay) forwards; }
+@keyframes prompt-letter-roll { from { transform:translateY(0); } to { transform:translateY(-2lh); } }
+@keyframes prompt-letter-hide { to { visibility:hidden; } }
+@keyframes prompt-letter-reveal { to { visibility:visible; } }
+@media(prefers-reduced-motion:reduce) {
+  .prompt-letter-preview .prompt-letter-wheel { display:none; animation:none; }
+  .prompt-letter-preview .prompt-letter-original { visibility:visible; animation:none; }
+}

@@ -3,9 +3,14 @@ ARG NODE_IMAGE=node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5ea
 FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.json ./
+COPY apps/harness/package.json apps/harness/package.json
 COPY scripts/prepare-ws.mjs scripts/prepare-ws.mjs
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY packages packages
+COPY apps/browser/shared apps/browser/shared
+COPY adapters/dsh-context-budget/evidence.mjs adapters/dsh-context-budget/evidence.d.mts adapters/dsh-context-budget/
+COPY adapters/dsh-compat/messages.mjs adapters/dsh-compat/
+COPY adapters/dsh-home adapters/dsh-home
 RUN ./node_modules/.bin/tsc -p tsconfig.json
 
 FROM ${NODE_IMAGE}
@@ -17,7 +22,10 @@ COPY apps/home/*.mjs ./
 COPY apps/home/web ./web
 COPY adapters/dsh-home /app/adapters/dsh-home
 COPY adapters/dsh-execution /app/adapters/dsh-execution
+COPY adapters/dsh-context-budget/evidence.mjs /app/adapters/dsh-context-budget/evidence.mjs
+COPY adapters/dsh-compat/messages.mjs /app/adapters/dsh-compat/messages.mjs
 COPY services /app/services
+COPY apps/browser/shared /app/apps/browser/shared
 COPY release/product.json /app/release/product.json
 COPY --from=build /app/dist /app/dist
 COPY LICENSE /app/LICENSE

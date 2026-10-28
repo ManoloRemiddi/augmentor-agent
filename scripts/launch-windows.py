@@ -118,9 +118,11 @@ def main():
     identity = ctypes.WinDLL('shell32', use_last_error=True).SetCurrentProcessExplicitAppUserModelID
     identity.argtypes = [ctypes.c_wchar_p]; identity.restype = ctypes.c_long
     if identity(APP_ID) < 0: raise RuntimeError('Windows could not set the Augmentor application identity.')
-    if '--preview' not in args and '--screenshot' not in args:
-        from windows_supervisor import ensure
+    if not any(flag in args for flag in ('--preview','--screenshot','--local-health')):
+        from windows_supervisor import ensure, restore_selected
         ensure(ROOT)
+        try:restore_selected(ROOT)
+        except (OSError,ValueError) as error:print('The selected managed DSH could not be restored:',error,file=sys.stderr)
     if background: return
     sys.argv = ['augmentor-desktop', *args]
     try:

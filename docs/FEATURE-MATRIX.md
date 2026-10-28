@@ -1,5 +1,292 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Packaged privacy lifecycle](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
+now observes the actual unchanged e37d79b6/b1edf4d2 Host trees and original GUI:
+six packaged plus two default-source fresh/cold/upgrade/rollback phases, eight
+explicit synthetic model calls, zero unexpected IP/page destinations. Final
+20-case cohort plus current/source matrix checks pass; both seals and all 1,120
+compiled source inputs match. The Linux source gate runs automatically and now
+requires `strace`; future pins still need qualification. Both MX owner PIDs/all
+36 protected file sets/hashes, shared rows, registry twelve, menus/selections and
+GPU/voice settings remain exact. Tests/CI/docs only: no app update/restart or
+additional migration. [Evidence](../release/harness-packaged-privacy-qualification-20261017.json).
+
+[Connected tools settings](MCP-TRANSPORT.md#connected-tools-panel-in-the-original-plugins-page--october-17)
+now groups On/Off, sign-in and reconnect, with advanced tool access/JSON and
+separate technical evidence. Both themes at 1280/640/420/320 widths pass footer,
+contrast, hit-area and focus checks. Inspection’s shared CSS and two missing
+transitive asset routes are fixed without exposing arbitrary files. Source,
+fresh ordinary and exact sealed each pass **129 Node / 41 Python** (36 files,
+nine Chromium cases, two workers/no skips); all **1,120 compiled files** match.
+
+Both actual MX reviews now run **b1edf4d2 / 20261017-061143-d0c0fc29** after guarded
+shutdown, verified shared/pre-shutdown/full cold backups (**418 regular files**)
+and installed-opener startup. All four conversations, 36 authoritative prefixes,
+12 prompts and 19 captured memory records remain; only typed connection metadata
+appends. Actual Plugins overview and new default detail panel pass in both owners
+with zero browser errors, private profile reads, settings or agent actions.
+Advanced/technical sections start collapsed and the footer stays visible. All
+**24,689 sealed inputs**, original menu assets/locations, Qwen/GPU/voice states
+and production/earlier Preview selections verify; registry revision twelve.
+[Exact evidence](../release/harness-mcp-settings-qualification-20261017.json).
+No further real migration; owner pilot feedback, physical use and later platforms
+remain separate. Voice stays deferred.
+
+### Preceding local-model identity checkpoint
+
+[Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) now refuses an inactive
+local profile before prompt dispatch and checks reported response IDs before SDK
+tool normalization. Source, fresh ordinary and exact sealed each pass **576 Node /
+92 Python** (74 files/nineteen Chromium/26 GUI cases), two workers/no skips;
+1,120 compiled files match, eight public-codec/native proof groups and the same
+five frozen historical preparations pass. A bounded actual-Qwen source probe
+confirms inactive-alias zero POSTs and matching raw response IDs.
+
+Both actual **main and pilot reviews now run e37d79b6 /
+20261017-055628-b9afa698** after verified pre-shutdown/shared SQLite/full cold
+backups (**416 files**) and guarded installed-opener startup. All four conversations,
+36 original authoritative prefixes, twelve prompts and nineteen captured memory
+records remain; only typed MCP close/new-connection metadata appends. Both actual
+Plugins pages expose On/Off and usable overview switches with zero console/HTTP
+errors. Original menu locations and all existing owned asset bytes verify after
+a caught registration-namespace correction; registry revision ten. All **24,686
+sealed inputs**, Qwen settings/PID and other GPU/voice states remain exact.
+No owner model request, additional migration, production update or public binary.
+[Code/package evidence](../release/harness-local-model-route-qualification-20261017.json),
+[actual review adoption](../release/harness-local-model-route-owner-review-20261017.json).
+Owner pilot feedback still gates wider migration; voice/later OS remain deferred.
+
+[Live recovered-history continuation](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
+passes on exact sealed **20261017-045822-6b886151 / d157ffe1** with the actual
+saved local Qwen route: historical reply cuts, original GUI Send/Allow once,
+cold recall and one owned file round trip. Five positive turns plus one preserved
+unanswered-approval refusal yield four successful reads/one successful write.
+Qwen is restored through the existing GPU manager with saved tuning unchanged;
+other GPU/voice service PIDs/states stay exact. All 24,679 candidate inputs and
+both reviews/all 36 protected files, PIDs, registry and selections verify.
+No owner app update or additional real migration; source code stays unchanged.
+[Live evidence](../release/harness-dsh-live-continuation-qualification-20261017.json).
+
+[Current full-catalogue readiness](HARNESS-DSH-MIGRATION-PILOT.md#current-full-catalogue-readiness-with-historical-archives--october-17)
+now verifies **28 projects / 106 parent conversations / 48 archived child logs**
+against sealed **20261017-045822-6b886151 / d157ffe1**. Fresh standard cuts and all
+77 legacy physical logs/current assets match; catalogue organization and source
+witnesses stay stable. One project/one conversation has an unavailable folder;
+one workspace is empty. Both owner catalogues contain a credential-ready default;
+this is configuration metadata, not live inference proof. No transfer, target, restart, runtime or GUI
+change; both reviews/all 36 protected files, PIDs, registry, selections and seals
+remain exact. Owner pilot feedback and guarded adoption remain required.
+[Aggregate evidence](../release/harness-dsh-current-readiness-20261017.json).
+
+[Recovered historical admission](HARNESS-DSH-HISTORICAL-IMPORT.md#historical-settlement-and-interrupted-seed-admission)
+now prepares the same five frozen projects/42 parents/35 archived descendants
+read-only. Complete-v3 direct-child evidence, inherited ancestor ownership and
+interrupted-turn/adjacent-seed forms retain exact historical data without live
+jobs, future source content or replay. Original GUI/SDK and cold native relocation
+use authored fixtures; owner transfer/adoption and current-catalogue refresh stay
+separate from format preparation. The older 23/64 readiness snapshot below is
+historical, not refreshed by this focused assessment. MX first; voice/later OS
+remain deferred.
+
+[Legacy descriptor-v2 offline proof](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17)
+reuses 51 pinned public MIT format modules without a Host/agent loop. An authored
+validator preserves the known old descriptor; its August schema reference is
+BSD-3-Clause and correctly attributed. Live/archive fetches verify 52 inputs;
+14 format groups, 30 Node / 24 Python cases and app type-check pass. The same
+frozen log refuses baseline and passes the historical profile, with original
+bytes/descriptor preserved. Complete family/provenance and project integration
+remain; readiness stays 23 projects/64 conversations. No app update/transfer;
+both owners/all 36 protected files and selections remain exact.
+[Evidence](../release/harness-dsh-legacy-format-qualification-20261017.json).
+
+[Full DSH readiness refresh](HARNESS-DSH-MIGRATION-PILOT.md#full-migration-readiness-refresh--october-17)
+checks all **30 projects / 107 parent conversations** against the qualified sealed
+converter: **23 projects / 64 conversations** pass preparation, with 13 archived
+child logs captured. Five projects/42 conversations are gated by DSH's legacy
+reader, one folder is unavailable, and one workspace is empty. No real transfer,
+model work or runtime/GUI update; both owners/all 36 protected files, registry,
+selections and seals remain exact. Pilot feedback/adoption gates remain.
+[Aggregate evidence](../release/harness-dsh-readiness-20261017.json).
+
+[Retained recovery identities](HARNESS-DSH-MIGRATION-PILOT.md#recovery-identities-after-dsh-migration--october-17)
+separate a synthetic message ID's ordinal from current event/citation coordinates,
+following public DSH migration behavior. The same frozen four-parent real export
+now passes complete read-only preparation; no transfer or model work.
+Source/ordinary/exact sealed each pass **376 Node / 55 Python** (53 files/
+sixteen Chromium files), with 1,114 compiled inputs matching. Private unselected
+**20261017-025154-ba9a5767 / 0a7b15f7** verifies 24,644 sealed inputs.
+Both owners/all 36 protected files, registry and selections remain exact.
+Original GUI, running reviews and the owner pilot-feedback gate remain unchanged.
+[Evidence](../release/harness-dsh-recovery-identity-qualification-20261017.json).
+
+[Recorded DSH argument failures](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-argument-errors--october-17)
+preserve attested v4 validation errors as labelled history with exact argument
+text in the original Chat/Trajectory. No replay or fabricated argument object.
+The same four-parent real export passes the argument check but still refuses a
+separate recovery format; it is not ready for transfer. Source/ordinary/exact
+sealed each pass **345 Node / 55 Python** (fifty files/fifteen Chromium files), with 1,114 compiled files matching. Private unselected
+**20261017-024110-584cc337 / 016f44ce** verifies 24,643 sealed inputs;
+both owners/all 36 protected files, registry and selections remain exact.
+Existing reviews and the pilot-feedback gate remain unchanged.
+[Evidence](../release/harness-dsh-arguments-qualification-20261017.json).
+
+[Audio processor cleanup and POSIX qualification](PI-VOICE.md#audio-processor-lifecycle-and-hosted-posix-qualification--october-16-2026)
+now fixes missing-tool backpressure, buffered PCM cancellation and joined owned
+process/input cleanup in private companion **0.1.21/component 2d25ba0**. Source/
+fresh ordinary each pass 64 Node cases plus three existing Windows-only skips,
+15 Python and four packed Pi cases, with pinned DSH lifecycle/install/remove,
+90 tracked/66 archive inputs and two expected-failing real-processor controls.
+Hosted **38822272331** passes Linux x64/macOS ARM64 full suites using pinned
+CI-only FFmpeg 7.1.5 source builds. Windows remains at its processor prerequisite;
+overall workflow failure is retained. Private code/tool artifacts stay outside
+public app/tests/CI; shared 0.1.19 pins, GUI, current MX review and services stay
+unchanged. Physical audio, distribution/adoption and full migration remain open.
+[Portable acceptance](../release/harness-pi-audio-processor-qualification.json).
+
+[Private Pi speech candidate](PI-VOICE.md#companion-package-acceptance--october-16-2026)
+**0.1.21/component add6fffb** now passes actual application acceptance in the
+speech repository's [draft PR #5](https://github.com/ManoloRemiddi/resonant-voice/pull/5).
+Source/fresh ordinary each pass 61 Node cases plus three existing Windows-only
+skips, 15 Python cases and four packed-companion Pi Host/Native/Browser cases.
+Pinned legacy DSH lifecycle and disposable archive install/remove pass; a
+revocation-removal control fails as intended. Final external application inputs
+stay unchanged. Private code/fixtures/archive stay outside public app/tests/CI;
+provider/ASR/PCM/devices are synthetic. Shared 0.1.19 pins, original GUI, MX review,
+installed/services and GPU/model settings are unchanged. Hosted component results,
+distribution/pin/adoption, physical speech and full migration remain open.
+[Portable acceptance record](../release/harness-pi-voice-companion-qualification.json).
+
+[Native and Browser Pi voice controls](PI-VOICE.md#native-and-browser-controls--october-16-2026)
+now reuse the existing orb, gesture/audio engine and private Pi owner. Final ASR
+submissions carry explicit spoken mode; native Send remains typed and Browser
+corrections steer the same SDK turn. Opening IDs fence automatic close across
+actors, and cleanup joins cold SDK loading, queued ticket retirement and workers.
+Original Harness GUI/suppliers and existing reviews/installed/services remain
+unchanged. The separate Harness voice plugin, real compatible companion/pin,
+physical ASR/TTS, installed adoption and later OS gates remain required.
+At **4cb16513**, source/fresh ordinary each pass **733/two existing optional
+skips/zero failures**, **126 files/all 53 Harness Chromium files**, unchanged
+workers/bounds. Both native/controller/maintenance sets pass **146/146**. All
+**1,057 compiled/3,366 tracked inputs** match at freeze; the two isolated
+safeguard-removal controls fail as intended and 22 packaging/private-source cases
+pass. Supplier/GUI source and dependency pins remain unchanged. The initial
+candidate, failed feedback control and hosted/fixture failures are retained.
+[Portable qualification](../release/harness-pi-voice-surfaces-qualification.json).
+
+[Pi spoken/typed input](PI-VOICE.md#spoken-and-typed-input--october-15-2026)
+now carries explicit admitted mode through the durable queue, actual SDK delivery,
+request-only response style, transcript capture and native managed-memory briefs.
+Typed edits get fresh typed receipts; restart does not reopen speech or replay
+unknown input. Unadmitted extension follow-ups cannot inherit human speech mode.
+Memory recall origin remains distinct from a later typed correction's style.
+The original GUI, current MX review and installed/services remain unchanged.
+Pi surface controls, compatible real companion and physical speech remain pending.
+At **cc6bbac5**, source/fresh ordinary each pass **712/two existing optional
+skips/zero failures**, **123 files/all 53 Harness Chromium files**, unchanged
+workers/bounds. All **1,057 compiled/3,361 tracked inputs** match at freeze; focus
+83/83 (16 actual Host cases), real native branch/cold mode, 22 packaging/private
+boundary cases and two expected-failing isolated controls qualify. The pinned
+supplier/GUI source and dependencies remain unchanged. Earlier setup/projection/
+Qt failures and pending hosted/platform/installed gates are retained.
+[Portable qualification](../release/harness-pi-input-mode-qualification.json).
+
+[Current MX export/Context review](HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
+**20261015-211446-7474ddb2** runs public **681a858/application 8c159cb7**, unselected.
+It includes the original DSH session-download menu/dialog and `/export`, late
+Context arrival correction, original skill/Permission/Trajectory controls,
+large-JSON inspection and themed Augmentor marks. Source/fresh ordinary/sealed
+target each pass **654/two existing optional skips/zero failures**, **116 files/all
+53 Harness Chromium files**, unchanged workers/bounds. All **24,468 sealed entries,
+1,045 compiled/820 Harness source files** verify; dependencies/Node/components stay
+unchanged and 911 notice files retain the 615 GUI supplier inputs. Three exact-sealed
+GUI cases and isolated actual-Qwen plan/read/mode-off/cold-history proof pass.
+Initial owner QA has zero sessions/turns/drafts/logins; ten sealed inventories/eleven
+review owners, selection and model/service settings verify preserved. Physical MX
+feedback/adoption, live voice, full migration and later OS artifacts remain open.
+Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
+export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
+
+
+[Pi Host speech ownership](PI-VOICE.md#host-ownership-and-joined-close--october-15-2026)
+at **83d32ea7** binds the existing durable human queue/public SDK owner to scoped
+speech, Stop, orphan disconnect and joined setup/delivery shutdown. The 68-case
+focused set passes with synthetic speech, including 12 actual Host cases. Final
+**999c1f5f** source/fresh ordinary each pass **700/two optional skips/zero failures**,
+122 files/all 53 Harness Chromium files; 1,051 compiled/3,356 tracked inputs match.
+A real delayed-own-notification control proves the original Permission dialog
+correction; new peer revisions still invalidate stale choices. Older
+fixture and ES2023 check failures are retained. Pi surface voice capability,
+spoken memory mode, compatible companion and actual ASR/TTS remain pending;
+current MX review, GUI and installed/services are unchanged.
+[Portable evidence](../release/harness-pi-voice-host-qualification.json).
+
+[Pi voice bridge foundation](PI-VOICE.md#passive-bridge-foundation--october-15-2026)
+at **ecab71a4** reuses the public scoped transport and passively observes live
+Pi SDK assistant text. The 19 focused cases pass, including actual Pi 1.1.0
+and existing Codex Native/Browser paths with synthetic speech. Pi Host/surface
+wiring, truthful voice memory mode, a separately qualified companion and actual
+ASR/TTS remain required. The GUI, current MX review and installed/services stay
+unchanged. [Portable evidence](../release/harness-pi-voice-foundation-qualification.json).
+
+[Original session download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
+at **49e23de4/application 8c159cb7** restores the original MIT DSH More menu,
+download modal/controller and `/export` on Pi originals, verified children,
+retained diagnostics and authorized declared uploads. One-use grants, bounded
+leases, joined cleanup and preserved unknown scratch retain private boundaries.
+Source/fresh ordinary each pass **654/two existing optional skips/zero failures**,
+**116 files/all 53 Harness Chromium files**, unchanged workers/bounds; all **1,045
+compiled/3,348 tracked** inputs match. Focus 51/51, original Light/Dark browser ZIP
+proof, two failing isolated guard-removal controls and 18 notice/packaging/boundary
+cases pass. The 615 GUI inputs include seven new verbatim MIT files; prior 608,
+dependencies, nine sealed inventories/ten owners, selection and settings verify
+preserved. [Portable evidence/roster](../release/harness-session-export-qualification.json).
+That source checkpoint now has the separate sealed MX review above. The preceding
+20261015-192847-cfb956a7 review remains application 1b467d3 unchanged; physical/
+installed/platform and full migration gates remain open. Foundation-only notes below are
+historical where they list this source workflow as absent.
+
+
+[Installed MX Models qualification](HARNESS-MODELS.md#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
+
+Qualified implementation **340327d6a554094d9ce9d54dcdd0810c08e5b245**: [Original endpoint discovery](HARNESS-MODELS.md#endpoint-discovery-source--october-13) now connects the copied candidate picker to bounded OpenAI/Anthropic listings, with local installed catalogs, public Pi credential resolution, scoped page coverage and cancellation. Strict source check/build and 65 MX files pass 334/334 plus five notice/workspace cases. Three new runtime MIT files retain two verbatim/one marked records; three existing GUI files are marked for coverage/default hints, with layout/CSS and other supplier records preserved. Ordinary/installed/live/OAuth/virtual/advanced/full P0/P1 gates remain open; selected MX stays 95e0fb2 / 20261012-222001-6b609cae. No installed restart or owner state change occurs.
+
+Qualified source **efc0dd564dd2ae2b68c86f50ad83fa53a8eea4a0**: strict check/build, **323/323** across 64 MX files and five notice/workspace cases pass. [Original Models settings source](HARNESS-MODELS.md) adds the copied MIT provider/editor/custom/model-list forms to private Pi configuration, preserving hidden fields and native ancestry, with stale-edit and unconfirmed-application guards. MIT GUI selection is 580 files (17 new verbatim); Apache dsh-context stays 108. Endpoint discovery, OAuth/virtual/advanced controls and complete P0/P1 qualification remain open. Source checks are recorded separately from ordinary and installed acceptance; selected MX and its running Host remain shortcut runtime 95e0fb2 / 20261012-222001-6b609cae. The prior Native PID is absent; this source turn performs no Native restart.
+
+[Installed original Context Insights](DSH-GUI-ON-PI.md#installed-original-context-insights--october-11): runtime db98a93393a97f39d143295dba5db196798aef57, private MX 20261011-221239-d4a9b70d, product 0.2.13, artifact b99b5f256aee307bf4be29f74445d40ba18ce0e794657717bc6d431a79770cd0, selected/running. Source and ordinary Node 24.19.0 each pass 242/242 across 36 files; sequential guarded adoption and 21,779 installed inventory entries pass. Original Insights filters/charts/heatmap/cards use bounded retained Pi reads and reported SDK buckets; empty contexts stay unavailable. Eleven histories/queues and old original prefixes are preserved with classified title/lifecycle/index changes and no new inference/tools. Supplier licences/CSS/dependencies/native/model/speech settings remain preserved; full plugin/migration/live/privacy/public packaging/platform gates stay open.
+
+[Original Context Insights](DSH-GUI-ON-PI.md#original-context-insights--october-11-follow-up) restores the supplier first-level overview with bounded retained Pi metadata/newest-body reads, reported SDK token buckets, original filters/heatmap/navigation and explicit unavailable data. Source/ordinary/installed qualification follows separately; full migration/plugin/platform gates stay open.
+
+[Installed original Context dialog](DSH-GUI-ON-PI.md#installed-original-context-dialog--october-11): runtime 3a112af4633d6259c1866650044a423459d45997, private MX 20261011-212056-aeaf1a5c, product 0.2.13, artifact e933bb08a2128614d8136dc35ced23a5f482609f955eb6487f2a6910bb0c19d7, selected/running. Source and ordinary Node 24.19.0 each pass 232/232 across 34 files; guarded update and 21,767 installed inventory entries pass. Original `/context` preserves Chat, recorded arguments and scoped deferred text consumption. All eleven histories/queue identities and prior original prefixes are preserved with six classified title/lifecycle appends and their index/counter updates. Supplier licences/CSS/dependencies/native/model/speech settings remain preserved; full migration/live/privacy/public packaging/platform gates stay open.
+
+[Original Context slash dialog](DSH-GUI-ON-PI.md#original-context-slash-dialog--october-11-follow-up) restores the original browser `/context` inspection dialog with guarded close/consumption and retained request data. MX source/ordinary/installed evidence is separated; Windows/macOS/other physical distro qualification and full plugin parity remain open.
+
+[Installed recorded-format qualification](DSH-GUI-ON-PI.md#installed-recorded-format-qualification--october-11) maps Anthropic, Responses and Gemini snapshots into the unchanged original Context dashboard, with exact request-local IDs, ordered fragments and explicit unavailable/opaque data. Runtime f5ff7be4d346213ef0b8dc463072261196b8c440 is selected/running in private MX release 20261011-205518-9903c1a4, product 0.2.13, artifact c6727cc06f6119aa6dc633df97b1371e191559616c33d3a3a1604b483ecd2803. Source and ordinary bundled Node 24.19.0 each pass 227/227 across 32 files; guarded immutable adoption and 21,763 inventory entries pass after GUI reads. Eleven displayed histories/queue identities and all prior original bytes are preserved, with six explicitly classified lifecycle/title appends and their counter/index updates. Synthetic new-API execution and retained installed Qwen inspection remain separate; no new owner inference/tool action occurs. Supplier/CSS/licence/dependency and model/speech settings are unchanged. Complete migration/live-provider/privacy/public packaging/platform gates stay open.
+
+October 11 Windows command follow-up: [owned Pi shell jobs](WINDOWS-SHELL-JOBS.md) replace direct-process-only Stop with a contained kernel Job, readiness before command release, private parent lease and truthful no-replay settlement. Eight real helper cases pass on both x64 and ARM64; actual Windows Host/assembled/physical acceptance remains open. Unix keeps the existing process-group adapter. Shared Native/Browser layout, installed selections and the full migration gates are preserved.
+
+October 11 specialist follow-up: [desktop jobs](PI-JOBS.md#desktop-specialist-jobs) now use the shared durable registry, distinct native SDK histories, pre-dispatch intent, scoped approvals/Stop, unknown recovery and one-time usage. Harness exposes child originals and optional provider payloads through parent-owned read-only inspection. Synthetic source/staged qualification does not establish live perception, physical consent or installed platform acceptance. Every remaining accepted P0/P1 gate and DSH retention remains binding.
+
+
+October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; actual concurrent integration, live services and every accepted P0/P1/platform/installed gate remain required.
+
+
+[Pi goals](PI-GOALS.md) now provide persistent revisioned state and explicitly armed same-owner continuation with round limits, Stop and restart/fork disarming. This extends the plans/todos slice; general jobs and desktop delegation now have source/staged authority and usage implementation. Their live/concurrent and platform/installed qualification remains required.
+
+October 11 planning candidate: [branch-owned plans and todos](PI-PLANNING.md) add model tools and a read-only Harness view. Native/Browser can use their existing inspection entry point without a layout change. Revisioned native state, branch isolation and cold inspection are separate from full persistent goals, jobs and delegation; every accepted migration and platform/installed gate remains required.
+
+
+October 10 follow-up: standalone Native Settings and Browser Models now expose the same Pi saved effort/mode and profile mappings as Harness. Actual production Qt and loaded Chromium/native bridge/Pi fixtures qualify saves, conflicts, reload/reopen, received Manual/Adaptive effort and scope guards in [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls). This supersedes the standalone settings gap in the preceding checkpoint. Live/virtual routing, SDK/embedded controls, richer inspection and the full migration/platform/installed gates remain required.
+
+
+October 10 candidate: Adaptive Reasoning's pure MIT policy, supported Pi adapter, per-conversation Manual/Adaptive effort, exact provider/model mappings and Harness settings/Context decision display are source/staged qualified in [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). Native and Browser settings controls, representative live providers and virtual/physical route acceptance remain required. Existing Native/Browser layouts and installed DSH support are retained. This checkpoint supersedes the earlier blanket adaptive-port gap only within this scope.
+
+
+October 10 shared prompt checkpoint: [Harness picker/editor qualification](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor), source `88569bb54d03c0e549101be33fcc0c67310ac86a`, covers actual Chromium/shared-SQLite plus Native-client stable CRUD, revision conflicts, shared instructions, two-step Enter and guarded clipboard insertion. It supersedes the earlier Harness library/editor source gap. Pi prompt improvement, full command/resource/instruction composition, loaded Native/Browser prompt GUI and installed/platform acceptance remain required. The full P0/P1 matrix remains binding; DSH is retained.
+
+October 10 Harness candidate: [Native Branch/Edit and ordinary input qualification](AUGMENTOR-HARNESS.md#native-branchedit-and-ordinary-sdk-inputs) uses Pi 1.1.0 with production Qt controls, exact tool history, original template submissions, saved-child restoration and handled/unknown receipts. It supersedes the earlier Native end-to-end source gap. Ordinary/FIFO input now expands approved handlers/skills/templates; Harness guards actual selection readiness. Synthetic source/staged qualification does not establish live memory cutoff, full prompt/command controls, other OS/installed acceptance or DSH retirement. The Harness delivery matrix and accepted migration specification retain the full remaining P0/P1 scope; dated tables below preserve their original baselines.
+
+The [October 10 Harness candidate](AUGMENTOR-HARNESS.md) adds a separate local Pi Chat/Trajectory/Context client, parsed-provider observations and native context-edit budgeting/original recovery. Its source/fixture qualification does not update the installed surfaces or close the full migration gates.
+
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
 The [SDK source candidate](SDK-ALIGNMENT.md) scopes Conversation/Thinking and
@@ -34,6 +321,9 @@ Earlier Mac setup update (26 September): source added a separate
 External DSH setup below remains available. Basic setup, chat and restart passed
 an isolated real Mac/DSH fixture; the public signed app, additional plugins and
 complete feature parity are not yet qualified.
+
+The [October 10 Harness implementation matrix](AUGMENTOR-HARNESS.md#delivery-gates) records incremental Pi coverage and remaining DSH workflow gates. First-interface availability does not mean full migration parity.
+
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.

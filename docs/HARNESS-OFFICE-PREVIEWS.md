@@ -1,0 +1,1725 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+[Storage-safe source follow-up](HARNESS-BUILD-STORAGE.md#resumed-ci-failure-correction):
+the Linux supervised worker now checks source identity after renderer errors as
+well as successful rendering. It reports a concurrent source change consistently
+without replacing an unchanged source's real parser error. Actual supervised Wasm
+source/publication refusal and recovery pass; no installed engine selection or
+sealed artifact changes. Hosted prior runs' failure is recorded, not waived.
+
+## Stopped-cleaner private package — October 17
+
+The new helper now passes **304 Node checks each** in source, fresh ordinary and
+exact sealed **20261017-124857-6306bf21**, application **248828e6** /
+runtime change **c351558f**. Each package also passes **41 packaging / 43 Office
+Python** checks (overlapping groups). The **24,747-input seal / 1,140 compiled
+files** verify; artifact SHA-256 is
+`c35084df299213de94fec5bd23717c67d7af54dc689978e2f591e7368d796057`.
+The exact sealed package additionally passes both original historical Branch GUI
+cases, v1/v2, with the corrected CDP interception lifecycle and unchanged child,
+draft, cold recovery, explicit Send and native/archive assertions. No errors/skips.
+
+The first sealed run retains **303 pass / one failure** from an ESRCH read of a
+just-exited authored Host. The external privacy driver now captures the known
+process start token before shutdown and handles authoritative disappearance via
+the existing identity helper. All privacy/network/history/configuration assertions
+remain; the rerun uses the same unmodified sealed application.
+
+This is a private incremental preview with unchanged production dependencies,
+native binaries and Node, not a clean-room/public installer. External drivers and
+verified diagnostic copies preserve their output-root precondition. Both owner
+reviews remain **97d95d58 / 20261017-095821-fb78d6df**, pinned engine default;
+all 36 protected file sets, PIDs, shared state, menus and model/GPU/voice services
+verify unchanged. No engine rebuild, owner activation, inference or transfer.
+The preceding passing1417db62 and failed 76ace249 carriers remain separate/exact;
+the failed carrier must never activate. Current c351558f Linux SDK passes; Debian CI continues separately;
+248828e6 is test/docs-only and preserves that run. Source/public packaging,
+remaining startup/durability/corpus/security and explicit managed-backend selection/
+adoption/rollback stay open. Owner pilot feedback still gates further migration.
+[Exact package and preservation evidence](../release/office-rebuild/stopped-cleaner-package-qualification-20261017.json).
+
+## Stopped cleanup owner — October 17
+
+A stopped independent scratch helper previously stayed stopped after its Node
+owner died, leaving its admitted private document copy until recovery. A real
+owned-process regression fails on that runtime. The helper now arms and reads
+back Linux's parent-death **SIGCONT** before allocation/readiness, then closes
+the parent-loss race using its existing pidfd and parent check. The kernel wakes
+the surviving helper; pidfd/lease/directory identity checks still determine cleanup.
+It does not kill the cleanup owner or grant authority from a stale numeric PID.
+A live renderer's shared lease still prevents removal until that lease is released.
+
+Four new real cases pass: stopped managed and transient helpers after owner loss;
+a separate live renderer lease preserving exact private bytes after the wake;
+and admitted real-entry conversion with the cleanup helper, supervisor and renderer
+all stopped before owner death. The broader source cohort passes **304 Node**
+(45 files/19 Chromium, two workers/no failures/skips), **43 Python**, and **24 actual
+native Office compatibility** cases. A read-only/networkless container at the same
+3 GiB/zero-swap/one-CPU/128-PID cap passes **24**, with two real-MX-manager cases
+explicitly skipped. The host cohort includes those cases. The original actual
+managed Host/GUI also passes with the unchanged Thin entry and its 53 engine files.
+
+This proves the post-readiness suspension/owner-loss case. It does not qualify
+pre-hook/bootstrap or uncommitted publication windows, simultaneous destruction
+of every cleanup owner, power loss, encryption or filesystem/network isolation.
+The journal's separate verified cold recovery remains available when all owners
+are lost. Linux parent-death signals track the spawning thread; an already-dead
+parent before arming is handled by the existing check rather than a promised signal.
+No owner app, profile, engine default, source document or model/GPU/voice setting
+is changed. The separately sealed passing `1417db62` carrier predates this fix;
+fresh ordinary/sealed/adoption checks for this new helper remain separate.
+[Exact fault, source and preservation evidence](../release/office-rebuild/stopped-cleaner-qualification-20261017.json).
+
+## Corrected private package qualification — October 17
+
+The corrected runtime **1417db62** now passes the same **300 Node checks** in
+source, a fresh ordinary package and the exact separately sealed carrier
+**20261017-123104-dba3acbf**. Each package also passes **41 packaging Python**
+and **43 Office Python** checks; these groups overlap and are not additive.
+The carrier's **24,744 sealed inputs / 1,140 compiled files** verify exactly;
+artifact SHA-256 is
+`bd72197a68841b6acac22f0e5c6b6d883243363e3edc327524dfe50140f874f5`.
+Tests cover 45 Node files/19 Chromium files, two workers, without failures/skips.
+The original actual managed Host/GUI also passes with the existing Thin engine
+in a separate unselected derivative; all 53 engine files verify. No engine rebuild.
+
+This is a private incremental preview over the verified `97d95d58` base, with
+23,580 unchanged baseline inputs and unchanged production dependencies/native/Node
+bytes. External test drivers and byte-identical Python diagnostic copies preserve
+their required private output-root precondition; the sealed application is not
+modified. It is not clean-room source installation or public package approval.
+The failed **20261017-115954-59433a62** carrier remains exact, unactivated and
+rejected; the passing carrier does not supersede that retained negative evidence.
+
+**Neither installed owner review is updated**: both remain `97d95d58` /
+`20261017-095821-fb78d6df`, with the default pinned Office engine. Read-only
+postflight confirms all 36 protected file sets, owner PIDs, shared state, menus,
+registry and model/GPU/voice services remain exact. No owner inference or transfer.
+Current `1417db62` Linux SDK passes; Debian CI remains in progress at this checkpoint,
+and the Mac matrix fails separately. Full hosted acceptance, explicit managed
+backend adoption/rollback, remaining startup/power-loss/corpus/security and public
+source/rebuild/third-party gates remain. Pilot feedback still gates more migration.
+[Exact package, test-scope and preservation evidence](../release/office-rebuild/corrected-package-qualification-20261017.json).
+
+## Packaged cleanup contention correction — October 17
+
+Historical source checkpoint; [corrected package results](#corrected-private-package-qualification--october-17) supersede its pending package status.
+
+The first separately sealed managed-Office carrier, **20261017-115954-59433a62**,
+is **not qualified or activated**. Its 24,743-input seal remains exact after a
+297-pass/one-failure run: concurrent active/queued disposal sometimes refused a
+brief journal metadata lock. A separate held-lock control reproduces the refusal
+on the old runtime. The source now serializes cooperating metadata transactions
+instead of treating contention as corruption. Renderer root leases remain
+nonblocking; live/held/replaced/unknown roots are still preserved.
+
+The existing ten-second metadata-helper deadline now uses SIGKILL, so it also
+terminates a stopped helper. Two actual regressions pass: wait for a held metadata
+transaction, and hard-kill a stopped known helper at the configured deadline while
+preserving a recoverable copy. This deadline requires the Node caller's event loop
+to run; owner death separately has a kernel hook. It is not a new independent
+kernel deadline for metadata helpers with a stopped owner.
+
+The source cohort passes **300 Node / 43 Python**, 45 Node files/19 Chromium files,
+two workers, no skips or failures. A separate read-only/networkless container at
+3 GiB/zero-swap/one-CPU/128-PID passes **21 process/journal cases**, with the one
+actual-user-manager case explicitly skipped. No OOM occurs. The real MX manager
+cases remain included in the source cohort. The permission-negative fixture now
+explicitly chmods/asserts 0644, passing under both 022 and 077 masks; packaging's
+077 mask previously made that supposed nonprivate file private. Guards are not
+relaxed. The empty-missing-font recovery fixture selects already-declared DejaVu
+Sans, rather than assuming Liberation fonts are installed in CI.
+
+Hosted `4c86603d` Debian failed before packaging on orphan-reaping/font fixture
+assumptions. In a local control using the same failed sealed runtime, an authored
+non-reaping PID1 reproduces two process failures; changing only Docker `--init`
+passes both unchanged assertions. CI's pinned Debian containers now use init.
+Fresh hosted acceptance and a rebuilt ordinary/exact-sealed carrier remain
+separate requirements. Both installed reviews remain `97d95d58`; the failed
+carrier is retained and must not be selected. Original provider/GUI/engine/default,
+owner projects/settings/services and public packaging gates remain unchanged.
+[Source, failed-carrier and container evidence](../release/office-rebuild/packaged-cleanup-contention-qualification-20261017.json).
+
+## Managed Office scratch recovery — October 17
+
+The opt-in `linux-managed-wasm` Host now places conversion copies in its own
+private `state/office-scratch/v1/data/`, with bounded external ownership receipts
+in `records/`. The existing shared/native and unmanaged process seats retain their
+transient scratch behavior. Default `pinned-kit` and both installed reviews remain
+unchanged. The factory requires the Host's private state explicitly; it does not
+invent a global location or scan unrelated temporary/workspace directories.
+
+An exact root identity and full Linux owner identity (PID, process start token,
+boot ID) are written and synced before readiness allows document bytes to be
+copied. Normal cleanup records a durable deleting phase outside the data tree,
+removes contents through the verified directory descriptor, then retires the
+receipt. The next managed converter initialization can reclaim dead-owner copies
+and resume a deleting phase. This is often the first Office use after restarting;
+ordinary chat does not eagerly initialize this optional backend. A live owner or
+held kernel renderer lease prevents reclamation. Missing ready roots, replaced
+directories, linked/unknown/malformed/duplicate receipts and incomplete metadata
+publication are preserved and refuse managed Office admission. Other chat state
+and original workspace documents are not cleanup targets.
+
+Ten recovery cases pass, including actual Node plus independent-cleaner death;
+an admitted real-entry startup with renderer/supervisor stopped and all owners
+killed; independent shared-lease refusal/release; live-owner and foreign-current-
+owner refusal; authored PID-reuse/prior-boot identity controls; outside-symlink
+target preservation; unknown/partial record retention and deleting-phase resume.
+Deleting-phase interruption is represented by authored valid phase receipts,
+rather than claimed as a power-loss test. Actual kernel/manager and original-GUI
+checks remain part of the **298-pass source cohort** (45 files, 19 Chromium files,
+two workers, no skips/failures), plus **43 Python** source/notice/packaging checks.
+The changed shared helper also passes **24 actual native-backend compatibility
+cases**, without skips. A separate actual managed Host/original-GUI test also
+passes the existing Thin engine, with all 53 engine package files verified and
+unchanged assertions/deadlines. This source candidate is not installed or promoted.
+
+Uncommitted allocation/record-publication windows deliberately remain preserved
+if identity cannot be proved. Full bootstrap/process-window qualification,
+power-loss/filesystem durability, broader font/document/macro/security and public
+source/rebuild/third-party gates remain, along with exact ordinary/sealed/installed
+adoption and rollback. Process/resource supervision does not imply a filesystem/
+network sandbox. [Recovery contract and reproduction](../release/office-rebuild/README.md#managed-office-scratch-recovery--october-17)
+and [data retention](DATA-AND-SUPPORT.md#managed-office-recovery-copies--october-17).
+[Exact source/evidence](../release/office-rebuild/managed-scratch-recovery-qualification-20261017.json).
+
+## MX managed Office resource limits — October 17
+
+An additional explicit source candidate, `AUGMENTOR_OFFICE_BACKEND=linux-managed-wasm`,
+runs the same process converter in a fresh transient systemd **user scope**.
+The default remains `pinned-kit`; both installed reviews remain unchanged.
+MX's existing systemd 257.13 user manager and unified cgroup hierarchy are tested;
+this does not qualify other distributions or require a system service/root access.
+Missing manager, rejected properties, mismatched scope, missing effective limits
+or an unverifiable deadline refuse conversion without switching backends.
+
+Before admitting the renderer, the actual helper verifies its exact scope and
+kernel files: **3 GiB memory maximum, zero swap, 128 tasks, one CPU quota and
+whole-group OOM termination**. It independently checks manager identity/kill policy
+and raw D-Bus deadline values. The configured external runtime is the conversion
+timeout plus two seconds, with a two-second stop timeout and final group SIGKILL.
+This manager deadline still progresses while the actual Node owner, supervisor
+and renderer are all stopped. Existing kernel parent-death hooks, pidfds, bounded
+protocol, source/publication receipts and separate scratch ownership remain.
+
+Six actual user-manager tests pass: independent kernel-limit reads, wrong-scope/
+unbounded refusal before parser work, stopped supervisor/renderer deadline,
+all-three-stopped owner recovery and cleanup, lower-cap whole-group OOM, and
+actual Wasm active/queued disposal followed by fresh conversion recovery. The OOM
+control deliberately uses **64 MiB** and authored allocation; it is not a claim
+that a real Office document OOMs at the production 3 GiB cap. The original GUI/
+actual Host also passes unchanged PDF/font/zoom/reload/Retry/recovery/narrow-close
+assertions with both the managed default engine and the existing Thin engine.
+The broader **44-file / 19-Chromium source cohort passes 288 Node tests**,
+without skips or failures; focused source/notice/packaging checks pass **43 Python**.
+These are isolated authored profiles, with no owner inference or project transfer.
+
+This adds actual per-conversion resource controls to an opt-in MX source path;
+it remains **process/resource supervision, not a filesystem/network sandbox**.
+Pre-admission bootstrap and simultaneous loss of every cleanup owner, durable
+scratch recovery, exact package/seal/installed adoption, broader document/font/
+macro/security and complete preferred-source/public packaging qualification
+remain. The installed app/engine, model/GPU/voice state and owner data are preserved.
+[Reproduction and platform requirements](../release/office-rebuild/README.md#mx-managed-office-resource-limits--october-17)
+and [source/evidence record](../release/office-rebuild/linux-managed-seat-qualification-20261017.json).
+
+## Opt-in Linux process converter — October 17
+
+The preceding diagnostic now has a source runtime implementation selected only
+with `AUGMENTOR_OFFICE_BACKEND=linux-process-wasm` on Linux x64. The default
+remains `pinned-kit`; neither installed MX review has changed. The original
+provider, queue/cache, authorized reader, Wasm entry, engine bytes and GUI remain.
+Each conversion gets a separate renderer supervised by a Linux helper, bounded
+versioned metadata pipes, an independent deadline and kernel parent-death hooks.
+The parent owns the publication descriptor; source/output receipts and original
+scratch-directory identity must still match before results are accepted.
+
+Ten fault tests pass, including stopped owner/supervisor/renderer death,
+independent timeout, reply overflow, changed real-Wasm input, replaced output
+preservation and a distinct successful recovery. The broader source cohort
+passes **281 Node tests** across 42 files, including 18 Chromium files; focused
+source/notice/packaging/parser checks pass **43 Python tests**, without skips.
+Shared scratch compatibility also passes **37 native-backend tests**, before the
+later Wasm publication refinement; this does not qualify that refinement on the
+native backend. The actual original Office GUI/Host test passes with both the
+default engine and prepared Thin engine, retaining its original assertions and
+deadlines. It checks PDF/font/zoom/reload/Retry/recovery/narrow-close controls
+and exact native-history/request evidence, using only an authored synthetic seed.
+
+The full contained source-backend matrix passes ten cases per engine and fourteen
+verified PDFs under the same **3 GiB / zero-swap / one CPU / 128-PID** diagnostic
+cap. Baseline/Thin memory peaks are **1,441,579,008 / 1,923,006,464 bytes**;
+PID peaks are 33. Each run confirms eight Wasm opens, ten closed renderers and
+ten closed scratch owners. Calibrated outside-file/HTTP canaries, real startup
+cancellation, distinct recovery and nested scratch cleanup pass. Twenty failed
+NSS Unix-socket lookups per engine belong to known closed scratch-owner helpers;
+only the driver's positive control makes an IP connection. Their attribution
+does not exempt converter/helper file or IP access. The first source-backend
+attempt retained as failed completed its cases but rejected these NSS calls in
+postflight; the corrected observer/parser records them explicitly.
+
+This is **process supervision, not a filesystem/network sandbox**. The diagnostic
+cgroup cap is not an installed per-job memory limit. Pre-ready/all-owner death
+windows, durable recovery, managed kernel resource controls, further lifecycle
+faults, exact ordinary/sealed/installed adoption and broader document/font/macro
+acceptance remain open. Existing source/third-party/public packaging gates stay
+intact; no public redistribution approval follows. Both actual MX reviews,
+all 36 protected file sets, shared settings, menus and GPU/voice state verify
+unchanged. [Reproduction](../release/office-rebuild/README.md#opt-in-linux-process-converter--october-17)
+and [source/evidence record](../release/office-rebuild/linux-process-seat-qualification-20261017.json).
+
+## Retained memory and process-boundary prototype — October 17
+
+The [memory diagnostic and explicit process converter seat](../release/office-rebuild/README.md#retained-memory-and-process-boundary-prototype--october-17)
+advance the earlier ThinLTO OOM investigation without changing the installed app.
+Four bounded profiles render two distinct documents with each engine, in one
+process and in fresh processes. Eight PDFs verify. Both engines return to their
+starting 11-thread count; main-thread heaps stay about 14 MiB while anonymous
+memory remains much larger. Thin's anonymous memory after two documents is
+1,494,536 KiB; after idle/forced diagnostic GC it is 1,522,120/1,582,596 KiB.
+GC does not solve this observation. The exact native allocator/Wasm JIT cause
+remains unproven. Exiting the renderer reclaims the memory; Thin's coordinating
+process stays at 21,400/21,700/21,928 KiB anonymous memory across two children.
+
+An opt-in diagnostic uses the original provider's existing converter-factory
+extension point. One original entry conversion runs per child process. The parent
+waits for process close before returning metadata/releasing capacity. Nested
+entry scratch is confined to the provider-owned input directory and removed
+after confirmed child close. Original entry source, provider, queue/cache, reader,
+engine bytes and GUI stay unchanged.
+
+Both engines now pass the same **ten contained cases each** at the existing
+**3 GiB / zero-swap / one-CPU / 128-PID** cap, with **14 verified PDFs**, eight
+actual Wasm opens and ten closed renderers each. Baseline/Thin peaks are
+**1,418,690,560 / 1,948,413,952 bytes**; PID peaks are 31. This full case set uses
+no forced GC. Calibrated HTTP/file canaries, archive limits, actual startup
+cancellation, distinct recovery and all outer/nested scratch-prefix checks pass.
+Only the driver IP positive control connects. Failed NSS lookups, if present,
+are attributed only to the driver/known closed renderers; they grant no file/IP
+exemption. The observed prototype traces have zero NSS connects. Six parser cases
+and the focused source/notice/packaging cohort pass **42 Python**, no skips.
+
+The first prototype's normal disconnect incorrectly invoked its parent-loss
+guard; its exit70 failure remains. The second baseline completed ten cases but
+its postflight rejected zero NSS lookups, and review found the old scratch check
+omitted the entry's real prefix. These attempts do not count as acceptance. The
+corrected run checks the real prefix and confines scratch before execution.
+
+This is an unselected process-seat prototype, not promotion or a production
+sandbox. Bounded IPC/options, real owner/parent/crash/hung/stopped/output/source/
+deadline/disposal faults, original GUI/Host integration and exact package/adoption
+tests remain. Broader font/corpus/macro, complete source/notice/third-party and
+public packaging gates remain. Both owner reviews/services verify unchanged.
+Installed `97d95d58` Linux SDK passes; hosted root (2,106 pass/44 skip), Browser
+(128 pass), native (1,072 run) and desktop stages precede the terminal public
+Office packaging refusal. No whole-workflow acceptance is claimed.
+[Evidence](../release/office-rebuild/process-memory-qualification-20261017.json).
+
+## Contained external resources and memory refusal — October 17
+
+The [contained original-provider diagnostic](../release/office-rebuild/README.md#contained-external-resources-and-memory-refusal--october-17)
+now checks the current engine and existing source-built ThinLTO candidate with
+authored documents under an actual **3 GiB / zero-swap / one CPU / 128-PID**
+container limit. Mounts are read-only except synthetic work and bounded temporary
+storage; the root filesystem is read-only, capabilities dropped and network
+namespace isolated. This is diagnostic containment, not an installed app sandbox.
+
+The current engine completes **ten cases**, including seven verified PDF outputs:
+embedded-image control, external HTTP/file images, cached INCLUDETEXT fields,
+WEBSERVICE, two archive-limit rejections, actual Wasm-startup cancellation and a
+distinct uncached recovery. Text/images verify; the saved external formula result
+is 41.50. A calibrated live container-local HTTP endpoint receives no document
+requests. Tracing shows no converter opens of the outside image/text canaries;
+only the driver's two calibration/preservation reads of each occur. The sole IP
+connect is the driver's positive HTTP control. Two failed parent NSS Unix-socket
+lookups are recorded separately. Eight actual Wasm opens and paired syscall
+returns verify the work. Provider/scratch teardown settles.
+
+The baseline peaks at **2,011,688,960 bytes** of cgroup-accounted memory and 20
+PIDs. The ThinLTO candidate completes three documents, with post-conversion memory
+of 1,337,466,880 / 2,148,909,056 / 2,678,329,344 bytes, then is **OOM-killed, exit
+137**, during the next case at the same 3 GiB cap. Its full boundary run fails.
+The cause of the higher retained memory is unproven; no unchanged retry, cap
+increase or promotion follows. Earlier functional/pixel parity does not establish
+resource acceptance.
+
+The earlier cached-cancellation and NSS-attribution failures remain separate.
+Source/engine identity and owner postflight preserve both actual MX reviews,
+four conversations/all 36 protected sets, shared settings, menus and GPU/voice
+state. The installed engine stays unchanged. Macro/custom-font/large-corpus and
+broader security, source/third-party/distribution gates remain open.
+[Evidence](../release/office-rebuild/contained-boundaries-qualification-20261017.json).
+
+## Rich document and original-GUI comparison — October 17
+
+The [reproducible rich-fixture diagnostic](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17)
+now compares the source-built and current default engines through the original
+provider on six authored DOC/DOCX/XLS/XLSX/PPT/PPTX files. All **16 pages** have equal
+text/page/image/font reports and raw pixels at 96 DPI, with source/cache ownership
+preserved. Required checks include writer headers/footers/tables/mixed fonts and
+pictures, sheet formula/cross-sheet results/literal text/hidden rows, and slide
+columns/pictures/footers/notes exclusions. Sample pages were visually inspected.
+
+The actual original GUI/current Thin Host also passes the rich three-page DOCX,
+font details, zoom, reload, invalid-file Retry/recovery and responsive close.
+Native/history/request evidence remains exact during previews. Kernel return
+values verify three source-built converter opens plus one driver hash read,
+zero default Wasm opens and no unresolved calls. GUI observations have zero
+errors/unexpected HTTP destinations. The fixture uses an authored synthetic seed;
+there is no real inference or document content sent to the model. Rich Calc/
+Impress GUI (subsequently qualified in the linked operator guide), custom fonts/large corpus, broad resource/security and full source/
+distribution/promotion acceptance are separate. No engine build/default or
+installed update, owner change or further real migration occurs.
+[Evidence](../release/office-rebuild/rich-documents-qualification-20261017.json).
+
+## Emscripten runtime source companion — October 17
+
+The [runtime companion exporter](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17)
+now retains the pinned public Emscripten source and eleven original notices.
+All 4,890 selected runtime/JavaScript/tool/third-party/root sources match the
+existing build's public revision. SDK release-version/revision files are explicit
+overlays, with the installer rewrite traced; they are not claimed as unmodified
+Git source. The final response's 15 system-library archives and one startup object
+match their recorded bytes. Actual empty Core submodules/configuration establish
+that no help/dictionary/translation submodule sources entered this build.
+
+The 16-file runtime companion and original Core export have **139 files /
+694,891,760 bytes** verified independently. Ten new cases and preceding source/
+notice/packaging checks pass **34 Python**, no skips. The exporter is offline;
+there is no engine compile, installed/default change, inference or real migration.
+Both MX reviews/shared data/services verify unchanged. Preceding 48f3d51e Linux SDK
+CI passes; new-source full hosted acceptance remains separate. Complete source
+delivery/rebuild and third-party coverage review, broader Office document/font/
+resource/security and promotion/rollback remain. The public packaging gate stays
+intact. [Evidence](../release/office-rebuild/runtime-inputs-qualification-20261017.json).
+
+## Completed-build source and notice export — October 17
+
+The [private source-input exporter](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17)
+now retains exact committed Core/Emsdk sources, the applied Core patch, recipe,
+65 pinned external files/59 unpacked receipts and the actual generated full licence
+bundle. Both generated licence files reproduce byte-for-byte. A first `git archive`
+attempt omits tracked schema files; its export and failed regression remain.
+Direct blob export independently verifies **149,173 Core / 138 Emsdk files**,
+including 58 schema files. Applying the exported patch reconstructs all 33 changed
+Core files exactly. The 123-file export totals 661,286,937 bytes.
+
+Eight new source-export cases and existing notice/Office packaging checks pass
+**24 Python tests**, no skips. No engine compile, dependency/default change,
+installed adoption, owner inference or additional migration occurs. Existing
+reviews, protected files/shared state and services verify unchanged. This narrows
+the source/notice packaging gap. The newer runtime companion above records the
+runtime and submodule inputs. Complete source delivery/rebuild, broader document/font/resource/security and
+promotion remain open. The public packaging gate is unchanged.
+[Evidence](../release/office-rebuild/source-inputs-qualification-20261017.json).
+
+## Current original GUI with the source-built engine — October 17
+
+The completed ThinLTO engine now passes a separate **current-GUI functional**
+diagnostic based on application **fcf9d32a**, with no installed engine update.
+Read-only inspection confirms the actual final-rule producer is terminal/code 0,
+its five runtime assets, Core/emsdk revisions and raw/trimmed source diffs still
+match. Earlier failed preparation containers remain separate; no engine build is
+restarted. Office entry/engine retain their **MPL-2.0** notices; the original GUI
+and provider remain MIT. This is not public redistribution qualification.
+
+An unselected private copy reuses the existing source-built entry/engine and the
+current GUI/runtime. All compiled paths/bytes outside the Office entry remain
+exact. The unchanged actual Office suites pass **5/5**, including original DOCX
+PDF pages/text, font details, zoom, reload, invalid-file Retry/recovery, queue/
+capacity/source/size/permission boundaries and canceled HTTP teardown. A scoped
+kernel file-open trace records five successful source-built Wasm opens and zero
+default-supplier Wasm opens, joining unfinished calls by traced thread identity.
+Thus the rendered workflow actually uses the experimental engine. The trace is
+not a whole-machine/network/security audit or performance benchmark.
+
+The two unchanged neighbouring PDF/spreadsheet original-GUI tests pass **2/2**
+in the same private copy: selectable PDF text/local assets/version reload/Worker
+cleanup, plus real isolated spreadsheet parsers, saved formulas, literal text,
+sheet controls, readonly values and limits. They are compatibility checks for
+separate viewers/parsers, not extra Office-engine format evidence. Authored data
+and a synthetic seed are used; previews add no model submissions and preserve
+native history/request logs. No owner content or real provider is used.
+
+The first GUI attempt remains recorded as failed before Host startup because
+its private wrapper omitted `scripts/fixtures/context-provider-http.mjs`. Copying
+the unchanged public fixture directory fixes that wrapper; product, engine and
+test sources/expectations/timeouts are unchanged. The corrected seven cases pass
+without skips. There is no new screenshot/pixel comparison. The largest reported
+child RSS is about **2.53 GiB**, not aggregate tree or resource acceptance.
+
+Three completed preceding queue-control test copies are removed after selection,
+symlink and actor checks, reclaiming about 0.6 GiB. Both sealed/rollback artifacts,
+418-file owner backups, logs, failures and Office build caches remain. Read-only
+postflight verifies both current owner PIDs/all 36 protected sets, shared data,
+registry sixteen, menus/selections and GPU/voice state. No owner update occurs.
+[Aggregate record](../release/office-rebuild/current-gui-qualification-20261017.json)
+identifies exact tests, source-built component versions and acceptance limits.
+
+The current implementation's hosted Linux SDK, full root (**2,102 pass/0 fail/44
+skip**), Browser (**128 pass**), native (**1,052 run/45 skip/OK**) and desktop stages
+pass. Public Debian packaging still refuses the unchanged Office exact-source/
+rebuild gate. Representative complex documents/fonts, source/third-party notice
+closure, broader resource/security acceptance, private promotion/rollback and
+public distribution remain open. The installed private MX engine stays unchanged.
+
+## Cancellation fixture process-exit race — October 15
+
+The first current-permission source cohort fails in the optional native Office
+cancellation fixture while reading `/proc/<pid>/comm`: the observed short-lived
+child exits between enumeration and read, yielding Linux `ESRCH`. Its matched
+ordinary cohort finishes 513 cases (511 pass/two existing optional skips/zero failures).
+This failure occurs before cancellation, not in a renderer/cleanup assertion.
+The test now reuses the existing `ownedProcesses`/`stillOwned` identity helpers,
+which already handle ENOENT/ESRCH and distinguish a reused numeric PID. It still
+requires an actual native renderer, every observed identity to terminate, exact
+scratch removal/input preservation, timeout and disposal refusal under unchanged
+deadlines. No production/native code, sandbox or gate changes. The failing log is
+retained; a fresh full source/copy qualification follows, rather than treating a
+passing repeat as a cause explanation.
+
+[Original HTML previews](HARNESS-HTML-PREVIEWS.md) now supplies rendered HTML separately from Office conversion. Office/PDF engine and native supplier bytes/notices remain preserved; ordinary/installed qualification and full migration/public distribution gates stay distinct.
+
+[Linux packaging source review](#linux-packaging-source-review--october-13) now
+exports the exact Office engine notices and build sources through production
+staging. Private payload identity passes; public source/rebuild approval remains
+open. Existing installed and unselected runtime artifacts are unchanged.
+
+[Installed original spreadsheet previews](HARNESS-SPREADSHEET-PREVIEWS.md#ordinary-and-installed-mx-qualification--october-12): runtime 64d52917684307cb2a29c75e908209c83d4f06de, private MX 20261012-190657-be20be18, product 0.2.13, artifact 231dd41c550624399cea35a3c6e2d7244d938fb751c83d80373643f2b290e676, selected and running. Source and ordinary Node 24.19.0 each pass 301/301 across 58 files plus five notice/workspace cases. Actual installed original grid/warnings/sheets/readonly/scroll/reload/tab acceptance preserves native history with zero subsequent inference. Eleven prior histories, drafts/attachments, profile values/revision and model-router arguments are preserved; one additional empty Linux placeholder has no history or request. All 23,790 installed entries pass. MIT GUI is 527 files; Apache dsh-context remains 108. Full migration/live/privacy/public distribution/platform gates remain open; preceding selections below are historical checkpoints.
+
+# Original Harness Office previews
+
+## Public-source Office entry — October 15
+
+The default converter now uses **@augmentor/office-entry 0.1.3-augmentor.1**,
+built from the complete public preferred TypeScript source at
+[DSH LibreOffice Kit b19bb73](https://github.com/deepseek-ai/dsh-libreoffice-kit/tree/b19bb73c74ed893b8a5d1716d32df32a113ed31b/packages/entry/src).
+The verified source archive SHA-256 is
+`33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036`.
+All 32 preferred-source files, original MPL-2.0 LICENSE/NOTICE, upstream/local
+hashes and explicit modifications are retained under
+`packages/runtime/vendor/office-entry`. This closes the entry's missing-source
+implementation gap by replacing the opaque npm entry. It does **not** establish
+that the npm 0.1.5 entry's preferred source was recovered.
+
+Only the source-fork identity and Wasm compatibility mapping change in the
+public entry implementation. The supported original MIT Office provider imports
+this component through its existing converter seat; queue, limits, scratch,
+cancellation, cache and original GUI behaviour remain. Native adapter type imports
+use the same component. Default Linux remains Wasm; `linux-native` remains opt-in.
+Public 0.1.3 native package mappings are pinned for other OSes, with **native and
+installed platform qualification still required**. No running or selected artifact
+is updated by this source change.
+
+The normal check verifies all source hashes and 31 generated declarations using
+TypeScript **5.9.3**. Build uses pinned esbuild **0.28.2** and emits four ESM entry
+points, source maps, complete preferred source/notices/build inputs and exact
+`SOURCE.json` hashes. Runtime dependencies are fontkit **2.0.4**, saxes **6.0.0**
+and the existing root fflate **0.8.3**; the opaque entry and its nested fflate
+0.8.2/Koffi dependency closure are removed. These are actual lock changes, not
+unchanged-dependency evidence. [Build and reconstruction instructions](../packages/runtime/vendor/office-entry/BUILDING.md)
+identify the source layout and pinned tools.
+
+The Linux packaging record is schema 2: all **82 source-built entry files** and
+all unchanged **49 engine files** are hash-bound. Production staging exports the
+entry's complete build/source/notice inventory as well as the existing 39 engine
+recipe/source files. Changed source, compiled entry, lock, links, extra files,
+forged exports and approval labels remain refused. **Public packaging continues
+to fail deliberately** because the exact engine rebuild is unqualified. MPL,
+font and third-party notice sufficiency are separate from private preview tests.
+
+Initial source integration passes strict check/build, all six actual authored
+Office formats through the original provider with unchanged inputs and owned
+cache copies, and **5/5** default queue/Wasm/original GUI cases. Nine real
+packaging cases pass, including preferred-source tampering and refusal of public
+Debian packaging. Fresh production staging collects **151** npm instance notices.
+At **622300056a989dfc0d3456db223fa79d2675267b**, the complete selected source and fresh ordinary
+cohorts each pass **298/298** across 66 files/all 44 Harness Chromium files,
+including 15 shared prompt DOM, 24 common/native Office and four default queue/Wasm
+cases. Both separate native-backend GUI viewers pass. Two workers, original
+deadlines and zero skips/cancellations remain. All **1,007 compiled files** and
+**2,121 executable inputs** match between trees; original GUI/CSS normalize to
+the same bodies, all seven MIT provider upstream hashes remain and only its
+entry import adaptation changes. Fresh dependencies are **20,702 entries/151 npm
+instances**: 145 old entry/FFI/nested dependency files disappear, and the only
+remaining file difference is npm private lock metadata. Node and 1,932 browser
+test dependency entries remain identical. The first ordinary invocation failed
+before tests because its executable path was relative; the corrected absolute
+invocation is the recorded full pass. A first provenance comparison against the
+intentionally modified prototype also failed; verification now reads the original
+hash-verified archive directly. Neither failed probe is presented as a test pass.
+
+The observed qualification host reports **Debian 13.7 (trixie), Linux x64**.
+MX Linux physical owner acceptance and wider OS/distribution checks remain
+separate. Both owner review inventories (24,305/24,288 entries), all four review
+processes, selected configuration and 38 canonical pre-existing changes verify.
+Qwen's read-only model endpoint returns 200; this does not qualify new inference
+or speech. Model/speech/GPU settings and installed artifacts remain untouched.
+[Portable qualification](../release/office-rebuild/source-entry-qualification.json)
+records exact scope, retained failures and remaining gates.
+
+Predecessor **1cb5a799** now passes the [SDK Linux/macOS/Windows matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38671302506)
+and Windows desktop. Its broader Validate run retains a Jobs pointer obstruction;
+Windows command-job tests and macOS/Windows Koffi notice packaging also fail.
+Removing that npm closure is not evidence that new-head hosted/platform tests
+pass. New-head CI, public and installed release qualification remain open.
+
+The separate full engine link retry on October 15 retains the verified compiler,
+recipe, one-thread resource controls and runtime/full-LTO flags in a copied cache.
+At an **8 GiB** memory cap it again terminates with OOMKilled=true, exit 1, exact
+8,589,934,592-byte peak and zero swap. The failed result is preserved; no repeated
+unchanged retry or further RAM increase is inferred. [Environment record](../release/office-rebuild/environment.json)
+retains this separately from the preceding 6 GiB attempts. Engine compile,
+packaging/render comparison and public binary approval remain false.
+
+## Fresh ThinLTO engine build — October 15
+
+The later low-optimization full-LTO attempt also reaches the final linker and
+exhausts the exact **8 GiB** cap, with zero swap and OOMKilled=true. Its failed
+cache and all earlier attempts remain retained. The separate fresh ThinLTO build
+now completes **compile and package**, exiting **0 / OOMKilled=false** at
+**2026-10-15 09:01:32 UTC**. Its cgroup peak is **6,951,043,072 bytes**, below
+the unchanged **8 GiB** cap, with zero swap. Preparation, all 18 original patch
+reverse checks plus its additional build-rule check, verification, configuration,
+final linking and `wasm-opt -Oz` finish. The earlier live-link/optimizer
+observations are historical; terminal container state and the driver's completed
+package receipt now establish success.
+
+The [published driver and build patch](../release/office-rebuild/README.md) use
+`-flto=thin` with the original `-Oz`, runtime thread/memory flags and feature set.
+Link-only thread/cache controls stay in the Emscripten make rule; they do not
+enter strict compile-only checks. The additional patch is **MPL-2.0**, and the
+preferred-source change is explicit. The tiny actual ThinLTO probe contains LLVM
+summaries, links against the pinned ThinLTO sysroot and returns 42. This proves
+the toolchain mode, not the complete Office engine. No old Core objects are reused.
+
+The same pinned builder, **8 GiB/zero-swap**, two-CPU, one-job/nice-15 and no-network
+profile remains. [Environment evidence](../release/office-rebuild/environment.json)
+retains the exact source/driver/patch hashes, preceding observations and both
+failed ThinLTO preparations. LibreOffice **26.8.0.3**, Core
+**bce0998afefdbc355585ca324285661a2170ba77**, produces a **131,888,969-byte**
+Wasm module. Its four runtime assets and supplier manifest are hash-bound in the
+[portable qualification](../release/office-rebuild/thin-engine-qualification.json).
+
+The [private candidate builder](../release/office-rebuild/prepare-thin-candidate.mjs)
+verifies that terminal build, original supplier sources/notices, Core diff and
+resource profile before cloning only an unselected ordinary app's `dist`,
+`node_modules`, Node and package manifests. It refuses sealed bases and existing
+outputs; no owner profile is copied. It builds all **32 MPL preferred entry
+sources**, **31 declarations** and four ESM entry points, changing only the entry
+identity and engine mapping. The private names are **@augmentor/office-entry
+0.1.3-augmentor.thin.1** and **@augmentor/office-engine-wasm
+0.1.5-augmentor.thin.1**. They are diagnostics, not registered npm releases or
+replacements for the default dependency. The supplier build identity omits the
+compiler override, so the separate resource-profile hash is required. Both the
+raw Core patch hash and the supplier's trimmed-stdout hash are recorded; they
+must not be compared as though their inputs were identical.
+
+The [paired original-provider probe](../release/office-rebuild/compare-thin-candidate.mjs)
+passes **DOC, DOCX, XLS, XLSX, PPT and PPTX** against the pinned engine using
+the exact same independently authored fixture bytes. Actual text, page counts,
+missing-font sets and **all ten pages' raw pixels at 96 DPI** match; rendered
+pages were also visually inspected. Each engine preserves input bytes, returns
+separately owned cache buffers and closes without remaining busy. The authored
+DOCX's missing-font notice remains visible. The tested public builder/probe,
+six direct refusal checks and unchanged public packaging gate have separate
+evidence in the portable record. Initial private preparation failures (raw versus
+trimmed diff comparison; unavailable timing executable before conversion) remain
+retained, rather than being presented as failed conversions or erased.
+
+This establishes a successful source compile/package and basic authored output
+parity. Representative complex documents, fonts, resource/performance/security
+acceptance, complete corresponding-source/third-party notice distribution,
+original-GUI candidate integration, physical/platform and public redistribution
+qualification remain. The default engine, installed and owner-review artifacts,
+and model/speech/GPU settings are unchanged. No public binary or installed
+promotion follows this diagnostic.
+
+## Immutable authored scratch input — October 15
+
+The shared scratch-seat test generated a DOCX when writing its source, then
+regenerated another inside the asynchronous converter callback for its byte
+assertion. ZIP timestamps can change between those calls. An independently
+authored past-dated ZIP reproduces the same `document-render/failed` wrapper and
+source call site as the Windows SDK failure without any Windows mechanism.
+The hosted inner error was not captured, so its exact cause remains unproven.
+
+The test now captures one source buffer and uses it for both admission and the
+exact copied-byte assertion. Its explicit year-2000 archive timestamp makes a
+future accidental regeneration differ reliably from the source. The original
+no-copy-before-admission, capacity-through-cleanup, single-render/cache and
+original byte-equality assertions remain. No runtime/provider/GUI/helper or
+library implementation changes. The complete shared/native file is qualified
+as a focused follow-up to the Models source/ordinary cohort; hosted Windows
+acceptance remains required. At **1d20c5c4789863423eb893add1745d025ed30e1c**, the complete shared/native
+file passes **24/24 each** on source and a fresh ordinary tree. The 298/298 source
+and ordinary baseline belongs to Models driver **cba66bce67e2f16fb5b03050c38b74972c10f10d**; it was not
+relabelled as a follow-up run. Application bytes remain exactly c78c832.
+[Combined portable evidence](../release/harness-model-peer-refresh.json).
+
+## Native caller-output ownership — October 15
+
+The former adapter checked that the requested PDF path was absent, then on a
+conversion failure removed whatever occupied that path. Two controlled real
+helper cases hold the original parent-directory lease before broker admission,
+create a regular file or symlink at the target and release the helper once.
+Both fail against the preceding runtime because cleanup deletes the replacement.
+The unrelated symlink target itself remains intact; the link deletion is also a
+failure. No model, owner profile or private source participates.
+
+The Node owner now reserves a new 0600 regular output with exclusive/no-follow
+creation through an open parent-directory descriptor. The helper receives the
+output and original parent descriptors, checks their owner/mode and link identity,
+and writes the validated PDF through the inherited output descriptor. Writes
+are flushed/fsynced; the caller path and parent are revalidated before success.
+Normal failures, cancellation and observed owner loss remove only a matching
+reserved output. The live Node fallback uses the same retained parent/file
+identity after helper loss. A replaced regular file or symlink is preserved and
+that converter closes to further work. No filename-only failed-output removal
+remains. The original provider consumes the PDF after conversion; a reserved
+empty file during native work is internal, not a GUI ready preview.
+
+An initial 24-case run passes 23 and retains one existing replaced-scratch
+failure: scratch refusal skipped reserved-output cleanup. Independent nested
+cleanup now preserves the unknown root while still cleaning the known output;
+the full reviewed set passes **24/24**. The final three focused contracts also
+pass after adding no-admission/closed-converter assertions and opening actual
+output/parent descriptors in the existing sandbox probe. Its nine negative
+boundaries include no extra descriptors in the parser and unchanged authored
+output bytes. All six authored document formats, font notices, bounds, default
+provider capacity, cancellation and hard owner/guard-loss cases remain.
+
+The final focused four-case run also passes after checking cancellation through
+its final output-identity barrier. Shared provider admission/cancellation/capacity
+contracts are added to Linux/macOS/Windows CI. The initial checkpoint predates
+the full source/ordinary qualification below.
+Linux x64 native remains opt-in; the original GUI, common supplier provider,
+default Wasm backend and other-OS behavior are unchanged. This qualifies the
+controlled replacement boundary and descriptor ownership, not all concurrent
+same-user mutations between an identity check and unlink. Pre-ready allocation,
+all cleanup owners lost/power loss, durable root recovery, completed-output
+handoff uncertainty, physical/font/security/source/licence/distribution and other
+OS gates remain open. No installed/default/public binary promotion follows.
+
+At **c78c832c7fadc3367e93520aabf87f768ea4fb4b**, source and fresh ordinary Node 24.19.0 each pass **297/297** across 66 files/all 44 Harness Chromium files, 15 shared prompt DOM cases, 24 native-common cases and four default queue/Wasm cases. Two workers, original deadlines and zero skips/cancellations remain. Both original native Office viewers separately pass font notices/PDF/zoom/reload/Retry and unchanged request/native evidence. All 925 compiled files and 2,051 executable inputs match between trees. Three native runtime outputs change; regenerated GUI hash names/receipts normalize to unchanged original GUI/CSS bodies. The 20,847 production dependency entries, 155 npm instances, Node and 1,932 browser-test entries remain unchanged. All seven MIT provider inputs/upstream hashes remain unchanged. Eleven packaging/source-boundary cases pass with the public Office gate closed. Read-only postflight verifies both owner review inventories/all four processes, selected artifact, 38 canonical changes and Qwen HTTP 200; owner history/credentials and model/speech/GPU settings are untouched. [Portable evidence](../release/office-rebuild/caller-output-ownership.json). New-head hosted, installed/live/physical and the wider gates above remain open.
+
+Preceding **76b83fa** [Validate 38665728402](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38665728402) records main Node **1,205 pass/one failure/42 identified skips**. The original Models test cannot edit Context window 1; captured text says the model view is read-only and requires an explicit refresh. Its trigger/sole cause is unproven; local passes do not erase it. Secondary/native/package stages are not reached. Three-platform SDK **38665728306** and Windows desktop **38665728364** pass. This remains the next investigation.
+
+## Admitted native actor completion — October 15
+
+The preceding source cohort at fc34230 reports settlement after a killed cleanup
+supervisor while its Python broker and two Bubblewrap actors remain observable.
+Their precise states/timing were not captured, so the old failure is retained
+without a claim about its sole cause. A pipe closing is insufficient completion
+evidence for a separate sandbox monitor's kernel exit/reaping.
+
+The trusted supervisor now registers its broker before admission. Each native
+catalog/render launch records a pending phase, the monitor identity and the
+namespace-init identity reported by Bubblewrap's supported
+[info interface](https://manpages.debian.org/trixie/bubblewrap/bwrap.1.en.html).
+The bounded private append log is fsynced before the phase is marked ready and
+parsing is admitted. A fixed positional-argument gate uses the system
+`/usr/bin/dash`, bound read-only; it rejects EOF/wrong admission and closes its
+one-way descriptor before executing the original parser command. Status pipes
+also close before parsing. User document text supplies no shell command.
+The tested system Dash is **0.5.12-12**. Its [Debian notice](https://sources.debian.org/src/dash/0.5.12-12/debian/copyright/) records BSD-3-Clause/public-domain source and GPL-2+ generated-code obligations; those remain separate. This adds no npm dependency and does not relabel the native system payload MIT.
+
+Normal supervision joins the registered actors before deleting private scratch.
+After helper loss, the live Node fallback invokes the same owned helper's
+cleanup mode, which verifies the existing root/device/inode/owner/mode and joins
+only recorded identities. Process descriptors prove kernel exit; the exact
+start token remains an additional reaping barrier. Reused PIDs are not joined or
+signalled. A partial registration is refused and scratch preserved; unconfirmed
+cleanup closes that converter to subsequent work. No general process discovery,
+temporary-directory scan, numeric-PID signalling or action replay is added.
+Existing document/font limits, graceful-to-forced interval and supplier
+queue/cache/GUI/default remain intact. This is a Linux x64 adapter; common
+provider behavior on other platforms is unchanged.
+
+At final application **b3003bde58199288510698c21238a0d689f88c0f**, source and fresh ordinary
+cohorts each pass **285/285 across 65 files**: all 44 Harness Chromium files,
+15 common prompt DOM cases, 22 common/real native Office cases and four original
+queue/default-Wasm cases. Two workers, all existing deadlines, zero skips and
+cancellations are preserved. Both original native-backed viewers separately pass
+font notices/PDF/zoom/reload/Retry and preserved native/request evidence. Eleven
+packaging/source-boundary cases pass with the Office public gate unchanged.
+
+Three controlled real-process completion contracts cover held actor/root,
+PID-token reuse and interrupted registration. Against the preceding helper,
+the two positive cases fail; the defensive refusal already passes. Initial/reviewed
+22-case runs and provisional **6aa2757** source/ordinary 285-case cohorts pass.
+Review then strengthens root revalidation before reading actor metadata, closes
+that converter for every ownership failure and records the full tested system
+Dash notice. The final cohorts above include those follow-ups. The existing
+killed-guard assertion now confirms no observed actor at settlement and captures
+states if it fails; it has no added post-settlement wait or relaxed predicate.
+The real parser starts only after its monitor/broker identities are observed in
+the registry, and the expanded sandbox probe requires no live admission/status
+descriptor in the parser. These contracts qualify admitted-actor completion;
+the older failure's exact states/schedule and sole cause remain unproven.
+
+All **925 compiled / 2,051 executable source/test/fixture files** match; both
+helpers match source. Original GUI/CSS and normalized spreadsheet bodies/metadata,
+seven supplier provider identities/inputs, production 20,847 dependency entries/
+155 npm instances/Node 24.19.0 and 1,932 Browser test entries remain preserved.
+The small ledger is transient lifecycle metadata, not a durable recovery index.
+[Portable qualification record](../release/office-rebuild/admitted-actor-completion.json)
+separates actor/GUI evidence, system Dash notices and open release scopes. Read-only
+postflight verifies both owner review inventories/all four processes, selection,
+38 canonical changes and Qwen HTTP 200; no owner profile/history/credentials or
+model/speech/GPU settings are changed.
+
+Preceding **c09782c** [SDK 38656747878](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38656747878)
+passes all three platforms and [Windows Desktop 38656747901](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38656747901)
+passes. [Validate 38656747993](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38656747993)
+retains main Node **1,202 pass/one failure/39 identified skips**: the original Free
+Search GUI case calls `indexOf` on an undefined immediate configured-order read.
+Its exact trigger/cause remains open; local 285-case passes do not supersede it.
+That run does not reach secondary/native/package stages. New-head hosted and
+separate Windows command/macOS packaging acceptance remain pending.
+
+All-owner loss, pre-ready registration windows, durable root indexing/power loss,
+direct caller-PDF publication, physical/font/security/source/licence/distribution/
+other-OS and broader migration gates remain open. **Full native release and
+promotion remain false.** No review/installed/default/binary promotion follows.
+The previous 281-case failure and its unqualified record below remain historical
+evidence, alongside this newer admitted-actor correction.
+
+## Original provider scratch ownership — October 15
+
+A real original-provider crash fixture against **04613ad09786c0ed6eb764cc304d09e40bb9ccb6**
+reproduces a separate source-copy leak: the native conversion actors exit and
+inner scratch is removed, but the provider's `dsh-office-to-pdf-` directory still
+contains the authorized document. Existing direct-converter cleanup does not
+own that outer directory. The fixture uses only an authored document/workspace
+and proven owned processes; it neither reads owner history nor performs model work.
+
+The original MIT provider now accepts an optional backend-owned scratch seat.
+Backends without it retain the existing temporary-directory path. The opt-in
+Linux native backend acquires a small independent cleanup owner before returning
+scratch admission. That owner opens the actual Node process descriptor, creates
+one private directory relative to an open parent descriptor, records its exact
+identity and sends a bounded readiness receipt. Only then does the provider copy
+source bytes. The helper receives lifecycle metadata/control, no document bytes,
+model/profile input, network access or directory-scan authority.
+
+The provider retains its original source authorization, content cache, queue and
+PDF reader. It awaits scratch release before freeing its conversion slot. Native
+supervision and its broker hold a shared parent-directory lease; cleanup acquires
+the exclusive lease after those trusted actors exit. The implementation uses
+[descriptor locks](https://docs.python.org/3/library/fcntl.html#fcntl.flock) and
+[descriptor-relative, symlink-resistant removal](https://docs.python.org/3/library/shutil.html#shutil.rmtree)
+with exact device/inode, owner and mode checks. A renamed/replaced root is refused
+rather than adopted or scanned. Unknown/moved directories and the authorized
+workspace source are preserved.
+
+Normal release follows complete PDF reading. Owner death independently removes
+the outer source/PDF directory. Guard loss with a live provider aborts conversion;
+the existing backend exit barrier precedes the provider's known-root fallback.
+Release has a two-second forced-exit bound for a stopped cleanup process, while
+capacity remains held through fallback cleanup. Existing native conversion
+limits, default pinned engine and GUI remain unchanged. No unknown action or
+conversion is replayed.
+
+At **fc342300c57582de674bfcf3cc5a4b0c8477c493**, the exact-ref focused **19/19**
+common/real cases pass, including all six new scratch-ownership cases. The
+unchanged 64-file Harness cohort plus four existing original queue/default-Wasm
+cases totals **282 across 65 files**, all 44 Harness Chromium files and 15 shared
+DOM cases, two workers/unchanged deadlines/no skips or cancellations. **Source
+passes 281/282 with one failure; fresh ordinary passes 282/282.** Both original
+native-backed viewers separately pass font notices, PDF/zoom/reload/Retry and
+preserved request/native evidence. Eleven packaging/source-boundary cases pass
+with the public Office gate closed.
+
+The retained source failure is the existing killed-native-cleanup-guard case:
+at reported settlement it still observes `python3` and two `bwrap` actors. Their
+exact states/timing were not captured; this is not declared a harmless zombie or
+an assertion error. Twelve independent exact-ref guard-loss probes pass, and the
+ordinary cohort/focused source cases also pass. Those successes do not supersede
+the actual broader source failure. **Full qualification and promotion remain
+false.** The next implementation must establish process-completion evidence for
+the known sandbox actors before reporting settlement. Inspecting Bubblewrap's
+[monitoring/admission interfaces](https://manpages.debian.org/trixie/bubblewrap/bwrap.1.en.html)
+is preparation for that fix, not a tested replacement. Assertions and existing
+deadlines are retained.
+
+All **925 compiled / 2,051 executable source/test/fixture files** match the fresh
+ordinary tree; both Python helpers match source. Original GUI/CSS and normalized
+spreadsheet bodies/build metadata remain unchanged. Production 20,847 dependency
+entries/155 npm instances/Node 24.19.0 and 1,932 Browser test dependency entries
+remain matched. Initial TypeScript path narrowing and the stale adapted-source
+receipt refused build; both preparation errors are retained and corrected against
+authored source. Seven MIT provider inputs keep exact upstream identities; only
+the adapted provider index and its modification record change. New helpers are
+independently authored, with no dependency/version/private-source import.
+[Portable qualification record](../release/office-rebuild/provider-scratch-ownership.json)
+distinguishes passed scratch/viewer evidence from the unresolved completion case.
+Read-only postflight verifies both owner review inventories/all four processes,
+selection, 38 canonical changes and Qwen HTTP 200; no owner data/service is changed.
+
+Preceding **04613ad** [SDK 38653941416](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38653941416)
+passes all three platforms and [Windows Desktop 38653941396](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38653941396)
+passes. [Validate 38653941476](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38653941476)
+passes main Node 1,202/34 identified skips/zero failures, Browser 121/121,
+Python/Qt 878/45 identified skips and both strengthened ten-phase X11 proofs,
+then refuses the unchanged Office exact-source/rebuild packaging gate. This
+confirms the prior canvas hosted scope; it does not qualify this newer scratch
+source or the separate Windows command/macOS packaging failures.
+
+All-cleanup-owner loss, empty allocation before readiness, direct caller-PDF
+publication, durable owned-root indexing/power loss, adversarial concurrent
+same-user directory replacement and physical/font/layout/security/source-notice/
+distribution/other-OS gates remain open. The new ownership path is Linux x64
+opt-in; the common optional seat has unchanged default behavior on other OSes.
+No owner review/selection, speech/model/GPU settings or public binary is updated.
+
+## Native guard loss and bounded live-owner drain — October 15
+
+Two real-native fixtures against **2929c6076741786efcc881b8ccc0ca83e691f97b**
+reproduce an admission stall when the separate cleanup guard is stopped or
+killed. The frozen guard holds stdout after Node kills the broker; a killed
+guard also cannot drain a held renderer on its own. Neither operation settles
+within the existing observed ten-second barrier. This is a live-owner lifecycle
+gap, distinct from simultaneous loss of every cleanup owner.
+
+Node now owns the cleanup supervisor directly in its existing detached helper
+group. The supervisor owns a separate-session broker and exact process
+descriptors; it does not read document/request input. A private admission pipe
+and owner check precede document work. The broker arms a kernel **SIGKILL** death
+signal before restoring interrupts or accepting admission, so supervisor death
+kills even a stopped broker and cascades through the existing namespace monitors.
+Normal cancellation uses the same two-second graceful-to-forced interval. If
+the supervisor stops, the existing Node group kill remains effective; the live
+Node removes its already known root after the helper's close barrier.
+
+Broker results travel through a bounded private pipe. The supervisor joins the
+actual broker, removes confirmed scratch, then relays its existing JSON reply.
+A private Node-pipe hold keeps the ordinary close barrier valid on supervisor
+loss; that descriptor is not passed to native children. Startup failure can kill
+only an unreaped direct child, without numeric process discovery or a weaker
+descriptor fallback. Changed-root refusal, caller input, byte/font/time limits,
+ordinary provider queue/cache, GUI and default pinned backend remain intact.
+No action or unknown conversion is replayed.
+
+Focused **13/13** common/real checks pass, including both new faults with all
+observed actors gone at settlement, unchanged original input, no leftover native
+scratch/output and the helper's actual direct parent confirmed. Earlier owner/
+broker-group, stopped-tree and replacement-root refusal checks also pass.
+At **edf50db97437fc4212e7f9c33bc800bd08d423aa**, strict type/build/version/source-
+boundary checks pass. Source/fresh ordinary **272/272 each across 64 files**
+include all **44 Harness Chromium files**, 15 shared DOM cases and 13 explicit
+common/real native cases. Both retain two workers, unchanged existing deadlines
+and zero skips/cancellations. Both separate original native-backend Office
+viewers pass font notices, PDF/zoom/reload/Retry and preserved request/native
+evidence. The two failing old guard comparators remain retained.
+
+All **921 compiled / 2,048 executable source/test/fixture files** match the
+ordinary copy; copied helper bytes match source. The Node converter's functional
+bytes are unchanged; its ownership comment/source map changed. Fresh spreadsheet
+overlay/chunk metadata differences are separately verified by exact normalization
+and actual asset sets/references. Initial preparation used an incorrect dated
+dependency-snapshot filename; the completed unselected tree was then verified
+against the correct immutable snapshot. The initial inventory assumption omitted
+the changed source map and was corrected against actual files. Both preparation
+failures are retained; no failed test was dropped or artifact rehashed to pass.
+Production **20,847 dependency entries / 155 npm instances / Node 24.19.0** and
+**1,932 existing Browser test dependency entries** remain matched. Eleven
+packaging/source-boundary cases pass with the Office public gate unchanged.
+
+Read-only postflight verifies current/prior **24,305/24,288-entry** inventories,
+all four review processes, selected configuration and 38 canonical changes.
+Qwen models returns HTTP 200; owner history/profile/credentials/drafts and
+model/speech/GPU settings remain untouched. [Portable qualification record](../release/office-rebuild/native-guard-drain.json)
+owns the exact scope and remaining work.
+
+Preceding **2929c60** [SDK 38646604104](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38646604104)
+passes Linux/macOS/Windows and [Windows desktop 38646603991](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38646603991)
+passes. [Validate 38646604138](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38646604138)
+passes main Node **1,202 / 32 identified skips / zero failures**, secondary
+Browser **121/121** and Python/Qt **875 / 45 identified skips**, then fails the
+real flare workspace/stacking proof's post-move geometry assertion. Canvas and
+window rectangles disagree; its cause is unproven. That run does not reach Office
+packaging and does not contain this new drain correction. Exact new-head hosted,
+installed/physical and wider platform acceptance remains open.
+
+All-cleanup-owner loss, pre-admission allocation,
+caller-PDF/original provider outer scratch, durable/power-loss and physical/
+font/layout/security/source-notice/distribution/other-OS gates remain open.
+This is source development; no running review/default/installed/binary promotion
+is performed.
+
+## Independent native scratch cleanup — October 15
+
+The preceding native adapter still leaves a real document/font/profile copy
+after simultaneous Node-owner and broker-group loss. If the conversion tree is
+stopped when its owner dies, it also cannot settle or clean up. Two real-native
+comparators against **271e1aedba84976129f00490b96f27f0893357af** demonstrate the
+retained directory and stopped-process barrier failure. Their inputs are authored
+fixtures, and cleanup signals target only proven owned processes.
+
+Before reading/copying document or font bytes, the trusted broker now acquires
+Linux process descriptors for its actual Node owner and itself, then starts a
+small private cleanup guard. The guard confirms readiness in its own session,
+outside the conversion process group. Owner loss requests graceful broker exit;
+an unresponsive broker is killed after the existing two-second grace period.
+The exact broker descriptor remains an exit barrier. On normal work, the broker
+joins its guard after final subprocess/root cleanup. On hard broker loss, the
+guard holds stdout open until owned scratch cleanup settles, retaining Node's
+existing close/capacity barrier. No conversion or unknown action is replayed.
+
+Python's [process descriptor](https://docs.python.org/3/library/os.html#os.pidfd_open)
+and [descriptor signalling](https://docs.python.org/3/library/signal.html#signal.pidfd_send_signal)
+APIs avoid signalling a reused numeric PID. Unsupported APIs fail before document
+work; there is no weaker fallback. The guard receives existing root/device/inode
+and process ownership metadata, not document/request input. It removes only the
+confirmed private directory and uses Python's
+[descriptor-protected recursive removal](https://docs.python.org/3/library/shutil.html#shutil.rmtree).
+A changed link, identity, owner or mode is refused. It neither scans a temporary
+directory nor deletes a caller-owned input/PDF or a moved/unknown root.
+
+Focused **11/11** real/common cases pass. New scenarios freeze the renderer then
+kill the actual owner and stopped broker group, or freeze all conversion actors
+then kill their owner. The independently owned guard drains the observed actors
+and removes the actual copied document/fonts/profile, leaving the original
+fixture intact and publishing no PDF. Another real case replaces the scratch
+directory's identity and verifies its new data and the moved original survive.
+The latter is refusal evidence, not recovery of the moved directory. The existing
+hard-stop case still freezes the same broker/monitor/renderer actors; its new
+independent guard remains responsive. Tests confirm that guard's separate session.
+
+At **8ce4334dde84af07625dbc51c5f21b1be35e4240**, strict check/build, version and
+source-boundary checks pass. Source/fresh ordinary **270/270 each across 64 files**
+include all **44 Harness Chromium files**, 15 shared prompt DOM checks and the
+11 explicit common/real native Office cases. Both use two workers, unchanged
+existing deadlines and zero skips/cancellations. Separate original native-backend
+Office viewers pass on both trees, including font notices, PDF, zoom, reload and
+Retry with preserved native/request evidence.
+
+All **921 compiled** and **2,048 executable source/test/fixture files** match the
+ordinary tree. The native helper's copied bytes match its source; other fresh
+compiled differences are the existing temporary spreadsheet overlay/chunk names
+and associated build metadata, with normalized GUI/worker bodies verified.
+Production **20,847 dependency entries / 155 npm instances / Node 24.19.0** and
+the existing **1,932 Browser-only test dependency entries** remain matched.
+Eleven packaging/source-boundary cases pass; public Office approval stays closed.
+Read-only postflight verifies both **24,305/24,288-entry** review inventories, all
+four review processes, unchanged selected configuration and 38 canonical changes.
+Qwen models returns HTTP 200; no owner history/profile/credentials or draft is
+read or changed, and model/speech/GPU settings are preserved.
+
+The preceding **271e1ae** [SDK 38641804850](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641804850)
+passes Linux/macOS/Windows, including the new shared prompt DOM step **15/15 on
+each platform**; [Windows desktop 38641804839](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641804839)
+also passes. [Validate 38641805015](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641805015)
+passes main Node **1,202 / 29 identified skips / zero failures or cancellations**,
+secondary Browser **121/121**, and Python/Qt **875 / 45 identified skips**, then
+refuses the retained exact-entry-source/full-engine-rebuild packaging gate.
+Those runs do not contain this new guard. Exact new-head hosted and installed/
+physical acceptance remains open.
+
+[Portable qualification record](../release/office-rebuild/native-independent-cleanup.json)
+records the actual failure comparators, process barriers and limited scope.
+The pinned kit remains default and the native backend stays an explicit Linux
+x64 development opt-in. GUI/CSS/supplier source, converter contract, dependency
+pins and running/selected artifacts are unchanged.
+Guardian loss or stall, allocation before guard readiness, successful caller-PDF
+and original provider outer-scratch crash recovery, power loss/durable indexing,
+font/layout/security/distribution and other OS adapters remain required. This
+improves two known native-scratch failures without qualifying all crash privacy or
+promoting a native default, installed review, binary or DSH retirement.
+
+## Native forced cleanup and parent ownership — October 14
+
+A new real-native regression freezes the **owned broker, monitors and renderer**
+before cancellation. At preceding `c6c229a`, the two-second forced group kill
+drains every observed process but leaves the broker-created font/profile scratch
+directory behind. The retained failing comparator proves a cleanup gap; normal
+cancellation passes did not cover it.
+
+The trusted Node parent now creates the private scratch directory and keeps its
+device/inode identity. It passes that exact directory, identity and creator PID
+to the broker at startup. The broker refuses an unexpected root, link, owner,
+mode or identity. The parent independently removes the same root after helper
+exit, including hard termination; a changed identity is refused rather than
+removing an unknown directory. The original provider's outer scratch and held
+queue/maintenance lifetime remain intact. No GUI, default engine, data format,
+model/speech/GPU setting, dependency pin or installed selection changes.
+
+The Linux broker arms `PR_SET_PDEATHSIG(SIGTERM)` and verifies its creator both
+before and after arming, before document/font work. The
+[Linux interface documentation](https://man7.org/linux/man-pages/man2/PR_SET_PDEATHSIG.2const.html)
+defines a creator-thread death notification and warns that it is not retroactive;
+the two checks guard creator loss while arming. A repeated graceful signal cannot
+interrupt the broker's final owned-root cleanup. Native descendants retain the
+separate PID/network/user namespace and Bubblewrap parent-death ownership.
+
+Initial dependency-backed checks pass **8/8**. The new hard-stop case observes
+all recorded descendants gone **when the operation settles**, and direct-converter
+scratch removed. Another case kills an actual authored Node owner while holding
+the renderer; its responsive broker drains descendants/removes its known root
+and publishes no PDF or replay. The tests inspect only their own process tree,
+include children launched by worker threads, and use start-time identity tokens
+before cleanup signals. No unrelated process/environment or owner profile is read.
+At **97a2fac94c2366532085eb74b495418e7920b6de**, strict check/build and source/fresh
+ordinary **252/252 each across 62 files** pass, including all **44** Harness
+Chromium files, unchanged two workers/deadlines, zero skips/cancellations. Both
+trees also pass the explicit native-backend original Office viewer. All **921
+compiled files**, **2,047 executable source/test/fixture files** and unchanged
+**20,847 dependency entries / 155 npm instances / Node 24.19.0** match. The existing
+nine Office packaging and two private-source boundary cases pass (**11/11**);
+the public gate is unchanged. The failed old hard-stop comparison is retained.
+
+Read-only postflight verifies current/prior reviews' **24,305 / 24,288** inventory
+entries, all four review processes, unchanged selection and **38** canonical local
+changes. Qwen's read-only model endpoint returns **200**. No owner history/profile
+or credentials are read; no selection/review/draft/service/GPU/voice change occurs.
+This remains opt-in source qualification, with no installed update or binary.
+
+The preceding integration documentation head **c6c229a** passes the three-platform
+[SDK workflow 38631233193](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38631233193)
+and [Windows desktop 38631233109](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38631233109).
+[Validate 38631233240](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38631233240)
+records **1,229 tests: 1,200 pass, two fail, 27 identified skips**, before native/
+packaging acceptance. The nested-tool case reaches its final stderr assertion
+with a memory-processing lease warning; the Trajectory argument case times out
+waiting for its second held proposal. Their causes remain unproven. Those hosted
+failures do not become passes because the local cohort succeeds. Separate native
+Mac/Windows packaging/runtime and new-head hosted checks remain unqualified.
+
+This does not yet qualify simultaneous loss of owner and broker, an unresponsive
+broker after owner loss, allocation before helper startup, post-publication crash
+boundaries or power-loss recovery. Those cases need durable owned-root recovery
+or an independently owned supervisor before promotion; unknown directories must
+not be scanned/deleted as a shortcut. Default kit preferred-source/rebuild and
+native distribution/font/layout/security/other-OS gates remain open. This Linux
+adapter fix preserves the shared converter/view contract and does not implement
+the missing macOS/Windows sandbox mechanisms. Running MX review/drafts remain
+unchanged.
+
+## Opt-in native provider integration — October 14
+
+An authored Linux x64 adapter now connects to the **original MIT Office provider,
+queue and viewer**, through an explicit converter-factory seat. The pinned kit
+remains the default and is lazily imported when rendering is needed. Development
+Hosts can choose `AUGMENTOR_OFFICE_BACKEND=linux-native`; `pinned-kit` or omission
+keeps the preceding engine. Unknown choices are refused. This is a source-only
+opt-in candidate, not an installed update or public distribution approval.
+Existing owner review processes, selections and drafts must remain intact.
+
+`packages/runtime/src/office-native-linux.ts` owns a serial converter and a
+trusted Python helper/process group. The original provider retains authorized
+stat/complete bytes/current-version checks, content-addressed caching, shared
+readers and held cancellation/maintenance capacity. A fresh provider generation
+prevents cross-lifetime cache reuse. The helper receives only provider-owned
+scratch paths and validated limits; the native renderer sees an immutable copied
+input, private profile/home/cache, bounded font snapshot and read-only system
+payload. No agent loop, Session, model/tool request or permanent document storage
+is added. There is no unisolated or different-engine automatic fallback.
+
+The helper validates all six extensions, binary CFB signatures and bounded OOXML
+membership/entry/uncompressed limits, before font/converter work. It supplies
+declared-font metadata using XML namespaces, preserves excluded font-table/theme
+and generic-theme handling, and matches normalized family/full/PostScript aliases
+from the actual sandbox font catalog. Default platform/user font roots and custom
+roots/groups are supported. Physical fonts are deduplicated, oversized files
+omitted, and the **whole copied font snapshot** is bounded by the current loaded-
+font budget. This allocation strategy needs large-catalog/required-font parity
+evaluation before promotion; it must not silently narrow the final font contract.
+Cache files are transient within the owned scratch tree. Complete, regular,
+bounded PDF publication is exclusive, and existing output is preserved on refusal.
+
+The twelve original fallback groups come from the verified **public preferred
+0.1.3** entry source at `b19bb73`, not the opaque pinned 0.1.5 bundle. Their JSON
+adaptation, complete original preferred file, MPL LICENSE/NOTICE and hash-bound
+selection live in `packages/runtime/vendor/office-font-fallbacks`. Build copying
+checks those exact bytes. These data retain **MPL-2.0**, separately from the MIT
+provider/GUI and authored application portions. Native binaries/fonts and linked
+source/notice closure still require distribution review; no policy is relaxed.
+
+Fresh profile settings disable macro execution, active OLE/DDE content and the
+Office Python runtime; the installed registry contains those keys. Namespace
+isolation denies owner files/process/environment/network and source/system writes.
+Broker/renderer address space is bounded, the native child has CPU/file-size/FD
+limits and lower priority, and the parent deadline covers all font/conversion
+work. These are not an aggregate cgroup/scratch-quota qualification. SIGTERM,
+group termination and sandbox parent-death ownership request teardown. Normal
+cancellation/disposal checks observe all owned descendants exit before the
+operation settles, with the original provider retaining its private scratch
+cleanup and slot ownership. Forced-termination/parent-crash races and direct-
+converter scratch cleanup still need qualification before promotion; the normal
+checks do not stand in for that evidence. Unknown outcomes are not replayed.
+
+Initial local focused checks pass **6/6** with explicit native dependencies: lazy
+provider seat/cache/authorization and retained cleanup, actual DOC/DOCX/XLS/XLSX/
+PPT/PPTX conversion and missing-font metadata, malformed/archive/font/input/output
+bounds and existing-output refusal, real built-command negative isolation, and
+native cancellation/timeout/disposal. The actual original Chromium viewer passes
+with the opt-in Host: two pages, original font warning/details, 100% zoom, changed
+bytes, malformed-file Retry/recovery, narrow fullscreen close, unchanged native
+history and **zero subsequent provider requests**.
+
+At **15b1d8d22c25bcfae015c8ba836b7ad2e07052b5**, strict TypeScript/build and source/
+fresh ordinary **250/250 each across 62 files** pass, including all **44** existing
+Harness Chromium files, with two workers and unchanged deadlines, zero skips or
+cancellations. The six native/converter-seat checks run with real prerequisites;
+all preceding 244 cases retain the default engine and their existing assertions.
+Separate source and ordinary actual original Office viewer runs also pass with
+the explicit native Host, including the same history/no-further-inference contract.
+These are source/ordinary qualifications, not an installed proof.
+
+All **921 compiled files**, **2,045 executable source/test/fixture files**, and the
+unchanged **20,847 dependency entries / 155 npm instances / Node 24.19.0** match.
+The first ordinary command fails to launch Node because a relative root is reused
+under its own cwd; no test/Host is started. That preparation failure is retained.
+The corrected absolute-root invocation supplies the successful ordinary evidence.
+The nine Office packaging and two private-source cases pass (**11/11**) without
+changing the gate. Read-only postflight verifies current/prior review inventories
+of **24,305 / 24,288**, all four review processes, unchanged selection and **38**
+canonical modifications; Qwen's read-only models endpoint returns **200**. Owner
+histories/credentials are not read and services/GPU/voice placement remain intact.
+No review/installed update, public binary, merge or DSH retirement occurs.
+
+Reproduce only in fresh isolated test profiles with installed native prerequisites:
+
+```sh
+npm run check
+npm run build
+AUGMENTOR_NATIVE_OFFICE_TEST=1 node --test --test-concurrency=1 tests/office-native-linux.test.mjs
+AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE=1 node --test --test-concurrency=1 tests/harness-office-chromium.test.mjs
+```
+
+The native tests are explicit dependency-backed checks; without their opt-in,
+six real-native cases are identified as skipped rather than reported as fixture
+passes. Two common converter-seat cases run independently of the OS adapter.
+The default original viewer/real Wasm checks remain mandatory and separate.
+The [Fontconfig reference](https://fontconfig.pages.freedesktop.org/fontconfig/fontconfig-user.html)
+describes private configuration, family preferences and the full matching catalog;
+this implementation does not import the owner's global font configuration.
+
+Remaining gates include large/custom/glyph/font fallback and complex layout
+parity; executable macro/external-resource/password cases; archive repair/error
+classification, aggregate scratch/resource bounds and cancellation races; ordinary
+artifact source/notice and installed GUI qualification; and other Linux layouts/
+architectures/macOS/Windows sandbox adapters with the **same feature contract**.
+The exact preferred-source/full rebuild gate for the still-default npm kit/Wasm
+remains closed. Retain DSH and the owner's working installed/review artifacts.
+
+## Controlled linker resources — October 14
+
+The actual pinned toolchain reports **LLD 21.0.0**. A tiny independently authored
+C++ probe compiles and executes with `--threads=1` and `--thinlto-jobs=1`; the
+captured actual native-linker invocation verifies both flags, beyond setting a
+compiler-helper environment variable. A separate private copy of the retained
+configured Debian 13 tree then receives the same controls through the
+[published driver](../release/office-rebuild/run-thread-limited.sh). Original
+Core/recipe/configuration identities are checked before copying. Full LTO and
+the engine's runtime memory/thread flags remain unchanged; helper/debug output
+goes to disk. Extra resource flags have a separate provenance receipt because
+the supplier's build identity does not capture them.
+
+The actual full-engine relink receives both native flags but still terminates
+**exit 1 / OOMKilled=true at 18:20:29 UTC**, with a **6,442,450,944-byte** cgroup
+peak, exactly the **6 GiB** cap. Two CPUs, one make job, no extra swap and 1,024
+processes remain enforced. Both failed trees/containers/logs are retained;
+there is no completed engine, output comparison or new source approval. The
+[environment record](../release/office-rebuild/environment.json) distinguishes
+this trial from the earlier GCC/configuration and ordinary-link failures.
+No larger-memory retry, service shutdown, cache eviction, model/GPU/voice change
+or installed/review mutation is made. The existing nine packaging/export/refusal
+cases pass; the public gate remains closed.
+
+[Emscripten's FAQ](https://emscripten.org/docs/getting_started/FAQ.html) documents
+compiler helper concurrency, and [LLVM's linker options](https://github.com/llvm/llvm-project/blob/main/lld/wasm/Options.td)
+describe native thread controls. Current online documentation is supplementary;
+the pinned tool's own help and captured command establish what this trial used.
+Those controls do not reduce full LTO to a different optimization mode or prove
+that the preferred-entry source gap is resolved.
+
+## Native Linux Office feasibility — October 14
+
+The [standalone authored probe](../release/office-rebuild/native-sandbox-probe.py)
+tests the existing Debian **LibreOffice 4:25.2.3-2+deb13u8** and
+**bubblewrap 0.12.0-1~deb13u1** as a possible Linux backend. It is outside the
+application runtime: no default, supplier pin, GUI, licence gate, selected build,
+review process or user data changes. Reproduce only in a new private output
+directory using [the probe recipe](../release/office-rebuild/README.md#native-sandbox-feasibility-probe).
+At **af60044882dd576d7a5a202791092d324b3bd383**, the exact-source combined probe
+passes. [The reviewed feasibility record](../release/office-rebuild/native-feasibility.json)
+pins its driver hash, installed package/source versions and complete format/
+isolation/cancellation/raster evidence. DOC, DOCX, XLS, XLSX, PPT and PPTX each
+produce actual PDF text containing the authored marker; Writer and slide second
+pages retain their second marker. All original source bytes remain unchanged.
+This is simple authored format coverage, not complex layout fidelity or bit-
+reproducible native output.
+
+Negative checks verify that the child cannot access an outside authored file,
+host process environment, inherited authored environment sentinel or host loopback
+listener, or write the read-only input/system payload. The bounded font catalog
+contains Liberation Sans and excludes the authored missing family. Startup and
+post-export-dispatch cancellation both observe the actual owned `soffice.bin`
+and await all descendants' exit. A **1,200 × 1,200** image at **two inches** is
+actually exported as **384 × 384 at 192 × 192 DPI**, measured by `pdfimages`.
+That confirms this image's result rather than inferring it from an accepted flag.
+
+The nine existing Office packaging/export/refusal cases and two private-source
+boundary cases pass: **11/11**, with the real tracked/history boundary check and
+shell/Python syntax checks. Existing output is refused before engine admission;
+an incomplete commit identity is also refused before output creation. An earlier
+otherwise passing preparation used an incorrect abbreviated ref, so it is
+retained separately and does not supply exact-ref qualification. No new runtime
+cohort is inferred from these diagnostic checks: the unchanged application's
+244-case source/ordinary Models qualification remains its own evidence.
+
+Read-only postflight verifies all **24,305** current-review and **24,288** prior-
+review inventory entries, their running processes and two earlier reviews. The
+selected configuration hash and **38** pre-existing canonical changes remain
+unchanged; Qwen's read-only model endpoint returns **200**. No owner history or
+credential data is read, no draft is discarded, and no model/speech/GPU settings
+or running/selected artifacts are changed. The prototype is not deployed to the MX
+review. Additional GUI/installed/native packaging and complete migration remain
+required.
+
+Each conversion uses the installed `oosplash` launcher and fresh private profile,
+home and cache directories. It exposes a fixed read-only system/library/registry/
+language payload and bounded Liberation font files, a read-only authored input,
+and owned writable scratch only. Network/PID/user namespaces, dropped capabilities,
+cleared environment, no display/DBus/GPU and per-process resource limits preserve
+isolation. This is a Debian x64 prototype; other architectures/layouts are not
+silently declared supported. `soffice.bin` alone initially returns profile-startup
+code 81; the installed launcher handles that initialization instead of a new
+generic action-replay loop. Earlier missing-registry and direct-launch failures
+are retained.
+
+The installed package's source version exists in
+[Debian Sources](https://sources.debian.org/src/libreoffice/4:25.2.3-2%2Bdeb13u8).
+That establishes availability of the version's public preferred source, not an
+actual native rebuild, complete linked closure or public redistribution approval.
+The installed Debian copyright record retains **MPL-2.0** and separate Apache/
+third-party terms. System LibreOffice is not MIT and is not relabelled as such.
+No library, font, system binary or generated document is copied into the app.
+
+[Official PDF export parameters](https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html)
+describe CLI filter properties. Merely accepting the requested 192 DPI would not
+establish rendering parity; the probe includes an actual raster measurement.
+Two preliminary combined attempts already convert all six formats and pass the
+isolation/font checks, then fail their cancellation observer. That observer
+misses children spawned by a worker thread and cannot qualify termination from
+the main thread's child list. The corrected probe walks every thread in its own
+process tree; separate actual startup and export-dispatch cancellation checks
+pass. These failures remain explicit rather than being relabelled as full passes.
+
+This path could eliminate reliance on the opaque npm entry/Wasm closure in a
+future Linux distribution while keeping the original MIT DSH GUI and provider/
+queue. It is not yet integrated or promoted. Before adopting it, preserve all six
+formats, authorized complete-byte/current-version reads, original missing-font
+metadata/custom roots/fallbacks and budgets, ZIP/malformed/password/error/output
+bounds, shared-reader cancellation/cache/maintenance/timeout/disposal and transient
+scratch guarantees. Qualify macro/external-resource negatives, complex layouts,
+original actual GUI and ordinary/installed artifacts, native dependency/source/
+notice policy and OS adapters. macOS/Windows remain explicit adapter gaps with the
+same feature contract. No fallback to a weaker unisolated process is authorized
+by this feasibility evidence. DSH and running review drafts remain available.
+
+The unchanged application's documentation head **d31c580** has now completed
+[Validate 38609853288](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609853288):
+main Node **1,200 pass / 23 existing skips / zero failure**, secondary **116/116**,
+Python **875 pass / 45 existing skips**, then the retained Office corresponding-
+source/rebuild packaging refusal. [SDK 38609852865](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852865)
+and [Windows desktop 38609852788](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852788)
+pass. Separate [macOS packaging 38609852832](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852832)
+refuses unreviewed Darwin Office MPL/libvips LGPL terms. [Windows native
+38609852802](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852802)
+retains real job/delegation/goal fixture failures and refuses unreviewed Office/
+Sharp native terms. The timeout causes remain unproven. This Linux diagnostic
+does not fix those platform gates or establish new-head hosted qualification.
+
+## Isolated Linux engine build — October 14
+
+The [rebuild environment](../release/office-rebuild/README.md) now records an actual
+isolated attempt using the pinned npm engine's **39 verified recipe/source files**.
+The official Core checkout is **bce0998afefdbc355585ca324285661a2170ba77**;
+Emsdk is **5eb0bde7585670252e8ba05e9d361627bffd08b5** and the verified Emscripten
+version is **4.0.10**. After applying only the shipped patches, the actual Core
+binary diff has SHA-256 **d91124546ab0502728693e537c9570b0290c8bbc2bf06d063551a0960da459cc**,
+exactly matching the shipped `sources/source-changes.patch`. The recipe's patch,
+shim/header and toolchain verification succeeds. This advances source preparation;
+it does not prove a completed engine build or output correspondence.
+
+The first Debian 12 attempt stops at configuration: GCC **12.2.0** is below the
+pinned Core's **GCC >=13** requirement. That image, inventory, log and failed build
+are retained. The Debian 13 definition uses GCC **14.2.0** and a separate fresh
+build directory. Verification/configuration succeeds, and compilation reaches
+final WebAssembly linking of `soffice.js`. The pinned `wasm-ld` receives SIGKILL;
+the actual container exits **1**, with **OOMKilled=true**, at **16:38:59 UTC**.
+The 6 GiB memory limit is insufficient for this final-link trial. Its failed
+receipt, logs, build directory and container are retained; no completed engine
+or output comparison is claimed. A further attempt requires a separately assessed
+resource profile before resuming the retained build.
+
+The container enforced two CPU cores, 6 GiB RAM/no extra swap, 1,024 processes and
+one make job with lower CPU priority. No GPU or owner model, voice, profile,
+installed engine or review artifact changes. These are a local trial's limits,
+not qualification of upstream automated-release resource gates.
+
+The base digests, actual host package inventories, Node 24.19.0/hash and observed
+preparation state are in [the environment record](../release/office-rebuild/environment.json).
+Apt content can change; image/engine bit reproducibility is not claimed. An initial
+image-ID equality assertion fails even though the rebuilt Debian 12 definition has
+matching filesystem layers/environment; those properties are recorded separately.
+The nine existing Office packaging/export/refusal cases pass. No gate is relaxed.
+Full compile/receipt, actual generated artifacts and rendering/conversion/cancel
+comparison, linked notices and exact entry preferred source remain unqualified.
+
+A fresh source-location check still finds public master at **b19bb73**, one branch
+and no tags. Pinned 0.1.5/latest 0.2.0 npm metadata provide neither `gitHead` nor
+an attestation. The complete pinned DSH tree has kit references/adapters but no
+`packages/entry` source directory. This bounded check does not prove that no other
+source exists. The [review record](../release/office-engine-public-source-review.json)
+keeps corresponding-source qualification false. The [supplier build guide](https://github.com/deepseek-ai/dsh-libreoffice-kit/blob/b19bb73c74ed893b8a5d1716d32df32a113ed31b/docs/building.md)
+and [Mozilla guidance](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) remain source/licence
+references; these components retain their own terms rather than becoming MIT.
+
+At application source **81094b3**, [Validate 38571935767](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38571935767)
+records **1,187 cases: 1,162 pass, two fail, 23 existing skips, zero cancellations**.
+The failures are original brand interaction and nested tool request controls after
+cold reopening; their causes remain unproven. Later native/package stages are
+not qualified by that run. The earlier cfe5fab Office packaging refusal remains a
+separate release gate. Build preparation and nine focused gate passes do not
+establish full GUI or release acceptance.
+
+## Actual public wrapper rebuild — October 14
+
+At **1598961772d31848291559d8755f491af702b09e**, the public-source review now
+includes an actual build of public commit **b19bb73c74ed893b8a5d1716d32df32a113ed31b**,
+not only package-version comparison. Its recorded archive SHA-256 verifies.
+The original frozen lock installs with lifecycle scripts disabled and isolated
+registry configuration. The original `pnpm run build:adapter` succeeds using
+Node **24.19.0**, pnpm **11.7.0**, TypeScript **6.0.3** and tsdown **0.22.14**.
+No owner profile, provider key, private repository or installed engine is used.
+
+Comparison covers all **36** JavaScript/declaration files of the pinned entry
+package. **28 match byte-for-byte**: the font-snapshot worker and 27 declarations.
+Three main/CLI/worker bundles and four existing declarations differ; the new
+`native-process.d.ts` has no corresponding public build output. The differences
+include the API version, RTL tile unmirroring and native printer-discovery
+suppression. This demonstrates a code gap beyond a version-label difference;
+it does not establish that corresponding source cannot exist elsewhere.
+The checked public branch and all **190** available history commits contain
+neither `native-process.ts` nor the `unmirrorRtlTile` TypeScript addition.
+The alternative repository named in that public checkout's metadata returns
+404/repository-not-found. The reviewed JSON records every compared hash, size,
+missing file, lock hash, toolchain and scope without machine-specific paths.
+
+The current npm `latest` is **0.2.0**, so that entry archive is also inspected
+without changing the dependency pin. Its official SHA-512 integrity verifies;
+it contains **105 files**, native frame-forwarding C++ sources/prebuilds and an
+optional Koffi **3.1.1** dependency. It does not include entry TypeScript preferred
+source. That inventory does not qualify its semantic compatibility, native
+suppliers or engine rebuild, and it does not close the existing entry source
+gate. The original **0.1.5** payloads, source/notice exports and GUI remain pinned.
+
+The official LibreOffice tag resolves to the recorded Core commit
+**bce0998afefdbc355585ca324285661a2170ba77**. The shipped engine recipe independently
+requires that checkout, its exact Emsdk checkout, applied patches/shim/header and
+Emscripten **4.0.10** before compiling. Its build identity rejects whitespace in
+build paths, so a future isolated engine build must use suitable container/cache
+paths. No Core/toolchain checkout, engine compilation, replacement artifact or
+public redistribution qualification is claimed by this wrapper proof.
+
+Reproduce the wrapper comparison from the hash-verified public archive recorded
+in `release/office-engine-public-source-review.json`: install its original frozen
+pnpm lock with `--ignore-scripts`, run the original adapter build, then compare
+each `entryPackage.files` path under `lib/` to the exact hashes in
+`release/office-engine-linux-wasm.json`. Use an isolated npm configuration/cache,
+the recorded toolchain and a separate output directory; keep installed files
+unchanged. The review's `entryRebuildComparison` stores the complete result.
+
+The **nine existing Office packaging cases pass**, including actual exported
+source/notice identities and rejection after forged approval labels or altered
+bytes. This is source-availability/build evidence, not another rendering/live
+GUI, installed, cross-platform or public-binary qualification. Exact entry
+preferred source, actual engine rebuild, full linked notices and distribution
+acceptance remain open. The [upstream repository](https://github.com/deepseek-ai/dsh-libreoffice-kit)
+and [MPL guidance](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) remain the primary
+source/licence references; component terms are not relabelled MIT.
+
+## Original document registration — October 12
+
+The original public DSH Office registration selects `.doc`, `.docx`, `.ppt` and
+`.pptx` in the existing file sidebar. Original loading, Retry, missing-font
+toolbar/details, retained per-tab results, PDF child slot, zoom and CSS remain
+in use. The existing original PDF renderer presents converted bytes; no new UI
+layout or agent owner is introduced. Client cache generations, pending readers,
+authorization-before-reuse, reset disposal and tab lifetimes remain original.
+
+The public MIT GUI selection adds **eleven files**, bringing it to **507** at
+**d743267388641bc76f17c45ce8b4c231aed1d32c**. Ten bodies are verbatim, including
+both CSS files and the document hook contract. One marked locale adaptation
+names the unavailable local service without directing users to a DSH Host.
+The preceding 496 supplier bodies/hashes remain unchanged. dsh-context remains
+**108 files**, Apache-2.0, with its existing notices and modifications.
+
+Seven selected public MIT runtime files retain the original Office provider,
+bounded queue, output validator, errors, identity and branded primitives under
+`packages/runtime/vendor/dsh-office`. Their source/adapted hashes and change
+notices are recorded. NodeNext imports, a Pi lifecycle/authorized-byte-reader
+seat and explicit limits replace Cordis, schema defaults and Typert decorators.
+Original converter slots, deferred source admission, content-addressed reuse,
+reader cancellation, classified errors and private scratch cleanup remain.
+Queue/provider busy state exposes actual teardown for maintenance. The engine's
+font disk cache is explicitly disabled. These helpers create no AgentSession,
+tool call, model request, attachment receipt or saved conversation event.
+
+## Authority, transport and lifetimes
+
+Only an authenticated Harness operator in an eligible Desktop conversation can
+read the renderer generation or request conversion. Browser-only, archived and
+delegated conversations, and read-only inspectors, retain no Office authority.
+Each source uses the same regular-file, no-follow, current-version and complete
+byte reader as ordinary previews. A byte-access check and stat precede queue
+admission and cached reuse; deferred full reads revalidate the expected version.
+Workspace authority is checked again after conversion. Existing absolute read
+namespace behavior is preserved rather than inventing a new filesystem grant.
+
+The provider admits **one CPU conversion**, four waiting metadata-only jobs and
+sixteen readers, with **20 MiB** source/reservation/output limits, eight retained
+PDFs, **64 MiB** retained output and sixty-four source aliases. Speculative
+background conversion is refused. The engine retains its **60-second** deadline,
+192 DPI, ten-thousand archive-entry and 250 MiB declared uncompressed limits,
+plus the original explicit font budgets. This changes no Qwen/Breeze/GPU,
+context/concurrency/precision or ASR/VAD settings.
+
+`GET /api/preview/office-generation` returns the provider lifetime.
+`GET /api/preview/office` sends a four-byte big-endian metadata length, bounded
+UTF-8 JSON metadata, then complete PDF bytes. Metadata is limited to **256 KiB**;
+large font lists are never silently omitted or forced into HTTP headers. Current
+source identity, rendering generation and missing-font declarations accompany
+the bytes. The client validates the envelope, authority/epoch and exact length.
+No-store responses, authenticated local transport and existing main-page/local
+PDF worker security policies remain in use.
+
+One reader cannot cancel another reader's shared conversion. Final-reader
+cancellation retires shared work; engine capacity remains owned until actual
+worker and scratch cleanup settle. `host.describe.activeOfficePreviews` reports
+this retained lifetime, and `host.prepareShutdown` refuses it even after an HTTP
+reader has left. Host close cancels and awaits the original provider. Tab close,
+session/role/Host epoch changes and adapter disposal retire client viewing and
+cache faces. Document bytes/PDFs are transient memory/private scratch, not native
+history, drafts or model context.
+
+## Engine and licence scope
+
+The current [source-backed entry](#public-source-office-entry--october-15)
+replaces the historical **@deepseek-ai/libreoffice-kit 0.1.5** npm entry.
+The unchanged Linux **0.1.5 Wasm** package uses LibreOffice **26.8.0.3**, source
+**bce0998afefdbc355585ca324285661a2170ba77**, build identity
+**81c24980c5de51d11e2e50d48ea2bd98f9830a97d35df551f4aed8b6ff5bfe2c**.
+The package manifest, engine payload hashes, source/rebuild recipe and licence
+paths are recorded in `release/office-engine-linux-wasm.json`. The application's
+pinned provider does not invoke system LibreOffice. The standalone native
+diagnostic above has not replaced it or added an automatic fallback.
+
+The [kit](https://github.com/deepseek-ai/dsh-libreoffice-kit) and LibreOffice
+engine are **MPL-2.0**, with their separate bundled third-party terms, MIT Harness
+portions and Apache notices. They are not relabelled MIT. The exact engine's
+nested LICENSE/NOTICE/MIT texts are retained with hash-bound catalogue entries;
+the collector rejects changed bytes, outside paths and links. MPL permission
+is accepted only for these reviewed exact package versions, not globally.
+
+The first ordinary staging attempt correctly rejects five missing npm licence
+texts. Saxes' pinned source LICENSE and Koffi's same-version parent MIT notice
+are recovered. Brotli, DFA and Fontkit omit root LICENSE files in their recorded
+publisher commits too. Their explicit MIT package/README declarations and
+author attribution are preserved separately from clearly labelled canonical
+SPDX MIT terms; no copyright year or restored upstream LICENSE is invented.
+Brotli's original Google Apache-2.0 decoder headers and standard Apache terms
+are retained separately. **Public copyright/notice sufficiency for these three
+declarations remains unqualified.** Ordinary notice collection is not that gate.
+
+Public MPL engine/wrapper source, third-party notice/rebuild sufficiency and any
+native dependency qualification remain separate from private MX testing, as do
+the existing Sharp/libvips and Liberation-font gates. No public binary release
+or all-MIT product licence claim follows from this source change.
+
+## Linux packaging source review — October 13
+
+Historical checkpoint. The [October 15 source-backed entry](#public-source-office-entry--october-15) supersedes the entry identity/inventory and its missing-source gap below; the engine/public distribution gate remains open.
+
+Implementation **647dd1a9d60ea53c716929481a3c28e19aa80615** adds
+`scripts/office_engine.py` to production staging and the Debian native inventory.
+The reviewed record now pins all **49 engine-package files**, including **39
+engine recipe/patch/source files**, and all **41 entry-package files**. It checks
+the locked npm integrity, installed package identity, complete file inventory,
+engine manifest/source/build identity and every hash. Missing, changed, linked
+or extra content is rejected. No supplier payload, dependency version, Office
+runtime, GUI, model or speech setting changes.
+
+Staging exports five original licence/notice bodies, the original engine manifest,
+the 39 source files and the reviewed build record into `licenses/office-engine`.
+The component inventory records **46 source/notice references** and explicitly
+marks public redistribution unqualified. Exported copies are verified against
+the reviewed package inputs; rehashing a local BUILD.json or relabelling the
+component cannot authorize changed bytes. This corrects the earlier broad
+`sourcesShipped` field: `engineBuildSourcesShipped` covers the shipped engine
+recipes, while the entry's preferred-source gate remains separately open.
+
+The actual preceding Debian exporter rejects the real staged `soffice.wasm` as
+an unreviewed filename. The new exporter first verifies its full source/notice
+bundle, then deliberately refuses public packaging with an explicit corresponding
+source/rebuild error. It does not whitelist Wasm globally or produce a public
+package from a private-preview identity. Changing approval labels alone cannot
+close the gate. Unknown native files remain rejected by the existing policy.
+
+The public source review is recorded in
+`release/office-engine-public-source-review.json`. At the October 13 inspection,
+the only public branch is master, commit **b19bb73c74ed893b8a5d1716d32df32a113ed31b**,
+whose entry package identifies itself as **0.1.3**. Both pinned npm **0.1.5**
+metadata records omit gitHead. Of the shipped 39 engine source files, **34 match**
+this public checkout, **two differ** (`engine/ui-resource-policy.mjs` and
+`docs/ui-resources.md`), and **three generated build/source files** have no same
+path there. The archive and differing files have exact recorded hashes. The npm
+entry package contains compiled JavaScript/declarations, without preferred
+TypeScript source. A version difference alone does not prove a compiled-code
+difference, and this snapshot comparison does not prove no other source exists;
+it does not establish corresponding source for the exact 0.1.5 entry either.
+
+The supplier describes the source/build materials carried with its engines in
+[the public repository](https://github.com/deepseek-ai/dsh-libreoffice-kit).
+[Mozilla's MPL guidance](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
+explains informing recipients where to obtain covered source. The exported engine
+recipes and licence texts establish identity; the exact entry source, engine
+rebuild and full linked third-party obligations still need qualification.
+
+Validation on MX/Linux: **nine new Office packaging cases**, four existing Codex
+packaging cases, eight QuickJS packaging cases and three nested-notice cases pass.
+Fresh `stage-production.py` completes with **151 npm instances**; its four actual
+staged WebSocket security cases pass. All **eight native dependency files** match
+the preceding ordinary navigation candidate before Node is added. Private-source
+boundary and version checks pass. These **28 focused cases** and fresh staging
+are packaging evidence, not another full GUI cohort or a new installed artifact.
+
+Preceding remote CI **f2e2d3e / run 38437616022** fails before packaging: of 1,129
+Node cases, 1,103 pass, three fail and 23 skip. Brand sidebar expansion and streamed
+Trajectory arguments time out; the Metafolder browser target closes or navigates.
+Those three actual-browser cases pass locally together with two workers and the
+same deadlines, but that isolated result does not resolve the remote failures or
+establish their cause. The navigation case passes in that CI run. Full CI and GUI
+reliability remain open; new-head CI is separate from focused packaging evidence.
+
+The selected appearance runtime **97897cf** and unselected navigation runtime
+**dfcdfb9 / 20261013-190500-3bf1e21f** remain as previously qualified. No activation,
+shutdown, public binary release or DSH retirement occurs. Public Debian packaging,
+Sharp/libvips/font and declaration-notice obligations, owner/plugin/live acceptance
+and the full migration remain open. Further OS work awaits owner MX feedback.
+
+## Qualification and remaining work
+
+Actual pinned Linux Wasm converts independently authored two-page OOXML, reports
+the unavailable authored font and preserves source bytes. Cached requests still
+reauthorize current byte access/stat; changed and removed sources cannot return
+old PDFs. Controlled original-queue checks verify metadata-only waiting,
+admission bounds, shared reader independence, caller-owned bytes and cancellation
+capacity through delayed real cleanup. Forbidden surfaces never obtain a
+converter, and maintenance refuses retained conversion teardown.
+
+Public SDK/HTTP/Chromium acceptance selects a real @file chip, displays both
+converted PDF pages, opens/closes the original font warning, chooses original
+100% zoom, reloads changed bytes, reports a malformed document, recovers through
+Retry and closes the original narrow fullscreen tab. One deterministic tool-free
+SDK seed creates real native history; subsequent preview actions preserve that
+history, native bytes and the provider request log. Inspector/Browser denial,
+zero remaining HTTP/file/conversion work and no external browser requests pass.
+The test documents contain no private or copied upstream fixture material.
+
+Source check/build and **300/300 across 57 files** pass with Node **24.19.0**,
+prepared QtTest, two workers and unchanged fixture deadlines. The five focused
+Office cases pass alongside existing file/PDF checks. Three nested-notice and
+two workspace-packaging cases pass separately. The wider recipe is the
+[55-file PDF cohort](HARNESS-PDF-PREVIEWS.md#installed-mx-qualification--october-12)
+plus `tests/harness-office-preview.test.mjs` and
+`tests/harness-office-chromium.test.mjs`.
+
+The first build exposes a missing selected original document hook contract;
+that verbatim file is added. The first focused run exposes an incomplete Host
+fixture and a synchronous input-validation assertion; both are corrected without
+changing product behavior or weakening the assertions. Final source tests have
+zero failures/skips/cancellations. The ordinary and installed qualifications
+below supersede the preceding PDF selection. Runtime implementation and its
+subsequent documentation-only qualification publication remain distinct.
+
+## Installed MX qualification — October 12
+
+Runtime **d0642d58f3edfbf9211e61ef60ffbe636141e301** is selected and running as
+private MX **20261012-084425-89e511a9**, product **0.2.13**, artifact SHA-256
+**731357a72f03ac54deb57973b9d51b3c140f9f5ada6c29f0c0220d153165e983**.
+Fresh ordinary bundled Node **24.19.0** repeats **300/300 across 57 files**, zero
+failures/skips/cancellations, with prepared QtTest, two workers and unchanged
+deadlines. Three nested-notice and two workspace-packaging cases pass in the
+ordinary tree too. The failed first staging attempt remains a failed checkpoint;
+a distinct fresh dependency stage passes after the reviewed notice additions.
+
+The ordinary assembly has **629 compiled files**, **20,801 dependency files**,
+**151 npm instances**, **780 licence files**, **nine native/Wasm executables**
+and **100 browser supplier notice records**. All **133 inherited npm instances**,
+their paths/bytes, and existing Node/native bytes are preserved. The eighteen
+new instances supply the kit, Linux Wasm engine and parsing/font/FFI support.
+The three added executable bodies are the pinned LibreOffice Wasm and the two
+Koffi glibc/musl carriers; Linux rendering does not invoke the Windows native
+pipe/FFI path. Their exact hashes/notices and the unchanged inherited native
+records are verified separately. Browser npm supplier records remain identical
+to the qualified PDF artifact. A post-assembly npm audit agrees byte-for-byte
+with the staged report and licence texts. Public MPL/native, three MIT declaration
+notice-sufficiency, Sharp/libvips and font source/rebuild gates remain open.
+
+Guarded adoption stages a separate immutable artifact with the explicit
+candidate Node, closes the idle Native through maintenance, completes one Host
+shutdown, activates the candidate and launches the stable Host. Exact selected
+Host executable/root are verified before stable Native startup. All **23,764
+installed inventory entries**, stable-launcher status and exact Native root pass
+before and after the GUI acceptance; no selected release is patched.
+
+The installed Office GUI acceptance uses a separate disposable profile with the
+actual selected Host and Node. One deterministic tool-free SDK seed creates real
+native history. The original @file completion/chip opens an independently authored
+two-page DOCX; actual GUI inspection verifies both pages, original missing-font
+warning/details, 100% zoom and **Read the file again** against changed bytes.
+Native originals, history and provider request log remain identical during
+these actions, with **zero subsequent provider requests**, file reads, Office
+work and Harness requests. The temporary browser tab is closed; the verified
+fixture producer and Host finish terminally. The saved local screenshot shows
+the actual installed original viewer and font warning. Source/ordinary malformed
+file/Retry and narrow-fullscreen evidence remain separate from this manual check.
+
+An initial manual idle probe used HTTP and counted its own request. The supported
+native IPC probe verifies zero outstanding requests without changing the
+expectation. Initial preservation reads before GUI connection correctly observed
+only close appends; opening the original owner GUI supplies its explicit
+load/title receipt. No process is restarted or expectation relaxed to satisfy
+these observations.
+
+The owner GUI reads both retained Qwen request bodies in the original Context
+trend/browser/file-activity widgets and leaves **Context Insights** open. No
+owner prompt/model/tool, Office file read, draft edit or preference write occurs.
+All **eleven histories and queue identities** remain intact, with no new owner
+conversations/admissions. Of **243** saved files, **233** are identical and four
+journals retain exact old prefixes with two title/session_info, two close and
+two load appends, plus six associated index/counter changes. Draft/attachment
+object sets and bytes, profile values **and revision**, Qwen/Breeze/GPU/context/
+concurrency/precision and ASR/VAD settings, production selection and router are
+preserved. Native is online/model-ready; no active owner turn, compaction,
+upload, Harness request, dirty draft, file lookup/preview or Office work remains.
+
+One read-only pre-promotion capture inadvertently reused the PDF baseline filename.
+Its completed before/after-GUI proof files remain retained. Office uses a separate
+snapshot of the selected PDF state; an additional comparison against the retained
+earlier prompt-wrapping baseline verifies unchanged histories/queues/drafts/
+attachments/profile/production and all old original prefixes. This is not a
+reconstruction or rerun of the overwritten PDF comparison snapshot.
+
+Real DOC/PPT/PPTX samples, complex OOXML/layout/font cases, password handling and
+full converter format coverage remain separate evidence gaps. The original
+spreadsheet grid, rendered HTML, native open/download, sidebar shortcuts and
+every remaining Harness/P0/P1 migration gate stay open. DSH remains available.
+Windows, macOS and other Linux implementation stay deferred for owner MX feedback;
+this shared Host/browser change adds no OS adapter.

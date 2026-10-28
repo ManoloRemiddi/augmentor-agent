@@ -88,10 +88,16 @@ def _scan(root, *, allow_missing=False):
                 # st_ino/st_dev/st_nlink as zero. Use the full no-follow stat for
                 # file identity and hard-link checks on every platform.
                 info=os.stat(entry.path,follow_symlinks=False)
+                try:
+                    _plain(info,directory=stat.S_ISDIR(info.st_mode))
+                except ValueError as error:
+                    try: target=os.readlink(entry.path)
+                    except OSError: target=None
+                    detail={'path':name,'reparseTag':getattr(info,'st_reparse_tag',None),'target':target}
+                    raise ValueError(str(error)+' Entry: '+json.dumps(detail,ensure_ascii=True)) from None
                 if stat.S_ISDIR(info.st_mode):
-                    _plain(info,directory=True);directories.append(name);pending.append(Path(entry.path))
+                    directories.append(name);pending.append(Path(entry.path))
                 else:
-                    _plain(info)
                     total+=info.st_size
                     if total>MAX_PAYLOAD:raise ValueError('Payload exceeds its supported size.')
                     files[name]=info

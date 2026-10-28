@@ -4,11 +4,71 @@
 
 In Desktop with the Augmentor DSH integration or a Codex API/local profile selected, type a draft and click **✦ Improve prompt** inside the input. The selected model rewrites it using the separate **Prompt library → Improve prompt** instructions. Letters roll while the request runs, then settle into the replacement in 700 ms. The result remains an editable draft; it is not sent to the conversation. After a rewrite, the same ✦ button becomes ↶ Undo; clicking it restores the previous wording. Editing the draft returns the button to ✦.
 
-Click **×** or press Escape to dismiss the pending improvement. Editing the draft also discards the pending result. Dismissing the preview does not necessarily stop the already-started model request. A failed rewrite or a request for clarification leaves the original intact and displays its explanation on the button. The rewrite uses a separate, tool-free model call and cannot execute the draft's instructions. Pi does not yet expose this model operation. Codex subscription profiles remain unavailable.
+Click **×** or press Escape to dismiss the pending improvement. Editing the draft also discards the pending result. Dismissing the preview does not necessarily stop the already-started model request. A failed rewrite or a request for clarification leaves the original intact and displays its explanation on the button. The rewrite uses a separate, tool-free model call and cannot execute the draft's instructions. Standalone Pi exposes this operation through its existing owner; see the Pi qualification below. Codex subscription profiles remain unavailable.
 
 The editor accepts drafts up to 6,000 characters, subject to the local request-size limit. Open **More → Prompt library → Improve prompt** to edit the instructions, preview their formatting, save changes, reload, or restore the default. The setting is shared with the browser library and DSH settings. Existing installations seed it once from `/prompt`; later edits or deletion of that shortcut do not change the setting. Concurrent saves are revision-checked. Only the approved improvement instructions ship as the default; personal saved prompts stay in the local database and are not bundled in source or releases.
 
 Regression checks: `tests/improve-prompt.test.mjs` and `tests/test_prompt_improvement.py`.
+
+## Harness input box — October 19
+
+The original Harness GUI now places **✦ Improve prompt** inside the upper-right
+corner of the input, matching Agent. Type a draft first, then click ✦. The current
+chat's selected model uses the same shared improvement instructions. The
+paint-only rolling preview keeps the original editable text underneath, then
+settles for 700 ms; reduced motion skips that interval. The result stays in the
+input for review. **× / Escape** cancels, and **↶ Undo** restores the original.
+Typing, changing chats/models or disconnecting discards pending results. Enter
+and Send wait during both pending and settling phases. New wording invalidates
+Undo even if the user later types the replacement again. Attachments stay in
+place; structured reference chips disable improvement with an explanatory
+hover label. Improve plain text before adding those chips. Drafts up to 6,000
+characters are supported; empty drafts and running chats disable the button.
+
+Settings → Plugins → Improve prompt opens the existing shared instructions
+editor. This is the existing tool-free Pi operation, with no new prompt store,
+chat turn, tool execution, automatic send, fallback model or retry. An unchanged
+answer keeps the original without a misleading Undo. Failure keeps the draft
+and reports the error. No new plugin installation is required.
+
+The implementation is shared across browser-hosted Harness surfaces. MX Linux
+is the installation target; macOS/Windows/other distributions are not qualified
+by this change. Regression coverage lives in
+`tests/harness-improve-draft.test.mjs` and the actual original GUI's
+`tests/harness-plugin-directory-chromium.test.mjs`, alongside the existing
+runtime, Native, Browser and thin-Harness improvement suites.
+
+Source checks pass **28 Node / four Native Python tests**, including the actual
+original GUI at 513 and 1280 pixels, pending/settling, Escape, typing, chat changes,
+Undo, unchanged replies, shared instructions and zero chat submission.
+The MX pilot is now **installed and running** on source **c0c7b6d9**,
+artifact **6fa33389…5d265e0**, with 24,822 sealed inputs and 1,146 compiled files.
+Ordinary/sealed checks each pass **32 Node / nine Python**, plus **six** exact-seal
+registered warm/cold SDK cases. Runtime/dependency bytes match the qualified
+previous artifact; its broader historical totals are not new runs here.
+One new immutable candidate was staged, its ordinary mirror removed, and the
+previous pilot artifact retained for rollback. No release was patched in place.
+
+The actual pilot remains at its fixed address and private identity. Registration
+**23→24** preserves its profile/shared pair, **110 conversations** and Metafolder
+**revision 26**, including owner work since the bulk migration. A fresh cold
+backup verifies **4,791 files**, with consistent shared database backups. Shutdown
+persists four previously unsaved empty queues as paused and removes one idle
+export control file; those typed changes were checked explicitly, alongside
+append-only MCP closure metadata. Main/production selections remain unchanged.
+
+Actual installed UI verifies the button in the input and a ready fresh bare-address
+tab. Two harmless auxiliary requests against the configured local Qwen model
+complete: a clear draft stays unchanged, and a rough draft becomes editable
+corrected wording. Undo restores the exact original. The test draft is cleared;
+**zero chat messages** are sent. Existing native prefixes are byte-preserved;
+reopening appends 18 MCP lifecycle records and reserves a file path for one
+existing empty session without creating a chat message. These are distinct from
+synthetic results. No voice/platform expansion or wider shared-store consolidation.
+
+[Packaged and installed evidence](../release/harness-improve-prompt-20261019.json)
+records scope and limits. At this checkpoint the new hosted Linux SDK job is
+running, Mac has failed, and Windows is running; no whole-matrix pass is claimed.
 
 ## DSH composer
 
@@ -56,3 +116,16 @@ The model operation is covered by `tests/codex-prompt-improvement.test.mjs`,
 including actual native/Browser bridges against a synthetic provider. Existing
 composer regression tests cover draft protection and Undo. See the
 [Codex evidence and limits](CODEX-INTEGRATION.md#apilocal-draft-improvement).
+
+## Pi controls and meaning-preservation limits — October 14
+
+Standalone Pi Native, Browser and the original Harness use one tool-free draft
+transaction and the same revision-checked shared instructions. A valid model
+`unchanged` response restores the exact original draft; ambiguity must not be
+silently completed. The response stays editable with Undo and is never submitted
+to chat automatically. The [live qualification](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14)
+records working controls, cancellation and preserved chat/native history alongside
+mixed rewrite meaning, a default-provider reasoning timeout and unqualified timing.
+The keep-original branch and stronger instructions are model guidance, not a
+semantic verifier. Explicit provider thinking capability/mapping is separate from
+the selected effort label. The current MX owner review predates this source change.

@@ -1,0 +1,31 @@
+/* Copyright (c) 2026 Manolo Remiddi · SPDX-License-Identifier: MIT
+ * Original Model Picker Augmented 1.1.2 settings styles, package/lib/client.js.
+ * Full notice: licenses/dsh-model-picker-augmented.txt. */
+.msp-section{max-width:720px;color:var(--dsw-alias-label-primary);flex-direction:column;gap:12px;display:flex;font-family:inherit}
+.msp-title{color:var(--dsw-alias-label-primary);margin:0;font-size:16px;font-weight:500;line-height:24px}
+.msp-intro{color:var(--dsw-alias-label-tertiary);margin:0;font-size:14px;line-height:22px}
+.msp-pkgName{color:var(--dsw-alias-label-tertiary);margin:0;font-size:12px;line-height:18px;font-family:var(--ds-font-family-code)}
+.msp-bar{align-items:center;gap:8px;display:flex}
+.msp-pageSearch{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);height:32px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);border-radius:8px;padding:0 10px;font-size:14px;line-height:22px;flex:1;min-width:0;font-family:inherit}
+.msp-pageSearch:focus{border-color:var(--dsw-alias-brand-primary);outline:none}
+.msp-pageSearch::placeholder{color:var(--dsw-alias-label-dimmed)}
+.msp-reset{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);height:32px;color:var(--dsw-alias-label-primary);cursor:pointer;background:none;border-radius:16px;padding:0 12px;font-size:13px;line-height:20px;flex:none;font-family:inherit}
+.msp-reset:hover{background:var(--dsw-alias-interactive-bg-hover)}
+.msp-cards{flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;display:flex}
+.msp-card{border:1px solid var(--dsw-alias-border-l2);border-radius:12px;flex-direction:column;gap:8px;padding:10px 12px;display:flex}
+.msp-cardHead{align-items:center;gap:8px;display:flex;flex-wrap:wrap}
+.msp-cardName{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:500;line-height:22px}
+.msp-cardTag{border:1px solid var(--dsw-alias-border-l3);color:var(--dsw-alias-label-secondary);border-radius:4px;flex:none;padding:1px 6px;font-size:11px;line-height:16px}
+.msp-cardDesc{color:var(--dsw-alias-label-tertiary);margin:0;font-size:12px;line-height:18px}
+.msp-chip{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);height:26px;color:var(--dsw-alias-label-secondary);cursor:pointer;background:none;border-radius:13px;align-items:center;gap:4px;padding:0 8px;font-size:12px;line-height:18px;display:inline-flex;font-family:inherit}
+.msp-chip:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}
+.msp-chipOn{border-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-brand-primary)}
+.msp-chip:disabled{opacity:.5;cursor:default}
+.msp-iconBtn{box-sizing:border-box;width:26px;height:26px;color:var(--dsw-alias-label-tertiary);cursor:pointer;background:none;border:none;border-radius:6px;justify-content:center;align-items:center;padding:0;display:inline-flex;font-family:inherit}
+.msp-iconBtn:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}
+.msp-iconBtn:disabled{opacity:.35;cursor:default}
+.msp-note{color:var(--dsw-alias-label-tertiary);margin:0;font-size:13px;line-height:20px}
+.msp-noteError{color:var(--dsw-alias-state-error-primary)}
+.msp-noteRow{align-items:center;gap:8px;display:flex}
+.msp-reset:disabled{color:var(--dsw-alias-label-dimmed);cursor:default;opacity:.7}
+.msp-noteWarn{color:var(--dsw-alias-state-warn-label)}

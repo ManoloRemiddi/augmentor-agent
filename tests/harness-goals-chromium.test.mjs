@@ -1,0 +1,44 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,rm,writeFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {planFixture,until} from './fixtures/plans.mjs';
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
+import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
+test('actual Harness goal controls preserve Stop, drafts, revisions, safe text and scoped cold inspection',{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const f=await planFixture(t,{goalMode:{hold:true}}),profile=await mkdtemp(join(tmpdir(),'augmentor-goal-chrome-'));let chrome,panel;
+ t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ for(const sid of ['goal-ui','goal-other']){await f.call('session.create',{sessionId:sid,selection:f.selection,cwd:f.workspace});await f.prompt(sid,{kind:'read'});await f.call('session.rename',{sessionId:sid,title:sid});}
+ const {url}=await f.link();chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,url.replace('/#','/inspection#')],{env:f.env,stdio:'ignore'});
+ let port;await until(async()=>{assert.equal(chrome.exitCode,null);try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'goal Chromium ready');const targets=await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json());panel=await harnessCdp(targets.find(row=>row.type==='page').webSocketDebuggerUrl);await panel.call('Runtime.enable');await panel.call('Page.enable');
+ const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,owner:f.errors()});throw error;});
+ await visible('document.querySelector("#runtime")?.textContent.includes("Pi 1.1.0")&&!document.querySelector("#send").disabled');await panel.evaluate('Array.from(document.querySelectorAll("#sessions button")).find(b=>b.textContent==="goal-ui").click()');await visible('sessionStorage.getItem("augmentor-harness-session")==="goal-ui"&&!document.querySelector("#send").disabled');await panel.evaluate('document.querySelector("[data-view=goal]").click()');await visible('document.querySelector("#goal-content").textContent.includes("No goal recorded")');
+ const text='<img src=x onerror="globalThis.goalInjected=true"> café 日本語';
+ await panel.evaluate('(()=>{document.querySelector("#goal-content details summary").click();const el=document.querySelector("[aria-label=\\"Goal objective\\"]");el.value='+JSON.stringify(text)+';el.dispatchEvent(new Event("input"));const limit=document.querySelector("[aria-label=\\"Maximum goal rounds\\"]");limit.value="2";limit.dispatchEvent(new Event("input"));Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Start goal and continue").click();})()');
+ await visible('document.querySelector("#goal-content .goal-state")?.textContent.includes("1 of 2")');assert.equal(await panel.evaluate('document.querySelectorAll("#goal-content img").length'),0);assert.equal(await panel.evaluate('globalThis.goalInjected===true'),false);
+ const pause='Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Pause goal")';
+ await visible(pause+'&&!'+pause+'.disabled');
+ // Keep an actual older inspection response pending while the displayed control
+ // accepts its one click. A refresh ticket must not silently discard that action.
+ await panel.call('Network.enable');panel.pauseRpcMethods=new Set(['session.goal']);await panel.call('Fetch.enable',{patterns:[{urlPattern:'*/api/rpc',requestStage:'Response'}]});
+ await panel.evaluate('document.querySelector("[data-view=goal]").click()');await until(()=>panel.pausedRequests.length>=1,'older goal inspection held');
+ const older=await panel.call('Fetch.getResponseBody',{requestId:panel.pausedRequests[0].id}),olderGoal=JSON.parse(older.base64Encoded?Buffer.from(older.body,'base64').toString():older.body);assert.equal(olderGoal.result.goal.phase,'active');
+ await harnessPointerClick(panel,pause,until);await until(async()=>(await f.call('session.goal',{sessionId:'goal-ui'})).goal.phase==='paused','one displayed Pause action admitted during inspection');
+ await until(()=>panel.pausedRequests.length>=2,'post-pause goal inspection held');panel.pauseRpcMethods.clear();for(const held of panel.pausedRequests)await panel.call('Fetch.continueRequest',{requestId:held.id});
+ await visible('document.querySelector("#goal-content .goal-state")?.textContent.includes("paused · continuation disarmed")');await f.settled('goal-ui');
+ assert.equal([...panel.requests.values()].filter(row=>row.method==='session.updateGoal'&&row.params.change.operation==='pause').length,1,'the UI submits one pause and never retries it');
+ const paused=await f.call('session.goal',{sessionId:'goal-ui'});assert.equal(paused.goal.roundsStarted,1);
+ await panel.evaluate('(()=>{const el=document.querySelector("[aria-label=\\"Goal objective\\"]");el.value="Preserve this stale draft";el.dispatchEvent(new Event("input"));})()');
+ await f.call('session.updateGoal',{sessionId:'goal-ui',change:{operation:'edit',expectedRef:{id:paused.goal.id,revision:paused.goal.revision},objective:'Concurrent operator revision'}});await visible('document.querySelector("#goal-content .goal-objective")?.textContent==="Concurrent operator revision"');assert.equal(await panel.evaluate('document.querySelector("[aria-label=\\"Goal objective\\"]").value'),'Preserve this stale draft');
+ await panel.evaluate('document.querySelector("#goal-content details summary").click();Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Save goal edit").click()');await visible('document.querySelector("#goal-content .goal-status")?.textContent.includes("revision changed")');assert.equal((await f.call('session.goal',{sessionId:'goal-ui'})).goal.objective,'Concurrent operator revision');
+ await panel.evaluate('Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Mark complete").click()');await visible('document.querySelector("#goal-content .goal-state")?.textContent.includes("complete · continuation disarmed")');
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});assert.equal(await panel.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);if(process.env.AUGMENTOR_GOALS_SCREENSHOT)await writeFile(process.env.AUGMENTOR_GOALS_SCREENSHOT,Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+ const count=f.requests.length;await f.stop();await f.start();const inspection=await f.call('inspection.open',{sessionId:'goal-ui'}),link=new URL(inspection.url.replace('/#','/inspection#')),token=new URLSearchParams(link.hash.slice(1)).get('token');
+ for(const [method,params,reason] of [['session.goal',{sessionId:'goal-other'},/selected conversation/],['session.updateGoal',{sessionId:'goal-ui',change:{}},/read-only/]]){const response=await fetch(link.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});assert.match((await response.json()).error.message,reason);}
+ await panel.call('Page.navigate',{url:inspection.url.replace('/#','/inspection#')});await panel.reload();await visible('document.querySelector("#runtime")?.textContent.includes("Read-only")&&document.querySelector("#composer").hidden&&!document.querySelector("#send").disabled');await panel.evaluate('document.querySelector("[data-view=goal]").click()');await visible('document.querySelector("#goal-content").textContent.includes("Concurrent operator revision")');assert.equal(await panel.evaluate('document.querySelectorAll("#goal-content textarea,#goal-content button").length'),0);assert.equal(f.requests.length,count);assert.deepEqual(panel.errors,[]);assert.equal(f.errors(),'');
+});

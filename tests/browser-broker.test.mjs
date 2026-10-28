@@ -1,5 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import test from 'node:test';import assert from 'node:assert/strict';
+import test,{after} from 'node:test';
+import {mkdtempSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
+const privateExecutorRoot=mkdtempSync(join(tmpdir(),'abr-'));process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=privateExecutorRoot;after(()=>rmSync(privateExecutorRoot,{recursive:true,force:true}));import assert from 'node:assert/strict';
 import {BrowserBroker} from '../dist/pi-browser/src/index.js';
 test('browser replies require the owning connection, detach rejects without replay',async()=>{
  const broker=new BrowserBroker(),owner={},other={},frames=[];
@@ -9,12 +11,12 @@ test('browser replies require the owning connection, detach rejects without repl
  broker.respond(owner,frames[0].id,{text:'Actual page'});assert.deepEqual(await task,{text:'Actual page'});
  assert.throws(()=>broker.respond(owner,frames[0].id,{}),/Stale/);
  const pending=broker.execute('chat',{action:'click'});broker.detach(owner);await assert.rejects(pending,/unknown/);assert.equal(frames.length,2);
- await assert.rejects(broker.execute('chat',{action:'click'}),/Open this chat/);
+ await assert.rejects(broker.execute('chat',{action:'click'}),/No connected browser executor/);
 });
 test('Stop cancels a browser request and late replies cannot run it again',async()=>{
  const broker=new BrowserBroker(),owner={},frames=[],signal=new AbortController();broker.attach('chat',owner,m=>frames.push(m));
  const task=broker.execute('chat',{action:'type'},signal.signal);signal.abort();await assert.rejects(task,/cancelled/);
- assert.equal(broker.pending.size,0);assert.throws(()=>broker.respond(owner,frames[0].id,{}),/Stale/);
+ assert.equal(frames.at(-1).params.action,'stop');broker.respond(owner,frames.at(-1).id,{ok:true,stopped:true});assert.equal(broker.pending.size,0);assert.throws(()=>broker.respond(owner,frames[0].id,{}),/Stale/);
 });
 test('Pi observation tools gate blind actions, deliver actual image blocks, and reject text-only capture',async()=>{
  const broker=new BrowserBroker(),registered=new Map(),owner={},frames=[];

@@ -1,8 +1,16 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {installLocalModelRouteGuard,localModelRouteFailure} from './local-model-route.js';
 import {Type} from 'typebox';
-import {createAgentSession, DefaultResourceLoader, SessionManager, SettingsManager,
-  type AgentSession, type ExtensionAPI, type ModelRuntime, type ToolDefinition} from '@earendil-works/pi-coding-agent';
-import type {Context, Model, Api} from '@earendil-works/pi-ai';
+import {createAgentSession, DefaultResourceLoader, SessionManager,
+  type AgentSession, type ExtensionAPI, type ExtensionFactory, type ModelRuntime, type ToolDefinition} from '@earendil-works/pi-coding-agent';
+import type {Context, Model, Api,Usage} from '@earendil-works/pi-ai';
+import type {ThinkingLevel} from '@earendil-works/pi-agent-core';
+import {privateDir} from './storage.js';
+import {managedPiSettings} from './pi-privacy.js';
+import {piScheduling} from './scheduling.js';
+import {piLlamaCppSchemas} from './provider-compat.js';
+import {join} from 'node:path';
+import {chmodSync,existsSync} from 'node:fs';
 import {desktopTools as definitions} from '../../computer-use/src/tools.js';
 import {COMPUTER_USE_VERSION, DEFAULT_DESKTOP_LIMITS,
   type DesktopBrief, type DesktopExecutor, type DesktopLimits, type DesktopResult} from '../../computer-use/src/contracts.js';
@@ -13,6 +21,16 @@ const briefSchema = Type.Object({
   successCriteria: Type.String({minLength: 1, maxLength: 1000}),
   constraints: Type.String({maxLength: 1500}),
 });
+export function desktopBrief(value:unknown):DesktopBrief{
+ const v=value as DesktopBrief;
+ if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).some(key=>!['task','successCriteria','constraints'].includes(key))||typeof v.task!=='string'||!v.task.trim()||v.task.length>2000||typeof v.successCriteria!=='string'||!v.successCriteria.trim()||v.successCriteria.length>1000||typeof v.constraints!=='string'||v.constraints.length>1500)throw Error('Desktop delegation requires a bounded task, explicit success criteria and constraints.');
+ return {task:v.task,successCriteria:v.successCriteria,constraints:v.constraints};
+}
+export interface DesktopTracking {
+ jobId:string;childId:string;manager:SessionManager;thinkingLevel:ThinkingLevel;limits:Pick<DesktopLimits,'requests'|'tools'|'timeoutMs'>;maxTotalOutputTokens:number;
+ onSession(session:AgentSession,result:DesktopResult):()=>void;
+ checkpoint(result:DesktopResult,outputTokens:number,usage:Usage):void;
+}
 const finishSchema = Type.Object({
   status: Type.Union([Type.Literal('completed'), Type.Literal('blocked'), Type.Literal('unknown')]),
   summary: Type.String({minLength: 1, maxLength: 600}),
@@ -27,7 +45,7 @@ Finish using desktop_finish with concise observed evidence or the precise blocke
 
 // Strip image payloads only; keep every tool call/result pair, constraint and error.
 // This conservative byte-based estimate is a guard, not an exact provider tokenizer.
-export function boundedDesktopContext(context: Context, limits: DesktopLimits, contextWindow: number): Context {
+export function boundedDesktopContext<T extends Context>(context: T, limits: DesktopLimits, contextWindow: number): T {
   let retained = 0;
   const messages = [...context.messages].reverse().map(message => {
     if (!Array.isArray(message.content)) return message;
@@ -58,6 +76,8 @@ interface RunOptions {
   approve(name: string, args: unknown): Promise<boolean>;
   cancelInteractions(): void;
   progress(result: {runId: string; tool: string}): void;
+  tracking?:DesktopTracking;
+  extensionFactories?:ExtensionFactory[];
 }
 export class DesktopSpecialist {
   private active?: {owner: string; abort: AbortController};
@@ -66,15 +86,20 @@ export class DesktopSpecialist {
   busy() {return this.active !== undefined;}
   cancel(owner: string) {if (this.active?.owner === owner) this.active.abort.abort();}
   async run(options: RunOptions, brief: DesktopBrief, signal?: AbortSignal): Promise<DesktopResult> {
+    brief=desktopBrief(brief);
     signal?.throwIfAborted();
     if (this.active) throw Error('A desktop specialist is already active. Wait for it or Stop it; do not run desktop workers concurrently.');
     if (!options.model.input.includes('image')) throw Error('Desktop delegation requires the selected model to support image input. No model was substituted.');
     if (options.policy === 'read-only') throw Error('Read-only chat: desktop delegation is disabled.');
     const abort = new AbortController();
     this.active = {owner: options.owner, abort};
-    let session: AgentSession | undefined, evidence: DesktopEvidence | undefined;
+    let session: AgentSession | undefined, evidence: DesktopEvidence | undefined,disposeObservation:(()=>void)|undefined,unsubscribe:(()=>void)|undefined;
+    let manager:SessionManager|undefined;
+    const protectNative=()=>{const file=manager?.getSessionFile();if(file&&existsSync(file))chmodSync(file,0o600);};
+    const limits={...this.limits,...options.tracking?.limits};
+    let outputTokens=0;const usage:Usage={input:0,output:0,cacheRead:0,cacheWrite:0,totalTokens:0,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}};
     let finished = false, stopped = false, timedOut = false, connected = false, actionSeq = -1, snapshotSeq = -1;
-    const result: DesktopResult = {version: COMPUTER_USE_VERSION, runId: '', status: 'unknown',
+    const result: DesktopResult = {version: COMPUTER_USE_VERSION,...(options.tracking?{jobId:options.tracking.jobId,childId:options.tracking.childId}:{}),runId: '', status: 'unknown',
       summary: 'Run did not finish. Inspect the application before continuing; do not replay inputs.',
       verification: 'No completed verification is available.', verificationSource: 'runtime',
       observedAfterLastAction: false, actionAttempted: false,
@@ -86,14 +111,15 @@ export class DesktopSpecialist {
     const onAbort = () => {options.cancelInteractions(); void session?.abort();};
     abort.signal.addEventListener('abort', onAbort, {once: true});
     signal?.addEventListener('abort', cancel, {once: true});
-    const timer = setTimeout(() => {timedOut = true; abort.abort();}, this.limits.timeoutMs);
+    const timer = setTimeout(() => {timedOut = true; abort.abort();}, limits.timeoutMs);
     try {
       evidence = new DesktopEvidence(this.evidenceRoot, options.owner, brief, result, this.limits.evidenceBytes);
       const guarded = (name: string, execute: (args: any) => Promise<any>) => async (_id: string, args: any) => {
         abort.signal.throwIfAborted();
         if (stopped || finished) throw Error('Desktop run has already stopped.');
-        if (result.counts.tools >= this.limits.tools) {stop('budget_exceeded', 'Desktop tool budget exceeded.'); throw Error(result.summary);}
+        if (result.counts.tools >= limits.tools) {stop('budget_exceeded', 'Desktop tool budget exceeded.'); throw Error(result.summary);}
         result.counts.tools++;
+        options.tracking?.checkpoint(result,outputTokens,usage);
         options.progress({runId: result.runId, tool: name});
         try {return await execute(args);} catch (error) {
           if (!stopped) stop(result.actionAttempted ? 'unknown' : 'blocked', String(error));
@@ -113,6 +139,7 @@ export class DesktopSpecialist {
             // Persist intent BEFORE dispatch, so a crash cannot look like an unattempted action.
             result.actionAttempted = true; actionSeq = result.counts.tools; result.observedAfterLastAction = false;
             evidence!.add(definition.name + '/intent', args);
+            options.tracking?.checkpoint(result,outputTokens,usage);
           }
           const value = await this.executor.control(definition.method, options.owner, args, abort.signal);
           const {image, ...metadata} = value;
@@ -141,32 +168,44 @@ export class DesktopSpecialist {
           evidence!.save(); return reply({accepted: true});
         }),
       });
-      const settingsManager = SettingsManager.inMemory({enableInstallTelemetry: false, retry: {enabled: false}, compaction: {enabled: false}, packages: [], defaultProjectTrust: 'never'});
+      const settingsManager = managedPiSettings(false);
       const resourceLoader = new DefaultResourceLoader({cwd: options.cwd, agentDir: options.agentDir, settingsManager,
         noExtensions: true, noSkills: true, noPromptTemplates: true, noContextFiles: true, noThemes: true,
+        extensionFactories:[piScheduling,piLlamaCppSchemas,...(options.extensionFactories??[])],
         appendSystemPrompt: [], systemPrompt: instructions + '\nPlatform knowledge:\n' + this.executor.domainInstructions});
       await resourceLoader.reload();
       abort.signal.throwIfAborted();
+      manager=options.tracking?.manager??SessionManager.create(options.cwd,privateDir(join(evidence.directory,'native')));
       const created = await createAgentSession({cwd: options.cwd, agentDir: options.agentDir,
-        modelRuntime: options.modelRuntime, model: options.model, thinkingLevel: 'off', settingsManager, resourceLoader,
-        sessionManager: SessionManager.inMemory(options.cwd), tools: customTools.map(tool => tool.name), customTools});
-      session = created.session;
+        modelRuntime: options.modelRuntime, model: options.model, thinkingLevel: options.tracking?.thinkingLevel??'off', settingsManager, resourceLoader,
+        sessionManager: manager, tools: customTools.map(tool => tool.name), customTools});
+      session = created.session;installLocalModelRouteGuard(session);
       if (created.modelFallbackMessage || session.model?.id !== options.model.id || session.model?.provider !== options.model.provider)
         throw Error('Desktop worker refused model substitution.');
       session.agent.toolExecution = 'sequential';
-      const originalStop = session.agent.shouldStopAfterTurn;
-      session.agent.shouldStopAfterTurn = async (context, signal) => stopped || finished || !!await originalStop?.(context, signal);
+      disposeObservation=options.tracking?.onSession(session,result);
+      unsubscribe=session.subscribe(event=>{if(event.type==='message_end'){protectNative();if((event.message.role==='assistant'||event.message.role==='toolResult')&&event.message.usage){const u=event.message.usage;for(const key of ['input','output','cacheRead','cacheWrite','totalTokens'] as const)usage[key]+=u[key]??0;for(const key of ['input','output','cacheRead','cacheWrite','total'] as const)usage.cost[key]+=u.cost?.[key]??0;if(event.message.role==='assistant')outputTokens+=u.output;options.tracking?.checkpoint(result,outputTokens,usage);}}});
+      const originalFinish = session.agent.finishTurn;
+      session.agent.finishTurn = async (turn, signal) => {
+        const decision = await originalFinish?.(turn, signal);
+        if (stopped || finished) return {action: 'end'};
+        return decision || undefined;
+      };
       const stream = session.agent.streamFunction;
       session.agent.streamFunction = (model, context, streamOptions) => {
         abort.signal.throwIfAborted();
-        if (result.counts.requests >= this.limits.requests) {stop('budget_exceeded', 'Desktop model request budget exceeded.'); throw Error(result.summary);}
-        let bounded: Context;
+        if (result.counts.requests >= limits.requests) {stop('budget_exceeded', 'Desktop model request budget exceeded.'); throw Error(result.summary);}
+        const remaining=(options.tracking?.maxTotalOutputTokens??Number.MAX_SAFE_INTEGER)-outputTokens;
+        if(remaining<=0){stop('budget_exceeded','Desktop reported output-token budget exceeded.');throw Error(result.summary);}
+        let bounded: typeof context;
         try {bounded = boundedDesktopContext(context, this.limits, model.contextWindow);} catch (error) {stop('budget_exceeded', String(error)); throw error;}
         result.counts.requests++;
-        return stream(model, bounded, {...streamOptions, maxTokens: Math.min(this.limits.outputTokens, model.maxTokens)});
+        options.tracking?.checkpoint(result,outputTokens,usage);
+        return stream(model, bounded, {...streamOptions, maxTokens: Math.min(this.limits.outputTokens, model.maxTokens,remaining)});
       };
       abort.signal.throwIfAborted();
       await session.prompt(JSON.stringify(brief), {expandPromptTemplates: false, source: 'rpc'});
+      const last=session.messages.findLast(message=>message.role==='assistant');const routeIssue=last?.role==='assistant'?localModelRouteFailure(last):undefined;if(routeIssue&&!finished&&!stopped&&!abort.signal.aborted)stop(result.actionAttempted?'unknown':'failed',routeIssue);
       if (!finished && !stopped && !abort.signal.aborted) stop(result.actionAttempted ? 'unknown' : 'failed', 'The worker ended without a structured finish. Inspect the evidence; no action was replayed.');
     } catch (error) {
       if (!stopped && !finished) stop(result.actionAttempted ? 'unknown' : 'failed', String(error));
@@ -177,12 +216,11 @@ export class DesktopSpecialist {
       if (abort.signal.aborted) stop(timedOut ? 'budget_exceeded' : 'cancelled',
         (timedOut ? 'Desktop time budget exceeded.' : 'Desktop worker cancelled.') + (result.actionAttempted ? ' An input may have changed the application; inspect it before continuing.' : ''));
       try {await this.executor.control('stop', options.owner, {});} catch {stop('unknown', 'Desktop stop could not be confirmed. Use the independent desktop Stop control and inspect the application.');}
-      session?.dispose();
-      try {evidence?.save();} finally {this.active = undefined;}
+      try{protectNative();}finally{try{unsubscribe?.();try{disposeObservation?.();}finally{session?.dispose();}}finally{try{evidence?.save();}finally{this.active=undefined;}}}
     }
     return result;
   }
-  package(options: Omit<RunOptions, 'model'>) {return (pi: ExtensionAPI) => {
+  package(options: Omit<RunOptions, 'model'>,trackedRun?:(brief:DesktopBrief,toolCallId:string,signal?:AbortSignal)=>Promise<DesktopResult>) {return (pi: ExtensionAPI) => {
     let delegated = false;
     pi.on('agent_start', async () => {delegated = false;});
     pi.registerTool({name: 'desktop_delegate', label: 'Delegate desktop task',
@@ -192,7 +230,7 @@ export class DesktopSpecialist {
         if (delegated) throw Error('Only one desktop delegation is allowed per coordinator turn. Report the outcome before starting another task.');
         delegated = true;
         if (!ctx.model) throw Error('Choose a model first.');
-        return reply(await this.run({...options, model: ctx.model}, brief, signal));
+        return reply(await (trackedRun?trackedRun(desktopBrief(brief),_id,signal):this.run({...options, model: ctx.model}, brief, signal)));
       },
     });
     pi.registerTool({name: 'desktop_evidence', label: 'Read desktop evidence',

@@ -1,0 +1,30 @@
+--- memory_engine.py
++++ memory_engine.py
+@@ -1393,6 +1393,10 @@
+     LOW = "low"
+     MID = "mid"
+     HIGH = "high"
++
++
++#: Use the configured iteration count for a document refresh (#4856).
++DEFAULT_MENTAL_MODEL_REFRESH_BUDGET = Budget.MID
+ 
+ 
+ def _resolve_thinking_budget(config_dict: dict, budget: "Budget | None", max_tokens: int) -> int:
+@@ -16235,6 +16239,8 @@
+         recall_include_chunks_override = trigger_data.get("include_chunks")
+         recall_max_tokens_override = trigger_data.get("recall_max_tokens")
+         recall_chunks_max_tokens_override = trigger_data.get("recall_chunks_max_tokens")
++        raw_budget = trigger_data.get("budget")
++        refresh_budget = Budget(raw_budget) if raw_budget else DEFAULT_MENTAL_MODEL_REFRESH_BUDGET
+         requested_mode: RefreshMode = trigger_data.get("mode") or "full"
+ 
+         current_content = (mental_model.get("content") or "").strip()
+@@ -16344,6 +16350,7 @@
+             recall_include_chunks=recall_include_chunks_override,
+             recall_max_tokens_override=recall_max_tokens_override,
+             recall_chunks_max_tokens_override=recall_chunks_max_tokens_override,
++            budget=refresh_budget,
+             # The refresh stores a document, so the agent states its structure and
+             # the markdown is rendered from it. The model never writes the markdown
+             # that gets persisted, and nothing has to read markdown back to find

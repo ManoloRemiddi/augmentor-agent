@@ -1,0 +1,7 @@
+# The dsh-plugin-wiki-skills bundle patch: one insert over the profile root.
+# Users can target the `wiki-skills` row by id from their own cordis.patch.yml
+# to replace this config or disable the entry.
+
+- insert:
+    - id: wiki-skills
+      name: 'dsh-plugin-wiki-skills'

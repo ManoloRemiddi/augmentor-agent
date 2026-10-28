@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {surfaceRequest} from './shared/surface.mjs'
+import {registerConnectedBrowserHost} from './shared/connected-executor.mjs'
+import {TOOL_REPAIR_BUILD} from './extension/build.mjs'
 import {PRODUCT_PROTOCOL,HARNESS_CAPABILITIES} from '../../dist/contracts/src/index.js'
 import {RELEASE} from '../../dist/contracts/src/release.js'
 import {promptLibrary} from './shared/prompts.mjs'
@@ -18,11 +20,12 @@ import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
 import {guardWorkspaceMethod,voiceEnabled,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 import {NativeBrowserMaintenance,connectBrowserOwner} from './shared/native-maintenance.mjs'
-let child,childClosed=false,closing=false,compatible=false
+let child,childClosed=false,closing=false,compatible=false,extensionBuild=''
 const pending=new Set()
 const childRequests=new Set(),childActions=new Set()
-const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
-const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size,onCommit:()=>close(0)})
+const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;if(value?.result?.protocol===PRODUCT_PROTOCOL)value={...value,result:{...value.result,companionBuild:TOOL_REPAIR_BUILD}};const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
+const connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>!compatible||closing||maintenance.paused,requiresReload:()=>extensionBuild!==TOOL_REPAIR_BUILD})
+const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size+connectedExecutor.active,onCommit:()=>close(0)})
 const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({
   endpoint:process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT,nonce:process.env.AUGMENTOR_BROWSER_OWNER_NONCE,
   pid:Number(process.env.AUGMENTOR_BROWSER_OWNER_PID),root:process.env.AUGMENTOR_BROWSER_OWNER_ROOT,maintenance,
@@ -35,7 +38,7 @@ function finish(){
 function close(code=0){
   if(code)process.exitCode=code
   else process.exitCode??=0
-  if(!closing){closing=true;maintenance.close();process.stdin.destroy();child?.stdin.end()}
+  if(!closing){closing=true;connectedExecutor.close();maintenance.close();process.stdin.destroy();child?.stdin.end()}
   finish()
 }
 function shared(id,operation){
@@ -61,6 +64,7 @@ function readFrames(stream,receive){
 function childSend(value){const body=Buffer.from(JSON.stringify(value)),head=Buffer.alloc(4);head.writeUInt32LE(body.length);child.stdin.write(Buffer.concat([head,body]))}
 readFrames(process.stdin,first=>{
     if(closing)return
+    if(connectedExecutor.receive(first))return
     if(maintenance.receive(first))return
     if(first.method!==undefined&&maintenance.paused){reply({id:first.id,error:{message:'Augmentor maintenance is in progress. This request was not started.'}});return}
     if(child){
@@ -72,6 +76,7 @@ readFrames(process.stdin,first=>{
       reply({id:first.id,result:describeWorkspace(loadProfile())});return
     }
     if(first.method==='augmentor/handshake'){
+      extensionBuild=first.params?.extensionBuild??''
       compatible=first.params?.protocol===PRODUCT_PROTOCOL&&first.params?.version===RELEASE.version
       reply(compatible?{id:first.id,result:{protocol:PRODUCT_PROTOCOL,version:RELEASE.version}}:{id:first.id,error:{message:'Extension and companion versions differ. Update both Augmentor components, reload the extension, then reconnect.'}});return
     }
@@ -91,8 +96,8 @@ readFrames(process.stdin,first=>{
       shared(first.id,()=>promptLibrary(first.params??{}));return
     }
     if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!==(workspaceProfile.harness??'dsh')){reply({id:first.id,error:{code:'PERMISSION_DENIED',message:'This workspace uses its registered harness.'}});return}
-    if(first.method!=='harness.select'||!['pi','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});return}
-    const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
+    if(first.method!=='harness.select'||!['pi','ah','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose Augmentor Harness, DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});return}
+    const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',ah:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
     child=spawn(process.execPath,[fileURLToPath(new URL(bridge,import.meta.url))],{stdio:['pipe','pipe','inherit'],windowsHide:true,env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
     readFrames(child.stdout,frame=>{
       if(frame.id!==undefined){

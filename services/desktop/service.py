@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Per-user desktop executor with an independent, always-visible Stop control."""
-import fcntl
 import json
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -15,25 +15,32 @@ import threading
 import time
 from PySide6.QtCore import Qt,Signal,QTimer
 from PySide6.QtWidgets import QApplication,QWidget,QHBoxLayout,QLabel,QPushButton
-if sys.platform=='darwin':
+if sys.platform=='win32':
+    from windows import WindowsDesktop as Backend
+elif sys.platform=='darwin':
     from macos import MacDesktop as Backend
 else:
     from gi.repository import GLib
     from portal import Portal as Backend
 ROOT=Path(__file__).resolve().parents[2]
+BUILD={'root':str(ROOT),'serviceSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'python':sys.executable}
 sys.path.insert(0,str(ROOT/'services'))
 from platform_support import require_same_user
+from platform_adapters import locks as fcntl
+from platform_adapters.transport import ThreadingLocalServer,cleanup_endpoint,prepare_endpoint
+from platform_adapters.private_files import descriptor
+from platform_adapters.paths import runtime_directory,private_directory
 sys.path.insert(0,str(ROOT/'services/lifecycle'))
 from lease import hold
 
 
-def endpoint():return Path(os.environ.get('XDG_RUNTIME_DIR',f'/tmp/augmentor-{os.getuid()}' if sys.platform=='darwin' else f'/run/user/{os.getuid()}'))/'augmentor-desktop.sock'
+def endpoint():return Path(os.environ['AUGMENTOR_DESKTOP_SOCKET']) if os.environ.get('AUGMENTOR_DESKTOP_SOCKET') else runtime_directory()/'augmentor-desktop.sock'
 
 
 def schedule(work):
     # macOS native work uses bounded child processes. Keep the Qt main thread
     # responsive to independent Stop while a permission/capture request waits.
-    if sys.platform=='darwin':threading.Thread(target=work,daemon=True).start()
+    if sys.platform in ('darwin','win32'):threading.Thread(target=work,daemon=True).start()
     else:GLib.idle_add(work)
 
 
@@ -94,20 +101,21 @@ class Handler(socketserver.StreamRequestHandler):
                 if not completed.wait(110):backend.cancel.set();raise RuntimeError('Desktop request timed out. Inspect the application before continuing.')
                 if 'error' in response:raise RuntimeError(response['error'])
                 result=response['result']
+            if method=='status':result={**result,'build':BUILD}
             response={'ok':True,'result':result}
         except Exception as exc:response={'ok':False,'error':str(exc)[:600]}
         try:self.wfile.write((json.dumps(response)+'\n').encode())
         except (BrokenPipeError,ConnectionResetError):pass
 
 
-class Server(socketserver.ThreadingUnixStreamServer):daemon_threads=True
+class Server(ThreadingLocalServer):daemon_threads=True
 class ExitSignal(QWidget):quit=Signal()
 
 
 def main():
-    hold('desktop');os.umask(0o077);path=endpoint();path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
-    lock=path.with_suffix('.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-    path.unlink(missing_ok=True);app=QApplication([]);app.setQuitOnLastWindowClosed(False);banner=Banner();backend=Backend(banner.update.emit)
+    hold('desktop');os.umask(0o077);path=endpoint();private_directory(path.parent)
+    lock=os.fdopen(descriptor(path.with_suffix('.lock'),writable=True,create=True),'a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    prepare_endpoint(path);app=QApplication([]);app.setDesktopFileName('com.augmentor.Agent');app.setQuitOnLastWindowClosed(False);banner=Banner();backend=Backend(banner.update.emit)
     server=Server(str(path),Handler);server.backend=backend;server.banner=banner;server.quit=ExitSignal();server.quit.quit.connect(app.quit)
     def stop_requested():
         backend.generation+=1;backend.cancel.set();schedule(lambda:(backend.stop(),False)[1])
@@ -115,7 +123,7 @@ def main():
     threading.Thread(target=server.serve_forever,daemon=True).start()
     # Inactivity closes sharing, leaving no indefinitely authorized input session.
     def idle():
-        if sys.platform!='darwin':
+        if sys.platform=='linux':
             while GLib.MainContext.default().pending():GLib.MainContext.default().iteration(False)
         if backend.owner and not backend.busy.locked() and time.monotonic()-backend.last_used>300:
             backend.cancel.set();schedule(lambda:(backend.stop(),False)[1])
@@ -123,7 +131,7 @@ def main():
     signal.signal(signal.SIGTERM,lambda *_:app.quit());signal.signal(signal.SIGINT,lambda *_:app.quit())
     try:app.exec()
     finally:
-        backend.stop();server.shutdown();server.server_close();path.unlink(missing_ok=True)
+        backend.stop();server.shutdown();server.server_close();cleanup_endpoint(path)
 
 
 if __name__=='__main__':main()

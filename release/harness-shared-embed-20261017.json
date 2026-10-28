@@ -1,0 +1,131 @@
+{
+  "schema": "augmentor-harness-shared-embed-source/1",
+  "date": "2026-10-17",
+  "sourceBase": "3b85f065ddb92165e5745c606bb781dfec37883c",
+  "scope": "MX shared embedding launch, inherited idle reader, unchanged SDK authority and real production version prerequisite",
+  "node": {
+    "pass": 42,
+    "fail": 0,
+    "skip": 0,
+    "files": [
+      "shared-profile-export",
+      "shared-profile-import",
+      "shared-profile-runtime",
+      "profile-transaction",
+      "harness-writing-peers-chromium",
+      "harness-shared-profile-chromium",
+      "shared-launch-integration",
+      "workspace-embedding",
+      "workspace-sdk",
+      "workspace-capabilities"
+    ],
+    "workers": 2
+  },
+  "python": {
+    "pass": 82,
+    "fail": 0,
+    "skip": 0,
+    "modules": [
+      "test_shared_launch",
+      "test_desktop_startup",
+      "test_desktop_deployment",
+      "test_harness_review",
+      "test_shared_profile_lease",
+      "test_hindsight_memory",
+      "test_harness_notice_assembly",
+      "test_license_inventory",
+      "test_private_source_boundary",
+      "test_app_sdk_platform"
+    ],
+    "bindingCases": 12
+  },
+  "npmCheck": true,
+  "actualGeneratedEmbedChain": {
+    "sdkAdapterRetained": true,
+    "selectedLibraryRead": true,
+    "staleInheritedPairOverridden": true,
+    "idleExclusiveGateRefused": true,
+    "idleProcessScanRefused": true,
+    "proxyAuthenticationRequired": true,
+    "sdkPromptWriteAndMemoryAdminDenied": true,
+    "bothLibrariesRetainNoDeniedWrites": true,
+    "closeReleasesGate": true,
+    "ownerProfileUsed": false,
+    "modelRequest": false
+  },
+  "productionPreflight": {
+    "actualSealedCandidateRef": "22103e61915b18e49926c463f8348a7fd9735509",
+    "actualSealedRelease": "20261017-151405-6c6b7080",
+    "actualIntegrationVersion": "0.2.11",
+    "candidateVersion": "0.2.13",
+    "actualHomeIdentityMatches": true,
+    "passed": false,
+    "reason": "Matching DSH integration required; real product-version guard refused before catalog request",
+    "sealedBytesUnchanged": true,
+    "guardBypassed": false,
+    "notOwnerUpdateAuthorization": true
+  },
+  "installedChanged": false,
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "newSourceSealedQualified": false,
+  "remaining": [
+    "Fresh immutable qualification of this embedding follow-up",
+    "Prepare matching installed DSH/product/extension without changing custom settings/voice/model paths",
+    "Explicit existing fixed mobile/custom/review/embedded entrypoint adoption, full cold backup/export",
+    "Real existing-bank/history/settings/charges/busy/restart/rollback acceptance",
+    "Owner pilot feedback before further project transfers; excluded project stays DSH; voice/later OS deferred"
+  ],
+  "privateEvidenceLogSha256": {
+    "harness-shared-embed-source-node-20261017.log": "bdf6e72d416798c9768271d18f14084cb1138910c35aed45d4ca4d6a17cce8d3",
+    "harness-shared-embed-source-python-20261017.log": "d8f6ceb1f33c93e374f07a839039338fb1bff8cc666ece3f9d1733eff771471a",
+    "harness-shared-embed-check-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-shared-embed-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "implementationFileSha256": {
+    "scripts/embed-launch.py": "7c0a5d2b3cb7708dd17214b5ab0d59a0ba0c2a7ed022214ef1d555cb480e1106",
+    "scripts/desktop-launch.py": "54fe8452dd03dec4e77148786be5a212e4dfe2f4a2ba3db1bcc28c89f2e7d34a",
+    "scripts/install-desktop-startup.py": "0d4b037c0bbbe5f3b43a56a9eca6a32fb750d462a0a77a45110fcbc95aa15a79",
+    "scripts/shared-launch-profile.py": "1d46bf88b189ef274ffb14c182f1a356306d7697d956282735a57f701f00b9b8",
+    "tests/shared-launch-integration.test.mjs": "e2140f2c285282811f87f6d1f3b9b080149933c2f93d2973f8dea00dc28ad96e",
+    "tests/test_shared_launch.py": "1d98c5ef8c410458f062a6d51f3450561e3071842cbfc5025b637a15146dd9d4"
+  }
+}

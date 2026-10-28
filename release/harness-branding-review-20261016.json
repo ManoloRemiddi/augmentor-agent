@@ -1,0 +1,61 @@
+{
+  "schema": "augmentor-harness-branding-review/1",
+  "date": "2026-10-16",
+  "scope": "Private unselected MX Linux review; original GUI branding only",
+  "applicationRef": "fe184a9fa8776484eb204a0e3e2813ebd11cea21",
+  "releaseId": "20261016-125125-c4472f8e",
+  "artifactSha256": "4028ec0fb1260d6b5e7cb224e5768d7007c2490c8c61ab74a195cfd033bd85a3",
+  "sealedEntries": 24556,
+  "compiledFiles": 1072,
+  "changes": [
+    "Running whale replaced with existing theme-aware Augmentor elastic circle",
+    "Whole-turn status and accessible announcement use Working; existing optional duration copy retained",
+    "Welcome headline uses Build with Augmentor",
+    "Context information-card application glyph uses Augmentor; plugin attribution retained",
+    "Generic unavailable-operation and conversation-ownership copy uses Harness"
+  ],
+  "qualification": {
+    "sourceChromiumCases": 6,
+    "sealedChromiumCases": 6,
+    "files": 3,
+    "workers": 2,
+    "failures": 0,
+    "skips": 0,
+    "licenseAndPrivateBoundaryAndNoticeCases": 16,
+    "realPiHost": true,
+    "provider": "independently authored local fixture",
+    "activeReasoningAndPartialOutput": true,
+    "stopSettles": true,
+    "lightAndDark": true,
+    "reducedMotion": true,
+    "contextAndTrajectoryAndRestart": true,
+    "originalBrandActions": true,
+    "manualLightRunningScreenshot": true,
+    "manualCuaTypingWarnings": 1,
+    "manualWarning": "An isolated synthetic input emitted a Lexical update-listener recursion warning; generation and Stop settled. Focused Chromium tests and owner reconnect reads showed no such warning. Not classified as a branding regression or a resolved editor issue.",
+    "ownerReviewInstancesUpdated": 2,
+    "ownerSessionsPreserved": 4,
+    "backupRegularFilesVerified": 381,
+    "protectedInputsVerifiedBeforeOwnerReconnect": 32,
+    "protectedInputsVerifiedAfterOwnerReconnect": 28,
+    "ownerQaInferenceOrAudioRequests": 0
+  },
+  "preservation": {
+    "existingProfilesReused": true,
+    "existingConversationAndImportedHistoryBytesVerified": true,
+    "originalDshPreserved": true,
+    "installedSelectionChanged": false,
+    "productionNodeDependenciesComponentsChanged": false,
+    "gpuOrModelConfigurationChanged": false,
+    "supplierLicensesAndOriginalHashesRetained": true,
+    "guiLayoutOrCssRedesigned": false,
+    "providerIdentitiesAndThirdPartyAttributionRetained": true
+  },
+  "limitations": [
+    "This is not full application, live-model or release qualification",
+    "Turn timestamp availability is unchanged; no new elapsed-time capture",
+    "Isolated manual CUA input warning remains unclassified",
+    "Voice and later platforms remain deferred",
+    "Private review only; no installed activation, merge, public binary or DSH retirement"
+  ]
+}

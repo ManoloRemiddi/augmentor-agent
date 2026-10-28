@@ -1,0 +1,37 @@
+{
+  "projects": 30,
+  "singleConversationProjects": 9,
+  "multiConversationProjects": 20,
+  "emptyProjects": 1,
+  "projectConversations": 107,
+  "sourceListedConversations": 1226,
+  "conversationsOutsideCurrentProjects": 1119,
+  "sourceRunningConversations": 0,
+  "completeParentHistoriesRead": 95,
+  "parentRecordsRead": 126633,
+  "parentMessagePartTypes": {
+    "text": 31395,
+    "reasoning": 14348,
+    "tool-call": 19135,
+    "image": 248
+  },
+  "parentFlags": {
+    "attachment-or-opaque-message-part": 76,
+    "edited-compacted-branched-history": 39,
+    "source-changed-during-read": 9,
+    "unfinished-or-no-turn": 20,
+    "pilot-bound-exceeded": 3
+  },
+  "historicalChildReferences": 32,
+  "workspaceMembershipStable": true,
+  "importAttempted": false,
+  "modelRequestsSubmitted": 0,
+  "notImportQualification": true,
+  "unscannedScope": "Historical child bodies and conversations outside current projects; exact tool-pair and migration semantics not validated by this inventory.",
+  "schema": "augmentor-dsh-project-inventory-review/1",
+  "date": "2026-10-16",
+  "existingPilotOnlySingleConversationProjectWithoutObservedFlags": true,
+  "scope": "Read-only parent-history format inventory; no imports, no child-body or non-project-history qualification",
+  "sourceIdsNamesPathsAndContentsPublished": false,
+  "flagsMayOverlap": true
+}

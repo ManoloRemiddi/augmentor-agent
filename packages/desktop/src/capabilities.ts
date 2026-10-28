@@ -6,6 +6,6 @@ import {fileURLToPath} from 'node:url';
 export function desktopCapabilities(platform:NodeJS.Platform=process.platform,env:NodeJS.ProcessEnv=process.env,present:(path:string)=>boolean=existsSync){
  const mac=platform==='darwin';
  const helper=env.AUGMENTOR_MACOS_HELPER??fileURLToPath(new URL('../../../native/augmentor-desktop-control',import.meta.url));
- const available=env.AUGMENTOR_PI_LINUX_TOOLS!=='0'&&(platform==='linux'||(mac&&present(helper)));
- return {available,preview:true,backend:mac?'macos-screencapturekit':platform==='linux'?'kde-wayland-portal':null,monitors:1,text:mac?'Unicode':'ASCII',requiresImageModel:true,requiresUserConsent:true};
+ const available=env.AUGMENTOR_PI_LINUX_TOOLS!=='0'&&(platform==='linux'||platform==='win32'||(mac&&present(helper)));
+ return {available,preview:true,backend:mac?'macos-screencapturekit':platform==='linux'?'kde-wayland-portal':platform==='win32'?'windows-sendinput':null,monitors:mac?1:platform==='win32'?'physical-active-window':'selected-portal-streams',text:platform!=='linux'?'Unicode':'ASCII',requiresImageModel:true,requiresUserConsent:platform!=='win32'};
 }

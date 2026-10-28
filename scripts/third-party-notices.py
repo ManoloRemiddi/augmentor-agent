@@ -36,6 +36,7 @@ def package_dirs(modules):
 
 def inventory(tree, catalog_root):
     lock = json.loads((tree / 'package-lock.json').read_text(encoding="utf-8"))['packages']
+    workspaces = json.loads((tree / 'package.json').read_text()).get('workspaces', [])
     catalog = json.loads((catalog_root / 'catalog.json').read_text(encoding="utf-8"))
     for name, source in catalog['sources'].items():
         if digest((catalog_root / source['file']).read_bytes()) != source['sha256']:
@@ -44,8 +45,19 @@ def inventory(tree, catalog_root):
     for package in package_dirs(tree / 'node_modules'):
         relative = package.relative_to(tree).as_posix()
         meta = json.loads((package / 'package.json').read_text(encoding="utf-8"))
-        key = meta['name'] + '@' + meta['version']
         locked = lock.get(relative)
+        if locked and locked.get('link'):
+            resolved = locked.get('resolved')
+            # Authored product workspaces are not third-party packages. Their
+            # actual installed dependencies remain in the recursive inventory.
+            if (resolved not in workspaces or not meta.get('private') or
+                    not isinstance(resolved, str) or
+                    not (tree / resolved).resolve().is_relative_to(tree.resolve()) or
+                    package.resolve() != (tree / resolved).resolve() or
+                    lock.get(resolved, {}).get('name') != meta['name']):
+                errors.append(f'{relative}: unverified workspace link')
+            continue
+        key = meta['name'] + '@' + meta['version']
         if locked is None:
             errors.append(f'{relative}: package is not in the lock'); continue
         if locked.get('dev'):
@@ -57,7 +69,19 @@ def inventory(tree, catalog_root):
         if choice and choice.get('expression')==effective_license:effective_license=choice.get('selected')
         if effective_license not in PERMISSIVE and catalog.get('additionalLicenses',{}).get(key) != effective_license:
             errors.append(f'{key}: unreviewed license {meta.get("license")}'); continue
+        nested = []
+        for name, reviewed in catalog.get('nestedPackageTexts', {}).get(key, {}).items():
+            relative_text = Path(name)
+            file = package / relative_text
+            if (relative_text.is_absolute() or '..' in relative_text.parts or
+                    not file.is_file() or file.is_symlink() or
+                    not file.resolve().is_relative_to(package.resolve()) or
+                    digest(file.read_bytes()) != reviewed.get('sha256') or
+                    reviewed.get('role') not in ('license', 'notice')):
+                errors.append(f'{key}: missing or changed reviewed nested text {name}'); continue
+            nested.append((file, reviewed['role']))
         files = [p for p in sorted(package.iterdir()) if p.is_file() and LICENSE_NAME.match(p.name)]
+        files.extend(file for file, role in nested if role == 'license')
         sources = []
         for file in files:
             content = file.read_bytes(); sha = digest(content); texts[sha] = content
@@ -82,6 +106,10 @@ def inventory(tree, catalog_root):
                     errors.append(f'{key}: missing reviewed license text'); continue
         for file in sorted(package.iterdir()):
             if file.is_file() and NOTICE_NAME.match(file.name):
+                content = file.read_bytes(); sha = digest(content); texts[sha] = content
+                sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
+        for file, role in nested:
+            if role == 'notice':
                 content = file.read_bytes(); sha = digest(content); texts[sha] = content
                 sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
         # Some upstream npm wrappers omit their repository NOTICE as well as LICENSE.

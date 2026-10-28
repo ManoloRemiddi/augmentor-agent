@@ -1,0 +1,15 @@
+{
+  "schema": "augmentor-dsh-preview-source/1",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "page.ts",
+      "sha256": "306eddceaf1fbcf961437695c8ec7692a5e4b873f579858c207007333991b342",
+      "upstreamPath": "packages/api/workspace-files/src/index.ts",
+      "upstreamSha256": "44d7596af49321099a3b0cd77d994eb3f57eeffc6457ba276352ab95345208ce",
+      "adaptation": "Extract original streaming page cutter; export it and substitute local error class only."
+    }
+  ]
+}

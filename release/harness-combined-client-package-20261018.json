@@ -1,0 +1,140 @@
+{
+  "schema": "augmentor-harness-combined-client-package-qualification/1",
+  "date": "2026-10-18",
+  "scope": "One private unselected MX combined client-publication artifact; no owner activation or migration",
+  "applicationRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+  "publicationRuntimeRef": "bc2d70167ca2d987a4afb2d175401f78e2db3f9c",
+  "artifact": {
+    "releaseId": "20261018-003235-2d294c67",
+    "artifactSha256": "535ad8e607de7fbd3f4aea707882a94a1ad8a2ba25ad7ebcd19f906137b4f1be",
+    "inventoryEntries": 24805,
+    "compiledFiles": 1143,
+    "baseArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93"
+  },
+  "qualification": {
+    "ordinaryPythonPass": 411,
+    "ordinaryNodePass": 66,
+    "sealedDevelopmentPythonPass": 411,
+    "sealedNodePass": 66,
+    "sealedDeclaredPythonCorePass": 210,
+    "sealedRegisteredReviewNodePass": 6,
+    "caseGroupsOverlap": true,
+    "finalFail": 0,
+    "finalSkip": 0,
+    "externalPublicTestViewScriptsAndServicesByteCopies": true,
+    "actualSealedSdkWarmAndCold": true,
+    "reviewFixtureUsesExistingArtifactWithoutAssembly": true,
+    "reviewFixtureOnlyChange": "Exact supplied-seal verification and authored registry launchData, never real deployment gate/fence",
+    "unchangedBundledNodeDependenciesComponentsAndLicenses": true,
+    "inventoryVerifiedAfterAllChecks": true,
+    "hostReadOnly": true,
+    "networkIsolated": true,
+    "reserveGiB": 64,
+    "publicationBackendHealthSynthetic": true,
+    "registeredReviewAuthoredModelRequests": 2,
+    "ownerModelRequests": 0
+  },
+  "retainedGraph": {
+    "retainedPersonalModules": 9,
+    "retainedRoleDefinitionsExercised": true,
+    "originalFullProfileExecuted": false,
+    "bothRetainedRolesRegistered": true,
+    "bothRetainedRolesCreated": true,
+    "coldRetainedRolesHistoryEventsExact": true,
+    "identicalEntriesReboundToCurrent": 8,
+    "legacyFrontendBundleRetained": true,
+    "bridgedImprovementSavedAndShared": true,
+    "bridgedTemplateSaveDelete": true,
+    "coldNoOwnerRoleContinuation": true,
+    "currentMemoryOwnerAfterColdStart": true,
+    "authoredModelRequests": 3,
+    "ownerModelRequests": 0,
+    "improveDoesNotSubmitConversation": true,
+    "existingCachedBankRowsExact": true,
+    "staleSourceDatabasesExact": true,
+    "fixtureProcessesTerminal": true
+  },
+  "privateSourceCopiedIntoArtifactOrPublicTests": false,
+  "actualConfigurationStage": {
+    "boundInputs": 48,
+    "moduleEdits": 10,
+    "readOnlyAdvisoryOnly": true,
+    "ownerApplied": false,
+    "persistentPrivateRecoveryStorage": true,
+    "ownerConfigurationNeverInDisposableScratch": true
+  },
+  "precedingAttempts": {
+    "inspectionFixtureOldPopup": {
+      "nodePass": 65,
+      "nodeFail": 1,
+      "correction": "Use the actual inline settings navigation; no production UI change"
+    },
+    "operatorLongSocketPaths": {
+      "ran": 411,
+      "errors": 118,
+      "failures": 5,
+      "correction": "Short authored /tmp workspace binding; production socket limits unchanged"
+    },
+    "declaredRuntimeGuiTestDependency": {
+      "ran": 390,
+      "errors": 27,
+      "missingModule": "PySide6.QtTest",
+      "correction": "Use existing GUI test environment for 411 and recorded runtime for 210 core cases; no runtime dependency changed"
+    },
+    "allFailedTemporaryAppCopiesRemoved": true,
+    "newAppArtifactCount": 1,
+    "ordinaryScratchAssembliesTotal": 3
+  },
+  "storage": {
+    "unusedCopiesRemovedTotal": 79,
+    "observedGiBRecoveredTotal": 43.06,
+    "rootFreeGiBApprox": 100.95,
+    "supersededCandidateRemoved": "add7b8915e45c2bb28b748db7a52c7d33713e97f",
+    "latestExtraCandidatesRetained": 2,
+    "managedScratchEmptyAfterQualification": true,
+    "selectedRunningRegisteredNeededRollbackProjectsHistoriesAndBackupsPreserved": true,
+    "olderUnclassifiedFoldersNotBlanketPruned": true
+  },
+  "hosted": {
+    "run": 39075248056,
+    "sourceRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+    "statusAtSnapshot": "in_progress",
+    "linuxConclusion": "success",
+    "macConclusion": "failure",
+    "macFailureGroup": "Shared memory settings, stale choices and inspector boundaries",
+    "macFailureObservation": "Authored first memory.status.connected assertion false; cause unqualified",
+    "windowsStatusAtSnapshot": "in_progress",
+    "wholeMatrixSuccessClaimed": false,
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39075248056"
+  },
+  "ownerPreservation": {
+    "mainAndPilotSamePids": true,
+    "protectedFiles": 36,
+    "registryRevision": 18,
+    "sharedRowsEngineSettingsMenusAndSelectionsExact": true,
+    "gpuVoiceServiceSettingsAndPidsUnchanged": true,
+    "selectedOrRunningAppChanged": false,
+    "ownerProjectsTransferred": 0
+  },
+  "remaining": [
+    "Exact gate-aware bootstrap pre-adoption for all current clients, including review and preview openers",
+    "Matching loaded Browser",
+    "One fresh real three-pair cold archive including the explicitly partial legacy Native source",
+    "Guarded configuration/data/client publication and ordinary reopen",
+    "Actual owner continuation and pilot feedback before further project transfers",
+    "VR-RasterStudio stays DSH; voice expansion and later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-combined-package-qualified-ordinary-node-20261018.log": "3a08539161db511d3fdfc71d7118057894654c79fa7896926c228a25370e66f8",
+    "harness-combined-package-qualified-ordinary-python-20261018.log": "4a3958d65c4c7f2eeb5f2cbaebfd54d43261e28e979b5fb8088ccda7ff6e20cb",
+    "harness-combined-package-qualified-sealed-node-20261018.log": "50082731598c7eee1131296be4c2b70a10abf5aaf901424e4441ef475c0a3946",
+    "harness-combined-package-qualified-sealed-finish-python-20261018.log": "f1bcfe73f4959aa92917a9f86341ca33d44bfd1ae0e50d01ad454e9bc1ac0275",
+    "harness-combined-package-qualified-sealed-finish-declared-python-20261018.log": "35b9bbb69f65f341bfd5aaf5e1fa9ead6447494b6aa1c37e7a113fb2e4d50eb6",
+    "harness-combined-package-sealed-review-20261018.log": "8f723543150ac2591a4702346844cea90a37dd227e769a27bcb35fd2f76ce79e",
+    "harness-combined-package-sealed-retained-roles-20261018.log": "99524ddf14de1afd0858e814e56c66a09ca419c7c5ff4c9a249e0b325f193399",
+    "harness-combined-candidate-retention-private-20261018.json": "f2ff3b0fb30521935594b7fe6ab8da2e38ed9f049f239501e8ce8fada1823c54",
+    "harness-combined-package-owner-preservation-private-20261018.json": "acf53d4011a65907df767aa48a21ec466940a61979f0c42523bf54c0322b4730",
+    "harness-launcher-publication-sdk-current-private-20261018.json": "5db6f24070e371855891c8e8097f63992dbb6ed0b2c8302820beb76a5673ae4a",
+    "harness-launcher-publication-mac-sdk-20261018.log": "cc4fce05c559c7b1364855bd23cc606390f2d78b44c926b701ab0afb4daeca99"
+  }
+}

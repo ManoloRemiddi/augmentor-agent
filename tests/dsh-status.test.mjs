@@ -25,3 +25,27 @@ test('Browser history and Stop use live idle status even without turn/end',async
  assert.equal(calls.filter(x=>x==='session/cancel').length,1)
  assert(!calls.includes('session/prompt'))
 })
+
+test('Browser transport forwards a stream opening before any model text',async t=>{
+ const server=createServer(),wss=new WebSocketServer({server}),sockets=[],notifications=[]
+ wss.on('connection',socket=>{sockets.push(socket);socket.on('message',()=>{
+  for(const value of [
+   {type:'snapshot',cursor:0,records:[],header:{id:'s'}},
+   {type:'assistant-stream',frame:{type:'start',time:1}},
+   {type:'assistant-stream',frame:{type:'chunk',time:2,chunk:{type:'reasoning-delta',text:'Thought'}}}
+  ])socket.send(JSON.stringify({type:'item',value}))
+ })})
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve))
+ const adapter=createRemoteAdapter(`http://127.0.0.1:${server.address().port}`,{
+  websocketHeaders:async()=>({}),fetch:async(_url,options)=>{
+   const body=JSON.parse(options.body)
+   const value=body.method==='session/list'?{items:[{sessionId:'s',running:true}]}:{records:[],hasMore:false}
+   return Response.json({type:'server-response',rpcId:body.rpcId,result:{ok:true,value}})
+  }
+ },frame=>notifications.push(frame))
+ t.after(()=>{adapter.close();for(const s of sockets)s.terminate();wss.close();server.close()})
+ await adapter.call('session.history',{sessionId:'s'})
+ const events=notifications.filter(n=>n.method==='session.event').map(n=>n.params.event)
+ assert.deepEqual(events.map(e=>e.type),['assistant/start','assistant/chunk'])
+ assert(events.every(e=>e.seq===undefined))
+})

@@ -23,7 +23,7 @@ test('browser writes require observed selectors and carry the exact tab/document
   let result = f.call('browser_snapshot'); f.reply(snapshot); assert.equal((await result).success, true);
   assert.equal((await f.call('browser_type', {selector: '#invented', text: 'x'})).success, false);
   result = f.call('browser_click', {selector: '#send'});
-  assert.deepEqual(f.frames.at(-1).params, {action: 'click', selector: '#send', target: {tabId: 7, url: snapshot.url, documentEpoch: 1234}});
+  assert.deepEqual(f.frames.at(-1).params, {action: 'click', owner: 'codex:one', selector: '#send', target: {tabId: 7, url: snapshot.url, documentEpoch: 1234}});
   f.reply({ok: true}); assert.equal((await result).success, true);
   const count = f.frames.length;
   assert.equal((await f.call('browser_click', {selector: '#send'})).success, false);
@@ -52,7 +52,7 @@ test('in-flight persisted dispatch is unknown after restart and foreign response
 test('abort, timeout and disconnect settle once without granting observation authority', async t => {
   const f = fixture(t, 10);
   let result = f.call('browser_snapshot'); assert.equal((await result).success, false);
-  assert.equal(f.browser.broker.pending.size, 0);
+  assert.equal(f.frames.at(-1).params.action,'stop');f.reply({ok:true,stopped:true});assert.equal(f.browser.broker.pending.size, 0);
   const abort = new AbortController(); result = f.call('browser_snapshot', {}, 'aborted', abort.signal); abort.abort();
   assert.equal((await result).success, false);
   result = f.call('browser_snapshot'); f.browser.detach(f.owner); assert.equal((await result).success, false);

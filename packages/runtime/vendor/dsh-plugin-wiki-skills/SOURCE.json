@@ -1,0 +1,225 @@
+{
+  "schema": "augmentor-public-source-selection/1",
+  "package": "dsh-plugin-wiki-skills",
+  "version": "0.2.1",
+  "repository": "https://github.com/Lion-1209/dsh-plugin-wiki-skills",
+  "reportedGitHead": "c56a4018053af7e1a96ebc09f69242e63535a7f0",
+  "npmTarball": "https://registry.npmjs.org/dsh-plugin-wiki-skills/-/dsh-plugin-wiki-skills-0.2.1.tgz",
+  "npmTarballSha256": "162c001724d7faf3816ecb312a79c93b43537c6db566edad00ce6cc6bf2c1d4d",
+  "license": "MIT",
+  "scope": "Public npm preferred JavaScript/Markdown source; the matching public Git snapshot is recorded separately. Published npm bytes, including preserved CRLF, are the exact selected inputs. Original operation bodies and attribution are retained; Pi loader and bounded vault IO are authored bindings.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "3297076bb9657fab01387fe6cda1cb68fc40f6ab75d499f10ea6e4252e817dcf",
+      "originalSha256": "3297076bb9657fab01387fe6cda1cb68fc40f6ab75d499f10ea6e4252e817dcf",
+      "modified": false
+    },
+    {
+      "path": "ORIGINAL_LICENSE",
+      "sha256": "0434da4847b2273a6650e84d80cafcfdaafcafd9fc50cf0b6a8036aaebf0e786",
+      "originalSha256": "0434da4847b2273a6650e84d80cafcfdaafcafd9fc50cf0b6a8036aaebf0e786",
+      "modified": false
+    },
+    {
+      "path": "README.md",
+      "sha256": "d15f05a7f666c6d8a1f7a6bb899cca98bddf25040fdc8dffa454142133f7b53a",
+      "originalSha256": "d15f05a7f666c6d8a1f7a6bb899cca98bddf25040fdc8dffa454142133f7b53a",
+      "modified": false
+    },
+    {
+      "path": "cordis.patch.yml",
+      "sha256": "691acf1fe4cf579fb34553cc70faaca4689f950f612d96fa840256b9289a6007",
+      "originalSha256": "691acf1fe4cf579fb34553cc70faaca4689f950f612d96fa840256b9289a6007",
+      "modified": false
+    },
+    {
+      "path": "index.js",
+      "sha256": "7e5f9b7beed5031f106ec7adcbe7c65a161bc717810c613598a3c74aee84d395",
+      "originalSha256": "7e5f9b7beed5031f106ec7adcbe7c65a161bc717810c613598a3c74aee84d395",
+      "modified": false
+    },
+    {
+      "path": "package.json",
+      "sha256": "590b37a588f67c7102d3362c664552e6bb70b612818239b61b4825431ec6235e",
+      "originalSha256": "590b37a588f67c7102d3362c664552e6bb70b612818239b61b4825431ec6235e",
+      "modified": false
+    },
+    {
+      "path": "skills/defuddle/SKILL.md",
+      "sha256": "e60ed4b0b00c2b8b521377af8e0c85f7f8cc014e13c2018734b9f9385f2f2131",
+      "originalSha256": "e60ed4b0b00c2b8b521377af8e0c85f7f8cc014e13c2018734b9f9385f2f2131",
+      "modified": false
+    },
+    {
+      "path": "skills/obsidian-bases/SKILL.md",
+      "sha256": "6bbf48d63ce1020c45c76d697786cb562922766a42db19b2a4edbd122aba966e",
+      "originalSha256": "6bbf48d63ce1020c45c76d697786cb562922766a42db19b2a4edbd122aba966e",
+      "modified": false
+    },
+    {
+      "path": "skills/obsidian-markdown/SKILL.md",
+      "sha256": "029ec1d45a6de64e44321e969064cfe241945ecd14e84eac376d0afdb55b0ce5",
+      "originalSha256": "029ec1d45a6de64e44321e969064cfe241945ecd14e84eac376d0afdb55b0ce5",
+      "modified": false
+    },
+    {
+      "path": "skills/save/SKILL.md",
+      "sha256": "8855c71f53315a0a03fafa8ac57b9789666c0bde51d7211e032bbe9b08c6c592",
+      "originalSha256": "8855c71f53315a0a03fafa8ac57b9789666c0bde51d7211e032bbe9b08c6c592",
+      "modified": false
+    },
+    {
+      "path": "skills/think/SKILL.md",
+      "sha256": "23ad87ac6acd363dbca21be29754773504b6f82e8be4a7bfe6c806e4e78fae48",
+      "originalSha256": "23ad87ac6acd363dbca21be29754773504b6f82e8be4a7bfe6c806e4e78fae48",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/SKILL.md",
+      "sha256": "28359eabc691e6b632634305d52a8c5fe5689a5a78b1da94faa144cdb1ca577a",
+      "originalSha256": "28359eabc691e6b632634305d52a8c5fe5689a5a78b1da94faa144cdb1ca577a",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/css-snippets.md",
+      "sha256": "261cee15fdaac3722de844093f8f077e274a1301bad361632d5b20c76297b40b",
+      "originalSha256": "261cee15fdaac3722de844093f8f077e274a1301bad361632d5b20c76297b40b",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/frontmatter.md",
+      "sha256": "2aa4290a5f56adc3033781c4f1a85d90dda81de655d976a473216f432e992c22",
+      "originalSha256": "2aa4290a5f56adc3033781c4f1a85d90dda81de655d976a473216f432e992c22",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/git-setup.md",
+      "sha256": "ec179d72221552a10ef5442366b669c6f7ffd110677a41d26326b8fd0302c17b",
+      "originalSha256": "ec179d72221552a10ef5442366b669c6f7ffd110677a41d26326b8fd0302c17b",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/mcp-setup.md",
+      "sha256": "2316f5bd30ac6bf3ee557ecab673cdbe4ee04b5ac3726574bd125533a78ce561",
+      "originalSha256": "2316f5bd30ac6bf3ee557ecab673cdbe4ee04b5ac3726574bd125533a78ce561",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/modes.md",
+      "sha256": "f049fad12fb4b8590b8cd376aa3a2a83116713e9ddf50317472ee7d9db54a2e1",
+      "originalSha256": "f049fad12fb4b8590b8cd376aa3a2a83116713e9ddf50317472ee7d9db54a2e1",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/plugins.md",
+      "sha256": "796ce61c731400935bb90d5677c0fc59323a330b326842793f1016c3e698b812",
+      "originalSha256": "796ce61c731400935bb90d5677c0fc59323a330b326842793f1016c3e698b812",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki/references/rest-api.md",
+      "sha256": "b57fe25f4c05fb9bbe50c543c891c860c1a14dcede175e580d974f3584cfad48",
+      "originalSha256": "b57fe25f4c05fb9bbe50c543c891c860c1a14dcede175e580d974f3584cfad48",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki-ingest/SKILL.md",
+      "sha256": "b0c833a6a228c64a0903a5ece46609cfdc9d3aaa8b562545e4b4d5d109f77f5d",
+      "originalSha256": "b0c833a6a228c64a0903a5ece46609cfdc9d3aaa8b562545e4b4d5d109f77f5d",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki-lint/SKILL.md",
+      "sha256": "37f1111ccd25f1935b8b681bc3c4a36e70df6c25c433b8d65774fb93c85bd6fb",
+      "originalSha256": "37f1111ccd25f1935b8b681bc3c4a36e70df6c25c433b8d65774fb93c85bd6fb",
+      "modified": false
+    },
+    {
+      "path": "skills/wiki-query/SKILL.md",
+      "sha256": "38363a20cbb6b53ab4394825ab65787963b5762480b57e2c90a024126ddce8fc",
+      "originalSha256": "38363a20cbb6b53ab4394825ab65787963b5762480b57e2c90a024126ddce8fc",
+      "modified": false
+    }
+  ],
+  "gitVerification": {
+    "commit": "c56a4018053af7e1a96ebc09f69242e63535a7f0",
+    "archiveUrl": "https://codeload.github.com/Lion-1209/dsh-plugin-wiki-skills/tar.gz/c56a4018053af7e1a96ebc09f69242e63535a7f0",
+    "archiveSha256": "b0b4a73439b01b93d339232055b5780f9c3ed15e74b1e867c746277ea9a9e086",
+    "matchingFiles": [
+      "README.md",
+      "package.json",
+      "LICENSE",
+      "cordis.patch.yml",
+      "index.js",
+      "skills/wiki-ingest/SKILL.md",
+      "skills/think/SKILL.md",
+      "skills/wiki/SKILL.md",
+      "skills/wiki-lint/SKILL.md",
+      "skills/obsidian-bases/SKILL.md",
+      "skills/wiki-query/SKILL.md",
+      "skills/save/SKILL.md",
+      "skills/defuddle/SKILL.md",
+      "skills/obsidian-markdown/SKILL.md"
+    ],
+    "differentOrMaterializedFiles": [
+      {
+        "path": "ORIGINAL_LICENSE",
+        "gitType": "file",
+        "npmSha256": "0434da4847b2273a6650e84d80cafcfdaafcafd9fc50cf0b6a8036aaebf0e786",
+        "gitSha256": "1c5915b8cde3e16949e40961353e483d44a65f90fae72405465dcff60118e57f",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/plugins.md",
+        "gitType": "file",
+        "npmSha256": "796ce61c731400935bb90d5677c0fc59323a330b326842793f1016c3e698b812",
+        "gitSha256": "a83f9d2fc60fc60d68bc4e0430966828fa244626082fde220e4a68a0f55eca5c",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/modes.md",
+        "gitType": "file",
+        "npmSha256": "f049fad12fb4b8590b8cd376aa3a2a83116713e9ddf50317472ee7d9db54a2e1",
+        "gitSha256": "6f3be8975b3dd88ee1282743ae6cf404f1d89b5348e30cb13bbbf4f0bafb8817",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/git-setup.md",
+        "gitType": "file",
+        "npmSha256": "ec179d72221552a10ef5442366b669c6f7ffd110677a41d26326b8fd0302c17b",
+        "gitSha256": "0fcb25dac3b418445633f573894af5702e5167bd677e5541c9bdaf53bafc0ac5",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/rest-api.md",
+        "gitType": "file",
+        "npmSha256": "b57fe25f4c05fb9bbe50c543c891c860c1a14dcede175e580d974f3584cfad48",
+        "gitSha256": "e6357e24e5fcf76884f817d9c48d29d8668e72c6fb984f7ccf485831993b3a73",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/frontmatter.md",
+        "gitType": "file",
+        "npmSha256": "2aa4290a5f56adc3033781c4f1a85d90dda81de655d976a473216f432e992c22",
+        "gitSha256": "1a7ce01cb1430aab66a94d3b179bd6861ea030b693b7ec35e314dfe1f4b7e180",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/css-snippets.md",
+        "gitType": "file",
+        "npmSha256": "261cee15fdaac3722de844093f8f077e274a1301bad361632d5b20c76297b40b",
+        "gitSha256": "83bb026938e32eb2b57575057cd960ce10ec389286c83facd3a0f0f98081fdac",
+        "sameTextAfterCRLFNormalization": true
+      },
+      {
+        "path": "skills/wiki/references/mcp-setup.md",
+        "gitType": "file",
+        "npmSha256": "2316f5bd30ac6bf3ee557ecab673cdbe4ee04b5ac3726574bd125533a78ce561",
+        "gitSha256": "6754d2fda5de3681a047140bf674ae321d1c5d22673a19f7cc361e757aec72d7",
+        "sameTextAfterCRLFNormalization": true
+      }
+    ],
+    "npmFilesAbsentFromCheckout": []
+  }
+}

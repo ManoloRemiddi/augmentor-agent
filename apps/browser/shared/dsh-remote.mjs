@@ -101,6 +101,8 @@ export function createRemoteAdapter(base, client, notify, log = () => {}) {
           if (frame.event.seq <= state.cursor) return
           state.cursor = frame.event.seq
           emitEvent(sessionId, frame.event)
+        } else if (frame.type === 'assistant-stream' && frame.frame.type === 'start') {
+          emitEvent(sessionId, { type: 'assistant/start', time: frame.frame.time, data: {} })
         } else if (frame.type === 'assistant-stream' && frame.frame.type === 'chunk') {
           emitEvent(sessionId, { type: 'assistant/chunk', time: frame.frame.time, data: { chunk: frame.frame.chunk } })
         }

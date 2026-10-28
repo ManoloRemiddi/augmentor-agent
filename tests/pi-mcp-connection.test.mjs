@@ -1,0 +1,21 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile,readdir} from 'node:fs/promises';
+import {join} from 'node:path';
+import {managementOwner,until} from './fixtures/mcp-management-owner.mjs';
+
+test('actual owner exposes safe connection generations, preserves native history and never probes or restores old liveness',{timeout:60000},async t=>{
+ const owner=await managementOwner(t),sid=await owner.create(),call=(method,params={})=>owner.client.call(method,{sessionId:sid,...params});
+ const web=async()=>{const info=await call('session.mcpInfo');return info.servers.find(row=>row.name==='web');};
+ let server=await web();assert(server.connection.current);assert.equal(server.connection.current.protocolNegotiated,false);const first=server.connection.current.instanceId;
+ await call('session.mcpAction',{requestId:'login',server:'web',action:'login'});await owner.authorize(sid,'login');server=await web();assert(server.connection.current.protocolNegotiated);assert(!server.connection.current.closed);assert.notEqual(server.connection.current.instanceId,first);assert.equal(server.connection.lastSaved.instanceId,server.connection.current.instanceId);assert.equal(server.connection.unsavedObservations,0);
+ const connected=server.connection.current.instanceId,stats=structuredClone(owner.wire.stats);for(let index=0;index<3;index++)await call('session.mcpInfo');assert.deepEqual(owner.wire.stats,stats,'catalog reads do not issue a health probe');assert.equal(owner.requests.length,0);assert.equal(owner.wire.stats.tools,0);
+ await call('session.mcpAction',{requestId:'reconnect',server:'web',action:'reconnect'});await owner.settle(sid,'reconnect');server=await web();assert.notEqual(server.connection.current.instanceId,connected);assert(server.connection.current.protocolNegotiated);assert(!server.connection.current.closed);
+ await call('session.prompt',{requestId:'explicit-read',content:[{type:'text',text:'Read the authored record once.'}]});await until(()=>owner.events.some(row=>row.method==='session/event'&&row.payload.event.type==='turn/end'),'explicit read');assert.equal(owner.wire.stats.tools,1);assert.equal(owner.requests.length,2);for(const request of owner.requests)assert(!JSON.stringify(request).includes('augmentor-mcp-connection')&&!JSON.stringify(request).includes('"instanceId"'),'native connection entries are not model context');
+ const profile=await call('session.mcpProfile');await call('session.mcpConfigure',{requestId:'disable',operation:'set-enabled',server:'web',enabled:false,expectedRevision:profile.revision});await owner.settle(sid,'disable');server=await web();assert(server.connection.current.closed);assert.equal(server.connection.current.state,'closed');const closedInstance=server.connection.current.instanceId;
+ const files=await readdir(join(owner.state,'sessions',sid)),native=files.find(name=>name.endsWith('.jsonl'));assert(native);const originals=(await readFile(join(owner.state,'sessions',sid,native),'utf8')).trim().split('\n').map(line=>JSON.parse(line)).filter(row=>row.customType==='augmentor-mcp-connection/1');assert(originals.some(row=>row.data.event==='protocol-negotiated'));assert(originals.some(row=>row.data.event==='closed'));
+ const safe=JSON.stringify(originals)+JSON.stringify(await call('session.mcpInfo'))+JSON.stringify(owner.events.filter(row=>row.method==='mcp/connection'));for(const value of [owner.wire.base,'AUTHORED_ACCESS_','AUTHORED_REFRESH_','AUTHORED_PRIVATE_AUTH_BODY','code_challenge='])assert(!safe.includes(value));assert(owner.events.some(row=>row.method==='mcp/connection'));
+ await owner.stop();await owner.start();const before=structuredClone(owner.wire.stats);assert.equal((await call('session.mcpInfo')).available,false);assert.deepEqual(owner.wire.stats,before);
+ await call('session.selectModel',owner.selection);await call('events.subscribe');server=await web();assert.equal(server.enabled,false);assert.equal(server.connection.current,null);assert(server.connection.lastSaved.closed);assert.equal(server.connection.lastSaved.instanceId,closedInstance);assert.equal(owner.requests.length,2);assert.equal(owner.wire.stats.tools,1);assert.deepEqual(owner.wire.errors,[]);
+});

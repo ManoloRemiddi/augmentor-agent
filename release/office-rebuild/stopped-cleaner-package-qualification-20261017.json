@@ -1,0 +1,214 @@
+{
+  "schema": "augmentor-office-stopped-cleaner-package/1",
+  "date": "2026-10-17",
+  "applicationRef": "248828e69010a6b9e58ec9ad06294d8acffc6675",
+  "runtimeChangeRef": "c351558fdd7e0a0ca110d49718d2726c31bdbc39",
+  "sourceEvidence": "stopped-cleaner-qualification-20261017.json",
+  "packageScope": "Private incremental overlay over independently verified97d95d58 base; no clean-room/public approval, owner adoption, model inference or migration",
+  "source": {
+    "nodePass": 304,
+    "fail": 0,
+    "skip": 0,
+    "pythonPass": 43,
+    "nodeFiles": 45,
+    "chromiumFiles": 19,
+    "actualNativePass": 24
+  },
+  "ordinary": {
+    "nodePass": 304,
+    "pythonPass": 41,
+    "officePythonPass": 43,
+    "compiledFilesVerified": 1140,
+    "testFiles": 45,
+    "chromiumFiles": 19,
+    "workers": 2,
+    "baselineUnchangedInputsVerified": 23580,
+    "externalOutputRootPreconditionConfirmed": true
+  },
+  "sealed": {
+    "releaseId": "20261017-124857-6306bf21",
+    "artifactSha256": "c35084df299213de94fec5bd23717c67d7af54dc689978e2f591e7368d796057",
+    "applicationRef": "248828e69010a6b9e58ec9ad06294d8acffc6675",
+    "inventoryEntriesVerified": 24747,
+    "compiledFilesVerified": 1140,
+    "nodePass": 304,
+    "pythonPass": 41,
+    "officePythonPass": 43,
+    "nodeFiles": 45,
+    "chromiumFiles": 19,
+    "workers": 2,
+    "activated": false,
+    "selectedConfigurationsUnchanged": true
+  },
+  "eachPackageFailuresSkips": {
+    "nodeFail": 0,
+    "nodeSkip": 0,
+    "pythonFail": 0,
+    "pythonSkip": 0
+  },
+  "externalPrivacyDriverCorrection": {
+    "initialNodePass": 303,
+    "initialNodeFail": 1,
+    "cause": "Linux returned ESRCH while reading a just-exited authored Host stat file after accepted shutdown",
+    "correction": "Capture full known process identity before shutdown; use existing processIdentity helper with ENOENT/ESRCH handling, start-token comparison and zombie recognition. Keep all privacy/network/configuration/history/GUI assertions.",
+    "sourceTestSha256": "95c26917c3068486127fb94df9f32da0a1e8a30be138b600c003938085405fba",
+    "sealedApplicationChanged": false
+  },
+  "pythonGroupsOverlap": true,
+  "unchangedProductionDependenciesNativeNode": true,
+  "externalDriversAndOperators": "Runtime/GUI/engine from exact SUT; drivers/static fixtures external. Python diagnostic operators copied byte-identical to external test root with existing private outputs parent; no sealed mutation.",
+  "exactSealedHistoricalBranch": {
+    "pass": 2,
+    "fail": 0,
+    "skip": 0,
+    "formats": [
+      "v1 JSON",
+      "v2 bundle"
+    ],
+    "qualifiedTestChangeRef": "248828e69010a6b9e58ec9ad06294d8acffc6675",
+    "assertions": "Original GUI exact child, unknown acknowledgement, newer draft, cold recovery, explicit Send, exact parent/archive evidence and zero CDP/browser/runtime errors",
+    "record": "../harness-branch-fetch-lifecycle-qualification-20261017.json"
+  },
+  "thinGui": "Separate unselected current-runtime actual Host/original GUI passes existing Thin entry/53 engine files; not the default engine in the sealed artifact",
+  "precedingCarrierRetained": {
+    "releaseId": "20261017-123104-dba3acbf",
+    "artifactSha256": "bd72197a68841b6acac22f0e5c6b6d883243363e3edc327524dfe50140f874f5",
+    "record": "corrected-package-qualification-20261017.json"
+  },
+  "failedCarrierNeverActivate": "20261017-115954-59433a62",
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "ownerUpdates": 0,
+  "ownerInference": 0,
+  "ownerTransfers": 0,
+  "engineRebuilds": 0,
+  "publicRedistributionQualified": false,
+  "hosted": {
+    "validate": {
+      "runId": 39026214407,
+      "head": "c351558fdd7e0a0ca110d49718d2726c31bdbc39",
+      "statusAtSnapshot": "in_progress",
+      "conclusionAtSnapshot": "",
+      "jobs": [
+        {
+          "databaseId": 117377598386,
+          "name": "source-boundary",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117377625395,
+          "name": "home-runtime",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117377625458,
+          "name": "handy / component (macos-14)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117377625472,
+          "name": "handy / component (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117377625540,
+          "name": "handy / component (windows-2022)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117377795467,
+          "name": "debian",
+          "status": "in_progress",
+          "conclusion": ""
+        }
+      ]
+    },
+    "sdk": {
+      "runId": 39026214391,
+      "head": "c351558fdd7e0a0ca110d49718d2726c31bdbc39",
+      "statusAtSnapshot": "in_progress",
+      "conclusionAtSnapshot": "",
+      "jobs": [
+        {
+          "databaseId": 117377598176,
+          "name": "contracts (macos-14)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "databaseId": 117377598278,
+          "name": "contracts (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117377598292,
+          "name": "contracts (windows-2025)",
+          "status": "in_progress",
+          "conclusion": ""
+        }
+      ]
+    }
+  },
+  "remaining": [
+    "Normal hosted completion; test-only248828e6 preserves c351558f source CI, not new-head/full workflow approval",
+    "Explicit managed backend profile/default selection, adoption and rollback before any owner promotion",
+    "Pre-hook/allocation/publication, total cleanup-owner loss/power-loss durability and wider corpus/security",
+    "Complete preferred-source/rebuild/third-party/public distribution gate",
+    "Owner pilot feedback before further transfers; excluded projects remain in DSH; voice/later OS deferred"
+  ],
+  "logSha256": {
+    "harness-office-wake-ordinary-node-20261017.log": "76e7643389182d51e23e021e5318d1ff90d36e4373daf40987a0528158ff5910",
+    "harness-office-wake-ordinary-python-20261017.log": "f2f1f5c005137dcc8fd1976a4a9ded837cb9ac6f367e601410d043963c8ebcdf",
+    "harness-office-wake-ordinary-office-python-20261017.log": "351f2ac8c32599e89bc0c220a46d13da39f8239b0d8590e299406af74a67a71a",
+    "harness-office-wake-sealed-node-initial-failure-20261017.log": "a379cc139e6186c21a466f71ed65d168c7f45cd9fd79085fdbfc985474664334",
+    "harness-office-wake-sealed-node-20261017.log": "dbc373a1c2fdadd2f655de5af81723271b25304783817313198c7411fa8d3153",
+    "harness-office-wake-sealed-python-20261017.log": "1d434bbd635fead34d3a0162f3636649c6f234c27e7d280c26aa19c12c17311b",
+    "harness-office-wake-sealed-office-python-20261017.log": "217ec1dc5e37b4a3f27624f5730b75e5fce498996e0975fb8d5ac3e64f662176",
+    "harness-office-wake-sealed-branch-20261017.log": "c65682f350d7c38d1a5eb42ab4bf7734680c8b15f0c89caf3a5c12480fe5981c",
+    "harness-office-wake-package-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  }
+}

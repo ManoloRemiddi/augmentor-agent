@@ -1,0 +1,33 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import test from 'node:test';import assert from 'node:assert/strict';
+import {StepTiming} from '../dist/runtime/src/step-timing.js';
+import {foldTimingRecords,timingSummary,mergeTimings} from '../apps/harness/dsh-context-timing.mjs';
+import {insightMetadata,foldInsightRecords} from '../apps/harness/dsh-insights-data.mjs';
+import {Interactions} from '../dist/runtime/src/interactions.js';
+const row=(seq,kind,data)=>({id:'event-'+seq,seq,time:Date.UTC(2026,0,1)+seq,turnId:'authored-turn',kind,data});
+function measured(){let clock=0;const timing=new StepTiming(()=>clock,()=> 'authored-step'),start=timing.begin();clock=5;timing.modelStart('request-one');clock=20;timing.stream('thinking_start');clock=25;timing.stream('thinking_delta');clock=35;timing.stream('text_start');clock=70;timing.modelEnd();timing.toolStart('outer','write');clock=80;timing.toolStart('nested','read','outer');clock=95;timing.wait('question','question/requested',true);clock=100;timing.toolEnd('outer');clock=115;timing.wait('question','question/requested',false);clock=120;timing.toolEnd('nested');clock=130;const end=timing.end();return {start,end,records:[row(1,'step/start',start),{...row(2,'model/request',{}),id:'request-one'},row(3,'step/end',end)]};}
+test('completed SDK clocks retain stream buckets, overlapping/nested tool intervals and known UI wait windows',()=>{
+ const f=measured(),summary=timingSummary(f.end);assert(summary);const result=foldTimingRecords(f.records);assert.equal(result.timing.wallMs,130);assert.equal(result.timing.ttftMs,15);assert.equal(result.timing.genMs,50);assert.equal(result.timing.reasoningMs,15);assert.equal(result.timing.textMs,35);assert.equal(result.timing.toolsMs,70);assert.equal(result.timing.toolCalls,2);assert.equal(result.coverage.interactionMs,20);assert.equal(result.requestActiveMs.get('request-one'),110);assert.equal(result.coverage.legacyRequests,0);
+ assert.equal(result.spans.reduce((sum,s)=>sum+s.end-s.start,0),130,'strip tiles the elapsed window once');assert.equal(result.spans.filter(s=>s.kind==='tools').reduce((sum,s)=>sum+s.end-s.start,0),50,'nested/parallel tool windows paint their union');assert.deepEqual(result.timing.tools.read,{calls:1,ms:40});assert(summary.tools[1].parentId==='outer');
+});
+test('missing, duplicated, mismatched and superseded step boundaries never fabricate complete totals',()=>{
+ const f=measured();for(const rows of [[f.records[0]],[f.records[2]],[...f.records,f.records[2]],[...f.records,{...row(4,'step/incomplete',f.start)}],[f.records[0],{...f.records[2],turnId:'foreign'}]])assert.equal(foldTimingRecords(rows).timing,null);
+ const ledger=new StepTiming(()=>1,()=> 'held');assert.equal(ledger.end(),undefined);ledger.begin();assert.equal(ledger.abandon('interrupted').boundary,'missing-public-sdk-turn-end');assert.equal(ledger.end(),undefined);
+ assert.equal(foldTimingRecords([{...row(1,'model/request',{}),id:'legacy'}]).coverage.legacyRequests,1);assert.equal(foldTimingRecords([]).timing,null);
+});
+test('malformed, huge and unsafe summaries refuse; sanitized metadata drops private extra fields',()=>{
+ const f=measured();for(const mutate of [x=>x.wallMs=Infinity,x=>x.models[0].firstDelta=10000,x=>x.models[0].blocks[0].start=-1,x=>x.tools[0].end=10000,x=>x.waits=Array(513).fill(x.waits[0]),x=>x.coverage.dropped=-1]){const copy=structuredClone(f.end);mutate(copy);assert.equal(timingSummary(copy),null);}
+ const copy=structuredClone(f.end);copy.privateQuestion='AUTHORED_PRIVATE_QUESTION';copy.models[0].privatePayload='AUTHORED_PRIVATE_PAYLOAD';const compact=insightMetadata(row(3,'step/end',copy));assert(!JSON.stringify(compact).includes('AUTHORED_PRIVATE'));const folded=foldInsightRecords(f.records.map(insightMetadata).filter(Boolean));assert.equal(folded.stepTiming.timing.wallMs,130);
+});
+test('a delta-only model retains unsplit timing without pretending to have stream block attribution',()=>{
+ let clock=0;const ledger=new StepTiming(()=>clock,()=> 'plain'),start=ledger.begin();clock=10;ledger.modelStart('plain-request');clock=20;ledger.stream('text_delta');clock=50;ledger.modelEnd();clock=60;const result=foldTimingRecords([row(1,'step/start',start),row(2,'step/end',ledger.end())]);assert.equal(result.timing.genMs,30);assert.equal(result.timing.textMs,undefined);assert.equal(result.spans,undefined);
+ const rich=foldTimingRecords(measured().records).timing,merged=mergeTimings([rich,result.timing]);assert.equal(merged.textMs,undefined,'mixed logs do not claim a complete split');
+});
+test('metadata window bounds and lost hooks remain explicit rather than retaining an old request identity',()=>{
+ let clock=0;const ledger=new StepTiming(()=>clock,()=> 'bounded',4);ledger.begin();ledger.modelStart('old');clock=1;ledger.modelStart('new');ledger.stream('text_start');clock=2;ledger.modelEnd();for(let i=0;i<20;i++){ledger.toolStart('tool-'+i,'read');ledger.toolEnd('tool-'+i);}clock=4;const value=ledger.end();assert(value.coverage.dropped>0);assert.equal(value.models[0].requestId,'new');assert(value.models.length+value.tools.length+value.waits.length+value.models.reduce((sum,m)=>sum+m.blocks.length,0)<=4);
+ const bytes=new StepTiming(()=>clock,()=> 'byte-bound');bytes.begin();for(let i=0;i<512;i++){bytes.toolStart('id-'+i,'\n'.repeat(256));bytes.toolEnd('id-'+i);}const bounded=bytes.end();assert(bounded.coverage.dropped>0);assert(Buffer.byteLength(JSON.stringify(bounded))<8192,'metadata summary remains smaller than 8 KiB even for escaped names');
+});
+test('interaction diagnostics identify the actual delegated owner and settle once without contents or behavior changes',async()=>{
+ const frames=[],events=[],interactions=new Interactions((sid,frame)=>frames.push({sid,frame}),()=>true,1000,15000,(...event)=>events.push(event));const pending=interactions.ask('parent','question/requested',{questions:[{question:'AUTHORED_PRIVATE'}]},undefined,'worker');const id=frames[0].frame.rpcId;assert.deepEqual(events[0],['worker',id,'question/requested',true]);interactions.answer(id,{answer:'accepted'},'parent');assert.deepEqual(await pending,{answer:'accepted'});assert.deepEqual(events[1],['worker',id,'question/requested',false]);assert(!JSON.stringify(events).includes('AUTHORED_PRIVATE'));assert.throws(()=>interactions.answer(id,{},'parent'),/already resolved/);
+ const failing=new Interactions((_sid,frame)=>frames.push({frame}),()=>true,1000,15000,()=>{throw Error('Diagnostic failure');});const safe=failing.ask('ordinary','approval/requested',{});failing.cancel('ordinary');assert.equal(await safe,undefined);
+});

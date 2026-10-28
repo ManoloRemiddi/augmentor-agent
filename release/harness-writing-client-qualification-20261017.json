@@ -1,0 +1,154 @@
+{
+  "schema": "augmentor-harness-writing-client-qualification/1",
+  "date": "2026-10-17",
+  "runtimeSourceBaseRef": "bfe8dc94ba907d266697cd36cf7b34de518a7f43",
+  "productCodeChanged": false,
+  "scope": "MX Linux, authored data and real executable client artifacts only; not live shared-store adoption",
+  "installedArtifact": {
+    "releaseId": "20261017-095821-fb78d6df",
+    "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+    "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+    "inventoryEntries": 24710,
+    "compiledFiles": 1120
+  },
+  "source": {
+    "pass": 2,
+    "fail": 0,
+    "skip": 0
+  },
+  "exactInstalled": {
+    "pass": 2,
+    "fail": 0,
+    "skip": 0
+  },
+  "actualOlderNativeWithMatchedBrowserAndServices": {
+    "pass": 2,
+    "fail": 0,
+    "skip": 0,
+    "writingAndManagedServiceRestartPass": true,
+    "ownColdHelperQualified": false
+  },
+  "writingCoverage": [
+    "Real inactive Qt Controller task dispatcher and real library widgets, no business-client mocks",
+    "Actual loaded Browser extension and Native Messaging host, no manifest/version spoof",
+    "Original Harness Plugins/Prompt Library UI",
+    "Native to Browser to Harness edits and explicit reload",
+    "Stable prompt identity across rename and cold reopening",
+    "Shared improvement instructions, stale prompt and instruction refusal, unsaved draft preserved",
+    "Authored composer and native conversation history unchanged",
+    "All warm clients use one prompt-service PID; controlled stop/restart verifies a different PID",
+    "Zero provider requests and no ignored browser/CDP/HTTP errors"
+  ],
+  "coldOwnership": {
+    "current": {
+      "actualClientHelperProvenanceVerified": true,
+      "duplicateAdmitted": false,
+      "qualified": true,
+      "ipNetworkSyscalls": 0
+    },
+    "olderNegativeControl": {
+      "actualClientHelperProvenanceVerified": true,
+      "duplicateAdmitted": true,
+      "qualified": false,
+      "ipNetworkSyscalls": 0
+    },
+    "onlyOwnedFixtureProcessesSignalled": true
+  },
+  "olderPackagedBrowser": {
+    "conclusion": "Unqualified: original settings remain Connecting and Prompt Library does not mount, including after supported Pi selection. Cause unresolved.",
+    "loadedOwnerExtensionIdentityEstablished": false,
+    "negativeLogRetainedPrivately": true
+  },
+  "driverCorrections": [
+    "Actual Controller task dispatch added to preview Window; no monitor bind or voice timers",
+    "Cold readiness expects renamed row",
+    "Explicit reselect/refresh after the real Native Save resets its form",
+    "Each actual page brought to foreground before frame-based pointer preparation",
+    "Extension runtime/storage readiness checked; supported harness/select dispatched once before private Native Messaging gate opens"
+  ],
+  "hostedBaseRef": {
+    "sourceRef": "bfe8dc94ba907d266697cd36cf7b34de518a7f43",
+    "validateRun": 39028318811,
+    "debianJob": 117383848493,
+    "conclusion": "failure before public packaging",
+    "tests": 2186,
+    "pass": 2132,
+    "fail": 1,
+    "skip": 53,
+    "failedCase": "Archived Fleet nested empty-child inspector is not observed pinned, v2 bundle.",
+    "focusedLocalFleetUnchanged": {
+      "pass": 3,
+      "fail": 0,
+      "causeResolved": false
+    },
+    "sdkRun": 39028318760,
+    "linuxJob": 117383601590,
+    "linuxConclusion": "success",
+    "macConclusion": "failure",
+    "windowsConclusion": "cancelled",
+    "wholeWorkflowPass": false
+  },
+  "ownerInstalledUpdated": false,
+  "ownerModelRequests": 0,
+  "ownerProjectsTransferred": 0,
+  "privateSourceCopied": false,
+  "testFilesSha256": {
+    "tests/harness-writing-peers-chromium.test.mjs": "44fcaad41a72e525f243c806641432b2764cb3d8163afb5db01c42f358aa6fec",
+    "tests/fixtures/native-writing-ui.py": "72a4307e9804012ec017e6f980fa2d9cf21a4b3bb6a4928b241a88a17122c22f",
+    "tests/fixtures/native-writing-cold.py": "289d5be3bd315b1f98a9fd50c0de97ec2b48de3d15120e86d68ab62c2a13c134"
+  },
+  "privateEvidenceLogSha256": {
+    "harness-writing-peers-final-source-20261017.log": "25187abb579b3dec1022a0e9c0279b5382df6fc9c3f1790280fbad085f554608",
+    "harness-writing-peers-final-installed-20261017.log": "d184c77041cba83a972f2ac8337803eae1dee951582fcfc054760d92c1ace371",
+    "harness-writing-legacy-native-matched-browser-20261017.log": "e1a57eb2d7484549e4bfaeb4c6dc307fd1d2bb1dc90638f26e266e51b0a7ab0c",
+    "harness-writing-peers-legacy-selected-20261017.log": "385165e723cfd60a6b4be3b58c3f89f73876f0c3752cb5614b616f0cc579f0b8",
+    "harness-fleet-current-source-20261017.log": "5fdd4968600de52f03bfa931ad168c695b151292e22a516fc89e81fbcf7d29c6"
+  },
+  "remaining": [
+    "Matching deployed Browser/Native/companions with old callers stopped; old cold helper must not own adopted store",
+    "Dedicated data layout and paired launchers, fresh full cold backups and guarded immutable deployment/rollback",
+    "Existing production identity/banks/configuration recall, outage, restart and installed cross-surface adoption",
+    "Owner pilot feedback before further project transfers; explicit exclusions remain in DSH",
+    "Resolve full-suite Fleet failure; public distribution, broader parity and quality gates remain; voice and later OS deferred"
+  ],
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  }
+}

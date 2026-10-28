@@ -1,0 +1,28 @@
+{
+  "schema": "augmentor-quickjs-artifact/1",
+  "files": {
+    "BUILD.json": "1c5e8dd66ddb079ab4b69185b04d411db79aa3fb954696d6b48b7e1846de09ed",
+    "quickjs.wasm": "79505123d7f65bd01202f41b40c2166952454950573402ef23b0bbf557775c82",
+    "sources/llvm-builtins.tar.gz": "56a18a20ccd53c978dedf39eb34011338853d5d4bcf6e41a7db5c6586b15ea06",
+    "sources/quickjs-ng.tar.gz": "a62cf1ff7d6d2f82b90a2d247a57e9eb56b81c03feb1f372a53923426e358cb0",
+    "sources/quickjs-wasi.tar.gz": "cb3a2e58fd7187104b9294962e205c28433ecb7653d75771a35ef98dfdfb8484",
+    "sources/wasi-libc.tar.gz": "d12a1568d9394e693e6b189277ba70446f96b81a4790c515427865a0d5412372",
+    "third-party/LLVM-LICENSE.txt": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+    "third-party/build-log.txt": "7b60194fb66427848a25325723193562b5dbb2b9dd14b80ba5714a7fd56dba95",
+    "third-party/cloudlibc-BSD-2.txt": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
+    "third-party/compiler-rt-LICENSE.txt": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+    "third-party/components.json": "889668180e23ab36fbbc6e9177fbaf8e68a881d376d0ce2f674ac68845907cfe",
+    "third-party/dlmalloc-malloc.c": "9e7ce51d813331ae87ef235f6ca2d5ce2167692e30bb51a173513e3754a67f8f",
+    "third-party/emmalloc.c": "c5b52c424c9101ba9b2d1338997e1758c9fdf369ab0450d9b72e9544fe482166",
+    "third-party/link-extraction.tsv": "69b2e2fe937dfac97a1ff9e990f68cf739684f43ba32ef2c22cdbc330e260427",
+    "third-party/musl-COPYRIGHT.txt": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+    "third-party/musl-fts-BSD-3.txt": "55af87e4017668f54467a3380e7ebbac5e672d8c763bfe95e6fc882a6fdc4046",
+    "third-party/quickjs-ng-MIT.txt": "96f73f9d2a16c21a36b418f06073be26e7d6d5e7c1bc99756b21a4f2c74ef171",
+    "third-party/quickjs-wasi-MIT.txt": "f7735da3b2531ddf451937117343cfadb853fd8054b499e7a70695dc57ffd184",
+    "third-party/wasi-libc-APACHE-LLVM.txt": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+    "third-party/wasi-libc-APACHE.txt": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "third-party/wasi-libc-LICENSE.txt": "2711a8b5a5cdfef0e639f96c1aca12ae23d7d64a02d0507f1bdf14d2b27bbc3a",
+    "third-party/wasi-libc-MIT.txt": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "third-party/wasm-abi.json": "02dca2b6fb0d218fd384b951e1ee6cbb7772f67a5ca20265ec6f74e0f60d5615"
+  }
+}

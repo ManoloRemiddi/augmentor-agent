@@ -12,6 +12,7 @@ class Composer(QTextEdit):
     submit_requested = Signal()
     improve_requested = Signal()
     improvement_changed = Signal()
+    improvement_cancelled = Signal(str)
     improvement_result = Signal(str, object, str)
 
     def __init__(self, parent=None):
@@ -67,9 +68,11 @@ class Composer(QTextEdit):
         return self.improvement_id
 
     def cancel_improvement(self):
+        identity=self.improvement_id if self.improving else None
         self.improvement_id=None;self.improving=False
         if self.roll:self.roll.timer.stop();self.roll.hide();self.roll.deleteLater();self.roll=None
         self.refresh_improve_button();self.improvement_changed.emit()
+        if identity:self.improvement_cancelled.emit(identity)
 
     def receive_improvement(self,identity,result,error):
         if identity!=self.improvement_id or not self.improving:return

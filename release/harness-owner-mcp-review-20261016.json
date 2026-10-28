@@ -1,0 +1,93 @@
+{
+  "schema": "augmentor-harness-owner-mcp-review/1",
+  "date": "2026-10-16",
+  "applicationRef": "1633e00f75f43f9efb88ec73bfd4ea8f3246a91d",
+  "releaseId": "20261016-220504-b91df2e4",
+  "artifactSha256": "2164f1ec0e5f5bc0aa8b100ad24d322ba1bf83d8829e7de7f5ee80a474aa92b1",
+  "sealedEntries": 24615,
+  "compiledFiles": 1102,
+  "scope": "Private unselected MX original MCP controls and existing-connection configuration adoption",
+  "qualification": {
+    "sourceCheckBuild": true,
+    "sourceNodePass": 28,
+    "exactSealedNodePass": 28,
+    "nodeFiles": 12,
+    "chromiumFiles": 3,
+    "offscreenQtCases": 1,
+    "sourcePythonPass": 41,
+    "exactSealedPythonPass": 41,
+    "workers": 2,
+    "skips": 0,
+    "failures": 0,
+    "savedOnOffVisibleInWebAndNativeSource": true,
+    "originalSettingsThemesAnd1280_640_420Containment": true,
+    "originalAndAdvancedMcpSettingsOAuthGuardsPass": true,
+    "nativeCoherentReloadAndSavedStatusPass": true,
+    "realExistingStdioMetadataOnly": {
+      "playwrightTools": 24,
+      "blenderTools": 26,
+      "playwrightInstalledPackageVersion": "0.0.79",
+      "playwrightDeclaredLicense": "Apache-2.0",
+      "playwrightAdvertisedVersion": "1.63.0-alpha-2026-08-05",
+      "blenderInstalledDistributionVersion": "1.0.3",
+      "blenderAdvertisedVersion": "1.30.0",
+      "blenderLicenseBoundary": "Existing external helper; earlier GPL source inspection; not bundled or copied by this pass"
+    },
+    "actualPlaywrightAuthoredLocalhostFlow": {
+      "independentClients": 2,
+      "toolCalls": 6,
+      "nonceAndCookieIsolationVerified": true,
+      "distinctOwnedPrivateTemporaryProfilesVerified": 2,
+      "persistentDefaultCollisionReproduced": true,
+      "explicitIsolatedModeRequired": true,
+      "sourceDshCookiesOrProfileCopied": false,
+      "userProjectsOrAccountsAffected": false
+    },
+    "actualOwnerGuiConsoleErrors": 0,
+    "actualOwnerGuiHttpFailures": 0,
+    "publicRedistributionQualified": false
+  },
+  "adoption": {
+    "guardedIdleOnlyApplicationUpdates": 2,
+    "coldBackupRegularFilesVerified": 410,
+    "coldProtectedInputsExactBeforeMcpConfiguration": 34,
+    "configurationBackedUpInputs": 34,
+    "configuredReviewProfiles": 2,
+    "mcpServersEach": 5,
+    "enabledStdioEach": [
+      "playwright",
+      "blender"
+    ],
+    "unreachableHttpStoredDisabledEach": [
+      "comfy",
+      "comfy_mx",
+      "unreal"
+    ],
+    "sourceTimeoutsConvertedMsToSecondsWithoutReduction": true,
+    "configurationActionsEach": 1,
+    "nativeAndDisplayMetadataAdded": 38,
+    "derivedDisplayCachesBoundChecksumsVerified": 4,
+    "oldAuthoritativeNativeAndDisplayPrefixesPreserved": true,
+    "otherOldInputsAndExecutionPoliciesPreserved": true,
+    "privateConfigurationAndManagementReceiptFilesAddedEach": 2,
+    "sharedPrompts": 12,
+    "capturedMemoryRecords": 19,
+    "pendingMemoryItems": 17,
+    "sharedEligibilityJobsSettingsAndEngineUnchanged": true,
+    "wikiStillEnabledNineSkillsAndSixteenFilesUnchanged": true,
+    "stableMenuRegistryRevision": 6,
+    "installedAgentSelectionAndEarlierPreviewUnchanged": true,
+    "ownerProjectToolOrModelWorkSubmitted": false,
+    "additionalRealDshProjectsTransferred": 0
+  },
+  "limits": [
+    "On is saved configuration; protocol and tool discovery do not prove Blender scene health or every application operation",
+    "Both Comfy and Unreal endpoints were unreachable and remain off; no application/GPU service was started",
+    "Playwright uses isolated temporary contexts and private output/TMPDIR, preserving DSH profile; independent logins are required and browser state is not persisted across restarts",
+    "Read-only/approval/full-access policy remains unchanged; no new read-only tool grants are inferred from server annotations",
+    "Authored localhost browser calls are separate from the two owner profile imports, which execute zero MCP tools/model requests",
+    "Source profiles contain private configuration; public evidence excludes paths, endpoints, credentials, tool output and user data",
+    "Native Qt label source and packaged/offscreen proof do not update the selected installed Agent; later OSes/voice remain deferred",
+    "Owner pilot feedback, broader MCP/application workflows, migration, hosted/public distribution and DSH retirement remain open"
+  ]
+}

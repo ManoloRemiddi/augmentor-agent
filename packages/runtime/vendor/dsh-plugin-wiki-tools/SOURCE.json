@@ -1,0 +1,141 @@
+{
+  "schema": "augmentor-public-source-selection/1",
+  "package": "dsh-plugin-wiki-tools",
+  "version": "0.14.0",
+  "repository": "https://github.com/Lion-1209/dsh-plugin-wiki-tools",
+  "reportedGitHead": "85de359ccd9af268fe2bd7aa3069d0aaef00259f",
+  "npmTarball": "https://registry.npmjs.org/dsh-plugin-wiki-tools/-/dsh-plugin-wiki-tools-0.14.0.tgz",
+  "npmTarballSha256": "f32e5a9b27b9fa1434708fe1d9a18d5076065cd4f26bde94bc454a514e15efa5",
+  "license": "MIT",
+  "scope": "Public npm preferred JavaScript/Markdown source; the matching public Git snapshot is recorded separately. Published npm bytes, including preserved CRLF, are the exact selected inputs. Original operation bodies and attribution are retained; Pi loader and bounded vault IO are authored bindings.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "3297076bb9657fab01387fe6cda1cb68fc40f6ab75d499f10ea6e4252e817dcf",
+      "originalSha256": "3297076bb9657fab01387fe6cda1cb68fc40f6ab75d499f10ea6e4252e817dcf",
+      "modified": false
+    },
+    {
+      "path": "README.md",
+      "sha256": "e7d950281801f2350decdcd058f2a7891885b3dd7956e58973f87f6daf97cebe",
+      "originalSha256": "e7d950281801f2350decdcd058f2a7891885b3dd7956e58973f87f6daf97cebe",
+      "modified": false
+    },
+    {
+      "path": "cordis.patch.yml",
+      "sha256": "5a044aa8f6fc14ddd7fc9ae163fb87ebcb609200438c24812e1c3ea3082ebdec",
+      "originalSha256": "5a044aa8f6fc14ddd7fc9ae163fb87ebcb609200438c24812e1c3ea3082ebdec",
+      "modified": false
+    },
+    {
+      "path": "index.js",
+      "sha256": "172a8823d8ba79f8efdd074af55740d6a7ea8ec0c70619e39032e576e0fdbb7b",
+      "originalSha256": "d50f5830642fe0b23f30c2c577fb88c721c72e336d1f423e973a79bd08de2f20",
+      "modified": true
+    },
+    {
+      "path": "lib/bm25.js",
+      "sha256": "6bf60cfaac0d598332b28d6681094c4eee90b86663429194d9d5f91128995af3",
+      "originalSha256": "6bf60cfaac0d598332b28d6681094c4eee90b86663429194d9d5f91128995af3",
+      "modified": false
+    },
+    {
+      "path": "lib/lint.js",
+      "sha256": "f2b5bbc93f28c8474df2df7ee8d6724e44bc099e186474dceb4cd385a3bb24eb",
+      "originalSha256": "e0047f91791c1de48435301f97a6effee13d5316173c6499fae7ff40cfa723c3",
+      "modified": true
+    },
+    {
+      "path": "lib/scaffold.js",
+      "sha256": "382769a027118c1d8115933b9142baa0c258fb4f8a636eb66e44db7d9d39789e",
+      "originalSha256": "a2844e9035910619788cbfc8a136849081bc23347540cb091d50b2a9ddd429b9",
+      "modified": true
+    },
+    {
+      "path": "lib/search.js",
+      "sha256": "5643966795fb9e0c149a30f7976abcf5e2a1ddd1d7af702f848934c2b750d0da",
+      "originalSha256": "0252d0984f092672ba1af8a83ac75caede07fc1d9235d8d1913df127ac1f0f44",
+      "modified": true
+    },
+    {
+      "path": "lib/vault.js",
+      "sha256": "958f61235c3eb57a4ea73a3958bdc4e7661ddb29464ca2271f35994dde7cc423",
+      "originalSha256": "c274e3ec48e49b9fc9847782f280c5902253f50e8a141b912b2586daba88ae4f",
+      "modified": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "fd9fb64eaa9400e69a0b14610985a2517bbe319674c79203050ab90e41265c5b",
+      "originalSha256": "fd9fb64eaa9400e69a0b14610985a2517bbe319674c79203050ab90e41265c5b",
+      "modified": false
+    },
+    {
+      "path": "original/index.js",
+      "sha256": "d50f5830642fe0b23f30c2c577fb88c721c72e336d1f423e973a79bd08de2f20",
+      "originalSha256": "d50f5830642fe0b23f30c2c577fb88c721c72e336d1f423e973a79bd08de2f20",
+      "modified": false,
+      "role": "original-snapshot"
+    },
+    {
+      "path": "original/lib/lint.js",
+      "sha256": "e0047f91791c1de48435301f97a6effee13d5316173c6499fae7ff40cfa723c3",
+      "originalSha256": "e0047f91791c1de48435301f97a6effee13d5316173c6499fae7ff40cfa723c3",
+      "modified": false,
+      "role": "original-snapshot"
+    },
+    {
+      "path": "original/lib/scaffold.js",
+      "sha256": "a2844e9035910619788cbfc8a136849081bc23347540cb091d50b2a9ddd429b9",
+      "originalSha256": "a2844e9035910619788cbfc8a136849081bc23347540cb091d50b2a9ddd429b9",
+      "modified": false,
+      "role": "original-snapshot"
+    },
+    {
+      "path": "original/lib/search.js",
+      "sha256": "0252d0984f092672ba1af8a83ac75caede07fc1d9235d8d1913df127ac1f0f44",
+      "originalSha256": "0252d0984f092672ba1af8a83ac75caede07fc1d9235d8d1913df127ac1f0f44",
+      "modified": false,
+      "role": "original-snapshot"
+    },
+    {
+      "path": "original/lib/vault.js",
+      "sha256": "c274e3ec48e49b9fc9847782f280c5902253f50e8a141b912b2586daba88ae4f",
+      "originalSha256": "c274e3ec48e49b9fc9847782f280c5902253f50e8a141b912b2586daba88ae4f",
+      "modified": false,
+      "role": "original-snapshot"
+    },
+    {
+      "path": "index.d.ts",
+      "sha256": "a67cb2b68e85d4f162715ffb0c26cdc92fdf5ec59decb27bcc875d8ff6451f83",
+      "modified": false,
+      "role": "authored-binding-declaration",
+      "license": "LicenseRef-Augmentor-MIT-Resale-1.0"
+    },
+    {
+      "path": "lib/vault.d.ts",
+      "sha256": "abd712f566680fd80c078640257571ecdc699dedb1962cbd5d26d62264d4b4a5",
+      "modified": false,
+      "role": "authored-binding-declaration",
+      "license": "LicenseRef-Augmentor-MIT-Resale-1.0"
+    }
+  ],
+  "gitVerification": {
+    "commit": "85de359ccd9af268fe2bd7aa3069d0aaef00259f",
+    "archiveUrl": "https://codeload.github.com/Lion-1209/dsh-plugin-wiki-tools/tar.gz/85de359ccd9af268fe2bd7aa3069d0aaef00259f",
+    "archiveSha256": "57820d200bb957ed8aae567043340479b47b00ce45626dbd4c9f24e2baa6d332",
+    "matchingFiles": [
+      "README.md",
+      "package.json",
+      "LICENSE",
+      "cordis.patch.yml",
+      "index.js",
+      "lib/search.js",
+      "lib/vault.js",
+      "lib/scaffold.js",
+      "lib/lint.js",
+      "lib/bm25.js"
+    ],
+    "differentOrMaterializedFiles": [],
+    "npmFilesAbsentFromCheckout": []
+  }
+}

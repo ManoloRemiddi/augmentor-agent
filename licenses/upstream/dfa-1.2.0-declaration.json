@@ -1,0 +1,12 @@
+{
+  "package": "dfa",
+  "version": "1.2.0",
+  "upstreamCommit": "3f5e603e5082caedabefefdf53e8a6ca3111e966",
+  "source": "https://github.com/devongovett/dfa/tree/3f5e603e5082caedabefefdf53e8a6ca3111e966",
+  "licenseDeclaration": "MIT",
+  "author": "Devon Govett <devongovett@gmail.com>",
+  "packageJsonSha256": "96c0ce3cc17b34aabd58fd442157766d9e244cba735e54ee4fe10d7841f0460c",
+  "readmeSha256": "30bd445925aa53205ff7f9afa6a43e21358fab656e471df6e028431aefc426c7",
+  "readmeLicenseSection": "## License\n\nMIT",
+  "review": "No root LICENSE in published package or recorded upstream commit. Canonical SPDX MIT terms supplied separately; public copyright/notice sufficiency remains unqualified."
+}

@@ -81,10 +81,12 @@ class InferenceBudget:
         with self.lock:
             return any(s == session and expires > self.clock() for (s, _), (expires, _) in self.leases.items())
 
-    def pause(self, paused):
+    def pause(self, paused, expected=None):
         if type(paused) is not bool:
             raise ValueError('Invalid processing pause setting')
         with self.lock, self.connect() as db:
+            if expected is not None and self.paused != expected:
+                raise ValueError('Memory processing changed. Refresh its status before choosing again.')
             self.paused = paused
             if paused and self.active:
                 self.active['cancelled'] = True

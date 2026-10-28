@@ -15,8 +15,8 @@ export function voicePython(root, env=process.env){
   return 'python3'
 }
 export class BrowserVoice {
-  constructor({ticket,submit,notify,spawnWorker=spawn,root=fileURLToPath(new URL('../../../',import.meta.url))}){
-    Object.assign(this,{ticket,submit,notify,spawnWorker,root});this.active=null
+  constructor({ticket,submit,release,notify,spawnWorker=spawn,root=fileURLToPath(new URL('../../../',import.meta.url))}){
+    Object.assign(this,{ticket,submit,release,notify,spawnWorker,root});this.active=null
     this.workers=new Set();this.operations=new Set()
   }
   get busy(){return Boolean(this.active||this.workers.size||this.operations.size)}
@@ -52,7 +52,8 @@ export class BrowserVoice {
     })
     this.write(active,{action:'prepare',handsFree})
     // Return the lease immediately, so release/cancel/heartbeats work during preparation.
-    void this.track(Promise.resolve().then(()=>this.ticket(sessionId))).then(ticket=>{
+    active.preparation=this.track(Promise.resolve().then(()=>this.ticket(sessionId,id)))
+    void active.preparation.then(ticket=>{
       if(this.active!==active)return
       if(ticket.protocol!=='resonant-voice/1'||ticket.sessionId!==sessionId||!/^ws:\/\/127\.0\.0\.1:\d+\/voice$/.test(ticket.url))throw Error('Invalid voice endpoint')
       this.write(active,{action:'start',ticket})
@@ -80,11 +81,18 @@ export class BrowserVoice {
     this.write(active,{action:'submission',result:{...result,id}})
   }
   close(active=this.active){
-    if(!active||this.active!==active)return active?.closed
+    if(!active||this.active!==active)return active?.closing??active?.closed
     this.write(active,{action:'close'});this.active=null
+    // Cancel setup now, then retire a ticket that could have been queued before
+    // close reached the Host. No next lease starts until both phases settle.
+    const release=async()=>{try{await this.release(active.sessionId,active.id)}catch{this.notify({method:'voice.event',params:{id:active.id,sessionId:active.sessionId,type:'error',message:'Voice closure was not confirmed. Check the connection before reopening.'}})}}
+    const remote=this.release?this.track((async()=>{
+      await Promise.allSettled([release(),active.preparation]);await release()
+    })()):Promise.resolve()
+    active.closing=Promise.all([active.closed,remote]).then(()=>{})
     active.worker.stdin.end()
     this.notify({method:'voice.event',params:{id:active.id,sessionId:active.sessionId,type:'state',state:'closed',closed:true,status:'Voice off'}})
-    return active.closed
+    return active.closing
   }
 }
 

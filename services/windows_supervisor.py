@@ -75,7 +75,7 @@ def _spawn_owner(root):
     with os.fdopen(descriptor(owner/'supervisor.log', writable=True, create=True), 'a', encoding='utf-8') as log:
         process = subprocess.Popen([runtime_python(root), '-I', '-Xutf8', '-B',
             str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
-            stdout=log, stderr=log, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            stdout=log, stderr=log, cwd=str(root), close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
     deadline = time.monotonic()+15
     while time.monotonic() < deadline:
         try: return request('status', root=root)
@@ -83,6 +83,18 @@ def _spawn_owner(root):
             if process.poll() is not None: break
             time.sleep(.1)
     raise ValueError('The Augmentor background owner could not start. Private diagnostics were preserved.')
+
+
+def restore_selected(root=ROOT):
+    """Restore the previously selected owned DSH; never provision a profile."""
+    from dsh.setup import current
+    state=managed_directory()
+    try:selected=current()
+    except AttributeError as error:raise ValueError('Saved DSH selection is invalid; its profile was preserved.') from error
+    if not isinstance(selected,dict):raise ValueError('Saved DSH selection is invalid; its profile was preserved.')
+    if selected.get('home')!=str(state/'home') or not (state/'home').is_dir():return None
+    if not ManagedAgent(root,state).owned():return None
+    return request('start-dsh',root=root)
 
 
 def ensure_companion(name, root=ROOT):

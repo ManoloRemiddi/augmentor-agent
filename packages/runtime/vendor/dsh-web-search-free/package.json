@@ -1,0 +1,77 @@
+{
+  "name": "dsh-web-search-free",
+  "version": "1.6.0",
+  "description": "Free web search plugin for dsh supporting firecrawl and tavily",
+  "keywords": [
+    "dsh-plugin",
+    "web-search"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MochiNek0/dsh-web-search-free.git"
+  },
+  "homepage": "https://github.com/MochiNek0/dsh-web-search-free#readme",
+  "bugs": {
+    "url": "https://github.com/MochiNek0/dsh-web-search-free/issues"
+  },
+  "dsh": {
+    "name": "web-search-free",
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-settings-plugins"
+      ]
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "koishi": {
+    "description": "免费 Web Search 与内容抓取 (支持多引擎轮询 fallback)"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json && tsc -p tsconfig.client.json && node wrap-client.cjs",
+    "check": "node scripts/check-package.cjs",
+    "prepublishOnly": "pnpm run build && pnpm run check"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.3"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/schemastery": "^3.18.3",
+    "@types/node": "^18.0.0",
+    "@types/react": "^19.2.18",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  }
+}

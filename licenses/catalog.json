@@ -107,6 +107,88 @@
       "file": "upstream/codex-0.159.2-notice.txt",
       "url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/NOTICE",
       "sha256": "9d71575ecfd9a843fc1677b0efb08053c6ba9fd686a0de1a6f5382fd3c220915"
+    },
+    "pi-1.1.0": {
+      "file": "upstream/pi-1.1.0.txt",
+      "url": "https://raw.githubusercontent.com/earendil-works/pi/abe508e1b89912adde45528136c3221eb69acdd7/LICENSE",
+      "sha256": "0457f5bcec3b3b211605dfb5d1a49042fd638f3686a410fe099c24a25af13c48"
+    },
+    "esbuild-0.28.2": {
+      "file": "upstream/esbuild-0.28.2.txt",
+      "url": "https://raw.githubusercontent.com/evanw/esbuild/609683d892977362a0f99026cb74b96263d728a9/LICENSE.md",
+      "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681"
+    },
+    "esbuild-0.28.2-xxhash": {
+      "file": "upstream/esbuild-0.28.2-xxhash.txt",
+      "url": "https://raw.githubusercontent.com/evanw/esbuild/609683d892977362a0f99026cb74b96263d728a9/internal/xxhash/LICENSE.txt",
+      "sha256": "f566a9f97bacdaf00d9f21dd991e81dc11201c4e016c86b470799429a1c9a79c"
+    },
+    "go-1.26.5": {
+      "file": "upstream/go-1.26.5.txt",
+      "url": "https://raw.githubusercontent.com/golang/go/go1.26.5/LICENSE",
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "proxy-agent-negotiate-1.1.0": {
+      "file": "upstream/proxy-agent-negotiate-1.1.0.txt",
+      "url": "https://raw.githubusercontent.com/TooTallNate/proxy-agents/4813885d3f4e2ff837878ceffdba656a71dc31f0/packages/proxy-agent/LICENSE",
+      "sha256": "8d8c55319c7729d57be811c747452636688d54f19701ee0752b6b15ad3771d9a",
+      "note": "The 1.1.0 negotiate wrapper declares MIT and Nathan Rajlich as author but omits LICENSE. Preserve the same monorepo author's complete MIT text from packages/proxy-agent at this inspected source ref."
+    },
+    "dsh-context-0.68.1": {
+      "file": "upstream/dsh-context-0.68.1.txt",
+      "url": "https://raw.githubusercontent.com/bowenliang123/dsh-context/2c8095c34da3fcef729a01437d2df65c83e08499/LICENSE",
+      "sha256": "919857728c4e1d0f76be03af00437d9910c943f883d04c8c58a6a0cb1c3225b0",
+      "note": "Original Apache-2.0; selected Context dashboard copied with original attribution and prominent adaptation notices. It is not MIT or relicensed under Augmentor terms."
+    },
+    "saxes-6.0.0": {
+      "file": "upstream/saxes-6.0.0.txt",
+      "url": "https://raw.githubusercontent.com/lddubeau/saxes/211fa0ebec9b628affc09219199639887174bfc3/LICENSE",
+      "sha256": "0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e"
+    },
+    "koffi-3.1.1": {
+      "file": "upstream/koffi-3.1.1.txt",
+      "url": "https://github.com/Koromix/koffi/tree/v3.1.1",
+      "sha256": "22bcbbbacd739b026a8dc484f62a31484ce4c4e31f3408b60b29b4e41d62b290"
+    },
+    "canonical-spdx-mit": {
+      "file": "upstream/canonical-spdx-mit.txt",
+      "url": "https://spdx.org/licenses/MIT.html",
+      "sha256": "bfdc2f417a23caae94d9cdb1e561e64faf3118ede32f19055a773722a45d6a82"
+    },
+    "brotli-1.3.3-declaration": {
+      "file": "upstream/brotli-1.3.3-declaration.json",
+      "url": "https://github.com/devongovett/brotli.js/tree/e36051345f6d27a56e5f39ea70d2f789b8574046",
+      "sha256": "943917da57088e164b395064df384f442e32d8a1d320a885ce26a166a4291086"
+    },
+    "dfa-1.2.0-declaration": {
+      "file": "upstream/dfa-1.2.0-declaration.json",
+      "url": "https://github.com/devongovett/dfa/tree/3f5e603e5082caedabefefdf53e8a6ca3111e966",
+      "sha256": "fc1409f289e26b975052bf9b9492402e99502be536effc43030a13f6391ae28a"
+    },
+    "fontkit-2.0.4-declaration": {
+      "file": "upstream/fontkit-2.0.4-declaration.json",
+      "url": "https://github.com/foliojs/fontkit/tree/fbf3b9ef21eebd219eb73e666faed573af0fba09",
+      "sha256": "e15a783fbf2e52de90c280ebab00b28a4af49e9305021a9a8b30c286f568f2be"
+    },
+    "brotli-1.3.3-decoder": {
+      "file": "upstream/brotli-1.3.3-decoder.json",
+      "url": "https://github.com/devongovett/brotli.js/tree/e36051345f6d27a56e5f39ea70d2f789b8574046/dec",
+      "sha256": "962628e530aff85b2503b6783545db6cbb19afcb7992d5438c8fc07d14f81769"
+    },
+    "apache-2.0-standard": {
+      "file": "upstream/apache-2.0-standard.txt",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "nodable-entities-3.1.0": {
+      "file": "upstream/nodable-entities-3.1.0.txt",
+      "url": "https://raw.githubusercontent.com/nodable/val-parsers/ac48e7ea591da372be023a481875c747535812b3/LICENSE",
+      "sha256": "750cb3fb6362804957ef52caaf9b5c824015be44d494637330d7cd8834d31d40"
+    },
+    "gpl-3.0": {
+      "file": "GPL-3.0.txt",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
     }
   },
   "overrides": {
@@ -176,13 +258,64 @@
     "@openai/codex@0.159.2-darwin-x64": "codex-0.159.2",
     "@openai/codex@0.159.2-darwin-arm64": "codex-0.159.2",
     "@openai/codex@0.159.2-win32-x64": "codex-0.159.2",
-    "@openai/codex@0.159.2-win32-arm64": "codex-0.159.2"
+    "@openai/codex@0.159.2-win32-arm64": "codex-0.159.2",
+    "@earendil-works/chord@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-agent-core@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-ai@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-codemode@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-coding-agent@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-mcp@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-telemetry@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-tui@1.1.0": "pi-1.1.0",
+    "@esbuild/aix-ppc64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/android-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/android-arm@0.28.2": "esbuild-0.28.2",
+    "@esbuild/android-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/darwin-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/darwin-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/freebsd-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/freebsd-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-arm@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-ia32@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-loong64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-mips64el@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-ppc64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-riscv64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-s390x@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/netbsd-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/netbsd-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/openbsd-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/openbsd-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/openharmony-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/sunos-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/win32-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/win32-ia32@0.28.2": "esbuild-0.28.2",
+    "@esbuild/win32-x64@0.28.2": "esbuild-0.28.2",
+    "@aws-sdk/credential-provider-http@3.972.75": "aws-sdk",
+    "@aws-sdk/credential-provider-login@3.972.80": "aws-sdk",
+    "@aws-sdk/nested-clients@3.997.47": "aws-sdk",
+    "proxy-agent-negotiate@1.1.0": "proxy-agent-negotiate-1.1.0",
+    "@img/sharp-libvips-linux-x64@1.3.4": "lgpl-3.0",
+    "saxes@6.0.0": "saxes-6.0.0",
+    "@koromix/koffi-linux-x64@3.1.1": "koffi-3.1.1",
+    "brotli@1.3.3": "canonical-spdx-mit",
+    "dfa@1.2.0": "canonical-spdx-mit",
+    "fontkit@2.0.4": "canonical-spdx-mit",
+    "@nodable/entities@3.1.0": "nodable-entities-3.1.0",
+    "@img/sharp-libvips-darwin-arm64@1.3.4": "lgpl-3.0"
   },
   "choices": {
     "json-schema@0.4.0": {
       "expression": "(AFL-2.1 OR BSD-3-Clause)",
       "selected": "BSD-3-Clause",
       "note": "The package LICENSE expressly offers either license; distribution selects BSD-3-Clause and retains the full original notice."
+    },
+    "dompurify@3.4.16": {
+      "expression": "(MPL-2.0 OR Apache-2.0)",
+      "selected": "Apache-2.0",
+      "note": "Original package expressly offers either licence. Browser distribution selects Apache-2.0 and retains the complete original LICENSE/copyright text."
     }
   },
   "additionalLicenses": {
@@ -191,7 +324,16 @@
     "@img/sharp-libvips-darwin-arm64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-darwin-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-x64@1.3.3": "LGPL-3.0-or-later",
-    "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later"
+    "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later",
+    "@img/sharp-libvips-linux-x64@1.3.4": "LGPL-3.0-or-later",
+    "@deepseek-ai/libreoffice-kit@0.1.5": "MPL-2.0",
+    "@deepseek-ai/libreoffice-kit-wasm@0.1.5": "MPL-2.0",
+    "@deepseek-ai/libreoffice-kit-darwin-arm64@0.1.3": "MPL-2.0",
+    "@img/sharp-libvips-darwin-arm64@1.3.4": "LGPL-3.0-or-later",
+    "@img/sharp-win32-x64@0.35.5": "Apache-2.0 AND LGPL-3.0-or-later",
+    "@img/sharp-win32-arm64@0.35.5": "Apache-2.0 AND LGPL-3.0-or-later",
+    "@deepseek-ai/libreoffice-kit-win32-x64@0.1.3": "MPL-2.0",
+    "@deepseek-ai/libreoffice-kit-win32-arm64@0.1.3": "MPL-2.0"
   },
   "additionalNotices": {
     "@openai/codex@0.159.2": [
@@ -216,10 +358,49 @@
       "codex-0.159.2-notice"
     ],
     "@img/sharp-win32-x64@0.35.4": [
-      "lgpl-3.0"
+      "lgpl-3.0",
+      "gpl-3.0"
     ],
     "@img/sharp-win32-arm64@0.35.4": [
-      "lgpl-3.0"
+      "lgpl-3.0",
+      "gpl-3.0"
+    ],
+    "brotli@1.3.3": [
+      "brotli-1.3.3-declaration",
+      "brotli-1.3.3-decoder",
+      "apache-2.0-standard"
+    ],
+    "dfa@1.2.0": [
+      "dfa-1.2.0-declaration"
+    ],
+    "fontkit@2.0.4": [
+      "fontkit-2.0.4-declaration"
+    ],
+    "@img/sharp-win32-x64@0.35.5": [
+      "lgpl-3.0",
+      "gpl-3.0"
+    ],
+    "@img/sharp-win32-arm64@0.35.5": [
+      "lgpl-3.0",
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-darwin-arm64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-darwin-x64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-linux-x64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-linux-arm64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-linux-x64@1.3.4": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-darwin-arm64@1.3.4": [
+      "gpl-3.0"
     ]
   },
   "packageNotices": {
@@ -228,6 +409,106 @@
     ],
     "@img/sharp-win32-arm64@0.35.4": [
       "README.md"
+    ],
+    "@img/sharp-win32-x64@0.35.5": [
+      "README.md"
+    ],
+    "@img/sharp-win32-arm64@0.35.5": [
+      "README.md"
     ]
+  },
+  "nestedPackageTexts": {
+    "@deepseek-ai/libreoffice-kit-wasm@0.1.5": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LICENSE": {
+        "sha256": "31c915ae5b7eafe51f06fc2537d2e7fefdee08e40d6b0d761d03d9f0fd58d660",
+        "role": "license"
+      },
+      "licenses/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      }
+    },
+    "@deepseek-ai/libreoffice-kit-darwin-arm64@0.1.3": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LibreOffice-MPL-2.0.txt": {
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "role": "license"
+      },
+      "licenses/LibreOffice-third-party.html": {
+        "sha256": "7527132c7368ce07be0796e6716d3cb53adecef76285e7d7394c7ccaf4f913f1",
+        "role": "notice"
+      },
+      "program/LibreOfficeDev.app/Contents/Resources/LICENSE": {
+        "sha256": "cf7c3ddc46aa5fc3344aec290e9300dd61b5fddec51548ae35dccbde92b2747b",
+        "role": "license"
+      },
+      "program/LibreOfficeDev.app/Contents/Resources/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      },
+      "sources/core-source.json": {
+        "sha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0",
+        "role": "notice"
+      }
+    },
+    "@deepseek-ai/libreoffice-kit-win32-x64@0.1.3": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LibreOffice-MPL-2.0.txt": {
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "role": "license"
+      },
+      "licenses/LibreOffice-third-party.html": {
+        "sha256": "6ef5eb44a3b8127960c27cb9c038fe89c221e139431ef33057c70811d91026ea",
+        "role": "notice"
+      },
+      "program/license.txt": {
+        "sha256": "9a7e34fbf3903507665e3ec7ca8b3d0c11f73bf2d5a0d754a079ab9f505bafef",
+        "role": "license"
+      },
+      "program/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      },
+      "sources/core-source.json": {
+        "sha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0",
+        "role": "notice"
+      }
+    },
+    "@deepseek-ai/libreoffice-kit-win32-arm64@0.1.3": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LibreOffice-MPL-2.0.txt": {
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "role": "license"
+      },
+      "licenses/LibreOffice-third-party.html": {
+        "sha256": "6ef5eb44a3b8127960c27cb9c038fe89c221e139431ef33057c70811d91026ea",
+        "role": "notice"
+      },
+      "program/license.txt": {
+        "sha256": "9a7e34fbf3903507665e3ec7ca8b3d0c11f73bf2d5a0d754a079ab9f505bafef",
+        "role": "license"
+      },
+      "program/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      },
+      "sources/core-source.json": {
+        "sha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0",
+        "role": "notice"
+      }
+    }
   }
 }

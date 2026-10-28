@@ -1,0 +1,26 @@
+{
+  "schema": "augmentor-office-font-fallbacks/1",
+  "repository": "https://github.com/deepseek-ai/dsh-libreoffice-kit",
+  "ref": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "license": "MPL-2.0",
+  "upstreamPath": "packages/entry/src/options.ts",
+  "scope": "Only the original twelve FONT_FALLBACKS groups and SANS_CJK_FAMILIES data; no opaque entry bundle, converter or model owner. Full public preferred source is retained as text.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034"
+    },
+    {
+      "path": "PREFERRED-OPTIONS.ts.txt",
+      "sha256": "e9e84945d08dd3f052aa80cc2d91c50d19be0fb4d47a00f1befe27f5b4f97f06"
+    },
+    {
+      "path": "groups.json",
+      "sha256": "94674edfd45bc0c9454b086eb6748873b5805da82a503421cb0d7cca37cf47d6"
+    }
+  ]
+}

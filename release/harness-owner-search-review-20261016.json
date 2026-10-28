@@ -1,0 +1,57 @@
+{
+  "schema": "augmentor-harness-owner-search-review/1",
+  "date": "2026-10-16",
+  "applicationRef": "1633e00f75f43f9efb88ec73bfd4ea8f3246a91d",
+  "releaseId": "20261016-220504-b91df2e4",
+  "artifactSha256": "2164f1ec0e5f5bc0aa8b100ad24d322ba1bf83d8829e7de7f5ee80a474aa92b1",
+  "sealedEntriesVerified": 24615,
+  "scope": "Existing private unselected MX reviews; verification without application or owner configuration changes",
+  "qualification": {
+    "sourceNodePass": 19,
+    "exactPackagedNodePass": 19,
+    "testFiles": 4,
+    "chromiumFiles": 1,
+    "workers": 2,
+    "skips": 0,
+    "testDeadlinesChanged": false,
+    "initialPackagedFailure": "External test wrapper lacked its screenshot outputs directory. Original failure retained; created that external directory and reran the unchanged packaged cohort. No sealed release file or assertion changed.",
+    "livePackagedTools": {
+      "mode": "keyless",
+      "searchCalls": 1,
+      "fetchCalls": 1,
+      "searchCompletedEngine": "bing",
+      "officialDebianSourcePresent": true,
+      "officialDebianPageFetched": true,
+      "apiCredentialsUsed": false,
+      "modelCalls": 0,
+      "ownerConversationUsed": false,
+      "method": "Direct execution of the packaged extension tools with the existing keyless settings; not a live model-turn or owner-conversation acceptance test"
+    },
+    "actualReviewGui": {
+      "reviews": 2,
+      "overviewOnAndSwitchUsable": true,
+      "keylessPanelVisible": true,
+      "apiPanelHidden": true,
+      "loadedAndAppliedNativeSessionsPerReview": 1,
+      "settingsAndAgentActionsSubmitted": 0,
+      "consoleErrors": 0,
+      "httpFailures": 0
+    },
+    "sameRunningOwnersVerified": true,
+    "searchSnapshotsUnchanged": true,
+    "searchPending": false
+  },
+  "deployment": {
+    "newArtifactStaged": false,
+    "ownerConfigurationWritten": false,
+    "reviewRestarted": false,
+    "productionSelectionChanged": false,
+    "additionalDshProjectsTransferred": false
+  },
+  "remaining": [
+    "Owner migration-pilot feedback and ordinary daily use acceptance",
+    "Representative credentialed API engines, quota/outage and broader keyless reliability",
+    "Historical Free Web Search 0.1.0 identity remains unconfirmed; owner-approved MIT alternatives are used",
+    "Voice, other operating-system rollout, public binary and DSH retirement are outside this checkpoint"
+  ]
+}

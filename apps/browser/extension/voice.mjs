@@ -109,6 +109,6 @@ export function attachVoice({send,onError,isHistory}){
     }
     button.disabled=(state.harness!=='dsh'&&state.capabilities?.voice!==true)||state.phase!=='ready'||history||!voiceEnabled
     if((lease||opening)&&(button.disabled||lease&&state.sessionId&&lease.sessionId!==state.sessionId))close()
-    if(button.disabled&&state.harness==='pi')button.title='Voice uses the shared DSH harness. Select DSH in Settings → Harnesses.'
+    if(button.disabled&&['pi','ah'].includes(state.harness))button.title='Voice uses the shared DSH harness. Select DSH in Settings → Harnesses.'
   }}
 }

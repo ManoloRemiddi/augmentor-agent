@@ -15,7 +15,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(os.environ.get('AUGMENTOR_NATIVE_ROOT', ROOT)) / 'apps/native'))
-from PySide6.QtCore import QPoint, QRect
+from PySide6.QtCore import QPoint, QRect, QObject, QEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 from augmentor_linux.window import Window
@@ -95,6 +95,25 @@ try:
         peer.terminate(); peer.wait(timeout=5); peer = None
     for point in (QPoint(0, 0), QPoint(500, 400), QPoint(-100, -80)):
         window.move(point); settle(); geometry()
+    # A late native placement can move only the canvas. Keep the owner in a
+    # fully visible area and stop animation so a periodic tick cannot mask it.
+    window.move(QPoint(400,200));settle()
+    window.activity.configure(animated=False,busy=True);settle();geometry()
+    before=QRect(window.geometry());expected=QRect(canvas.geometry())
+    displaced=[]
+    class CanvasNotification(QObject):
+        def eventFilter(self, watched, event):
+            if event.type()==QEvent.Type.Move and event.spontaneous() and canvas.geometry()!=expected:
+                displaced.append(QRect(canvas.geometry()))
+            return False
+    observer=CanvasNotification(canvas);canvas.installEventFilter(observer)
+    command('xdotool','windowmove',str(int(canvas.winId())),str(expected.x()+20),str(expected.y()+20))
+    assert displaced, 'External move produced no actual native canvas notification'
+    canvas.removeEventFilter(observer)
+    assert window.geometry()==before
+    assert not window.activity.timer.isActive()
+    geometry()
+    window.activity.configure(animated=True);settle()
     window.showMinimized(); settle()
     assert not canvas.isVisible(), 'Minimized owner leaves halo visible'
     window.showNormal(); settle(); assert canvas.isVisible(); geometry()
@@ -102,7 +121,7 @@ try:
     window.show(); settle(); assert canvas.isVisible(); geometry()
     window.toggle_compact(); QTest.qWait(700); geometry()
     window.toggle_compact(); QTest.qWait(700); geometry()
-    print(json.dumps({'passed': ['managed transient', 'workspace switch', 'pin/unpin', 'effect reappearance', 'two-process stacking both directions', 'desktop edges', 'minimize/restore', 'hide/show', 'compact/expanded'], 'platform': app.platformName(), 'renderer': 'GPU' if canvas.gpu and canvas.gpu.available else 'CPU'}))
+    print(json.dumps({'passed': ['managed transient', 'workspace switch', 'pin/unpin', 'effect reappearance', 'two-process stacking both directions', 'desktop edges', 'nonanimated native canvas recovery', 'minimize/restore', 'hide/show', 'compact/expanded'], 'platform': app.platformName(), 'renderer': 'GPU' if canvas.gpu and canvas.gpu.available else 'CPU'}))
 finally:
     if peer is not None: peer.terminate(); peer.wait(timeout=5)
     window.close(); release_kwin()

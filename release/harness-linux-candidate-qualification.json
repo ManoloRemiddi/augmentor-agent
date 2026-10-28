@@ -1,0 +1,155 @@
+{
+  "schema": "augmentor-linux-sealed-candidate-qualification/1",
+  "date": "2026-10-15",
+  "scope": "Private unselected Linux qualification candidate; not an activated review, installed update or public binary",
+  "applicationBytesRef": "6fd0b52fe5199fe599a7e3796d09800797024b6c",
+  "fixtureRef": "140da43fdd861b99f19c856be86862c65ac6e70f",
+  "priorSourceAndOrdinaryQualificationRef": "503908b7d15ffabc6fda1a72f0eefbf4c49be323",
+  "productVersion": "0.2.13",
+  "releaseId": "20261015-064752-4cf0f74f",
+  "artifactSha256": "8ae847bddca7523f405a3a920202161c90880b263018dfe508c82b8e26e76422",
+  "inventoryEntries": 24307,
+  "compiledFiles": 1007,
+  "compiledBytesMatchSourceAndOrdinary": true,
+  "productionDependencyEntries": 20702,
+  "productionNpmInstances": 151,
+  "nodeVersion": "24.19.0",
+  "noticeEntries": 871,
+  "sourceBuiltOfficeEntryFiles": 82,
+  "officePreferredSourceFiles": 32,
+  "officeEntryLicense": "MPL-2.0",
+  "officePublicRedistributionQualified": false,
+  "codexSupplierBundled": false,
+  "excludedBrowserTestDependencyEntries": 1932,
+  "testDriversOutsideArtifact": true,
+  "testFiles": 78,
+  "harnessChromiumFiles": 44,
+  "workers": 2,
+  "existingDeadlineChanges": false,
+  "earlierQualificationArtifact": {
+    "releaseId": "20261015-064537-7b7c4a5f",
+    "artifactSha256": "8437916b7783f013ace86445d9976a924cf932f3a631a321835d124ff3cc5d18",
+    "inventoryEntries": 26238,
+    "browserTestDependencyEntriesIncluded": 1932,
+    "tests": 363,
+    "passes": 361,
+    "failures": 0,
+    "skips": 2,
+    "durationMs": 174999.22739,
+    "qualificationOnly": true
+  },
+  "retainedPreparationFailures": [
+    "The first stage succeeds; the later per-subdirectory inventory comparison incorrectly treats an internal npm workspace link as external. Whole-release comparison verifies the same sealed artifact without modification or restaging.",
+    "The first qualification artifact includes browser test dependencies. A separate unsealed input excludes only those 1932 dependency entries and adds an explicit provenance record, then stages a new sealed candidate. The earlier artifact is retained."
+  ],
+  "installedSelectionChanged": false,
+  "reviewWindowsActivatedOrRestarted": false,
+  "ownerConversationsOrCredentialsCopied": false,
+  "publicBinaryPublished": false,
+  "remainingGates": [
+    "Full ThinLTO engine build, output/layout/performance, fonts and redistribution qualification",
+    "Physical MX owner acceptance and guarded activation, with existing drafts/reviews preserved",
+    "Remaining live provider, OAuth, MCP, search, memory and physical voice scenarios",
+    "Windows command-job adapters, native platform licensing/source packaging and wider CI",
+    "Complete accepted P0/P1 parity, data migration/privacy/update/rollback and DSH retirement"
+  ],
+  "qualificationFixtureRef": "cd46c36b2e1a9c0148a72d5b4c06daf22c221366",
+  "initialCleanCandidateRun": {
+    "tests": 363,
+    "passes": 360,
+    "failures": 1,
+    "skips": 2,
+    "durationMs": 174888.034132,
+    "assertion": "cold native restoration alone does not change originals",
+    "actualAppendedBytes": 303,
+    "decodedNativeCustomType": "augmentor-mcp-connection/1",
+    "decodedEvent": "closed",
+    "failedArtifactPatched": false
+  },
+  "coldBaselineCorrection": {
+    "productionRuntimeChanged": false,
+    "exactInstanceCloseAndNativeRetentionObservedBeforeBaseline": true,
+    "requestAndOuterDeadlinesChanged": false,
+    "focusedSdkModesPass": 6,
+    "independentControlledCloneCloseDelayMs": 80,
+    "beforeControlledBytesAppended": 303,
+    "afterControlledBytesAppended": 0,
+    "controlledOldFailsNewPasses": true,
+    "sdkEventsOrReceiptsFabricated": false,
+    "allOriginalPrivacyAndColdAssertionsRetained": true
+  },
+  "correctedCleanCandidateRun": {
+    "tests": 363,
+    "pass": 361,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 2,
+    "duration_ms": 174326.204532,
+    "skipDescriptions": [
+      "\ufe63 real controlled engine admits Codex Browser windows and Stop closes its upstream model socket without replay (0.144098ms) # SKIP",
+      "\ufe63 real controlled engine completes both scoped memory pipelines inside a Codex Browser window (0.150179ms) # SKIP"
+    ]
+  },
+  "fullInventoryVerifiedAfterTests": true,
+  "priorQualificationArtifactUnchanged": true,
+  "ownerReviewInventoryEntriesVerified": [
+    24305,
+    24288
+  ],
+  "allFourReviewProcessesPreserved": true,
+  "selectedConfigurationUnchanged": true,
+  "canonicalPreexistingStatusEntries": 38,
+  "qwenReadOnlyModelsStatus": 200,
+  "modelSpeechGpuSettingsChanged": false,
+  "physicalMxOwnerAcceptanceQualified": false,
+  "observedAtUtc": "2026-10-15T05:00:33.183868+00:00",
+  "qualificationHost": {
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "architecture": "Linux x64",
+    "physicalMxAcceptance": false
+  },
+  "hostedAtPriorDocumentationHead": {
+    "head": "503908b7d15ffabc6fda1a72f0eefbf4c49be323",
+    "runs": [
+      {
+        "conclusion": "success",
+        "databaseId": 38682795825,
+        "name": "Application SDK platform contracts",
+        "status": "completed"
+      },
+      {
+        "conclusion": "",
+        "databaseId": 38682795775,
+        "name": "Windows qualification",
+        "status": "pending"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 38682795843,
+        "name": "Windows desktop",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "databaseId": 38682795824,
+        "name": "macOS feasibility",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "databaseId": 38682795809,
+        "name": "Windows Pi command jobs",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "databaseId": 38682795684,
+        "name": "Validate Augmentor",
+        "status": "completed"
+      }
+    ],
+    "newFixtureHeadFullyHostedQualified": false,
+    "validateFailure": "Explicit Office public source/rebuild packaging refusal; preceding test stages pass",
+    "validateRun": 38682795684
+  }
+}

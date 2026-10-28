@@ -1,0 +1,83 @@
+{
+  "schema": "augmentor-macos-ah-agent-installation/1",
+  "date": "2026-10-20",
+  "target": "personal MacBook Air / macOS arm64",
+  "sourceRef": "dc87d48efae6530ead00540937e0058eea073e40",
+  "productVersion": "0.2.13",
+  "artifactSha256": "7b7c1bb0d3569e6dd1473321e0bd2a54a3b10df0f703261ae7066377f911cab2",
+  "applicationInventorySha256": "7e2b747511f3b47537010be02a529e8f38609fb825424f2f88b3dacc81115fca",
+  "applicationInventoryEntries": 2845,
+  "sourceChecks": {
+    "strictTypecheck": true,
+    "sharedBuild": true,
+    "macTests": 132,
+    "ahAdapterTests": 11,
+    "settingsTests": 12,
+    "browserRoutingTests": 4,
+    "companionPayloadTests": 1,
+    "controllerTests": 12,
+    "sdkBrowserTests": 5,
+    "browserRegressions": 34
+  },
+  "exactSealedChecks": {
+    "pythonTests": 27,
+    "nodeTests": 5,
+    "archiveInventory": true,
+    "strictCodesignBeforeAndAfterUse": true
+  },
+  "installedDesktop": {
+    "normalApplicationsEntry": true,
+    "defaultHarness": "ah",
+    "actualComposerAndSendButton": true,
+    "realAhReply": true,
+    "normalReopenRestoredConversation": true,
+    "testControlDisabledAfterReopen": true
+  },
+  "browser": {
+    "browser": "Comet",
+    "version": "0.2.13",
+    "extensionId": "dgfpmlnbofacjafljfohgmfacobgfjbh",
+    "nativeHostRegistered": true,
+    "realNativeHostSelectedAhAndInitialized": true,
+    "standaloneDefault": "ah",
+    "loadedInOwnerBrowserVerified": true,
+    "manualLoadRequired": false,
+    "initialRemoteUiBlock": "macOS initially denied osascript assistive access; later permission was available",
+    "installationUsedOrdinaryBrowserUi": true,
+    "visibleLiveFolder": "Desktop/Augmentor Browser Extension",
+    "liveFolderFilesMatchSignedInstalledExtension": 67,
+    "pinnedInToolbar": true,
+    "actualSettingsShowsAhConnected": true,
+    "actualComposerAndSendButton": true,
+    "realConfiguredProviderReply": "AH BROWSER READY",
+    "hideAndToolbarReopenRestoresReply": true,
+    "reopenedConnectedAndEmptyUsableComposer": true,
+    "browserSecurityDatabaseModified": false,
+    "browserRestartTested": false,
+    "screenshotInspection": false
+  },
+  "preservation": {
+    "existingAhRuntimeUnchanged": true,
+    "ahRuntimeSourceRef": "44ae92b31db900cee2c08704b6ccbc1e49b93ae1",
+    "ahRuntimeArtifactSha256": "41629b727335b9be87c675d245e314b4383144c39eaf8274f3723646b1544134",
+    "oldAhHistoriesDefaultModelAndBrowserAddressPreserved": true,
+    "oneLabeledNativeVerificationConversationRetained": true,
+    "temporaryBuildAndSupersededOfflineBundleRemoved": true,
+    "noMxAppBuildOrInstalledChange": true
+  },
+  "repositoryAudit": {
+    "implementationBranch": "feat/augmentor-harness",
+    "previousLocalSnapshotBranch": "archive/local-application-work-20261020",
+    "snapshotCommit": "7c46b29d8c867165f05b63b7e050bf54abfc3103",
+    "snapshotFiles": 38,
+    "oldCheckoutAndIndexPreserved": true,
+    "mainMergePerformed": false
+  },
+  "limits": [
+    "Retain the visible live extension folder; future upgrades must update/reload that loaded copy",
+    "Actual Browser UI verified through accessibility controls; screenshot inspection and full browser restart were not performed",
+    "Personal ad-hoc development installation; no new public download or notarization claim",
+    "Physical reboot, voice and broader desktop-control consent are not qualified by this check",
+    "Historical snapshot is preservation, not qualified deployment source"
+  ]
+}

@@ -72,10 +72,15 @@ class DualMemory:
             db.execute('BEGIN IMMEDIATE')
             config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
             if action == 'describe':
-                return {'protocol': PROTOCOL, 'pid': os.getpid(), **config, 'events': db.execute('SELECT count(*) FROM events').fetchone()[0],
+                return {'protocol': PROTOCOL, 'pid': os.getpid(), **config, 'configurationGuards': {'capture': 1}, 'events': db.execute('SELECT count(*) FROM events').fetchone()[0],
                         'pending': db.execute('SELECT count(*) FROM projections p WHERE EXISTS (SELECT 1 FROM event_scopes e WHERE e.kind=p.kind AND e.scope=p.scope AND e.seq>p.cursor)').fetchone()[0],
                         'failures': db.execute('SELECT coalesce(sum(failures),0) FROM projections').fetchone()[0]}
             if action == 'configure':
+                if 'expectedEnabled' in p:
+                    if type(p['expectedEnabled']) is not bool:
+                        raise ValueError('Invalid expected memory setting')
+                    if bool(config['enabled']) != p['expectedEnabled']:
+                        raise ValueError('Automatic memory changed. Refresh its status before choosing again.')
                 enabled = p.get('enabled', bool(config['enabled']))
                 if type(enabled) is not bool:
                     raise ValueError('Invalid memory setting')

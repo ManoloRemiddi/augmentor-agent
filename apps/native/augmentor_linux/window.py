@@ -12,8 +12,9 @@ import subprocess
 import uuid
 import threading
 from pathlib import Path
-from .ui_scale import scaled, LiveScale, px, normalize
-from PySide6.QtCore import Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
+from .ui_scale import factor, scaled, LiveScale, px, normalize
+from shiboken6 import isValid
+from PySide6.QtCore import QObject, Qt, QTimer, QLockFile, QUrl, Signal, QSize, QPoint, QRect, QVariantAnimation, QEasingCurve
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtGui import QColor, QPainter, QKeySequence, QShortcut, QRegion, QDesktopServices, QPalette, QIcon
 from PySide6.QtWidgets import (QApplication,QWidget,QFrame,QLabel,QPushButton,QVBoxLayout,QHBoxLayout,
@@ -32,7 +33,20 @@ from .preferences import Preferences
 from .resize import ResizeBorders
 from .workspaces import pin_kwin, release_kwin
 from .surfaces import Orb, ModelPicker, AppearanceDialog, TitleEditor
-from .panels import HistoryDialog, AccessDialog, UpdatesDialog, SettingsDialog, PromptLibraryDialog, ModelsDialog, LicensesDialog
+from .panels import HistoryDialog, AccessDialog, UpdatesDialog, PromptLibraryDialog, ModelsDialog, LicensesDialog
+
+from .agent_settings import SettingsDialog
+
+
+def deliver_background(callback, value):
+    """A retired embedded form must not receive a late worker UI update."""
+    targets=[getattr(callback,'__self__',None)]
+    for cell in getattr(callback,'__closure__',None) or ():
+        try: targets.append(cell.cell_contents)
+        except ValueError: pass
+    if any(isinstance(target,QObject) and not isValid(target) for target in targets):return
+    callback(value)
+
 
 
 class Window(QWidget):
@@ -49,6 +63,8 @@ class Window(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         scaled(self).setMinimumSize(364,364);self.resize(424,484)
         self.preferences=Preferences(not preview)
+        self.voice_configuration=None
+        self.voice_status_check=False
         if preview:self.preferences.values['ui_scale']=self.ui_scale.base
         initialize_voice_profile = None
         if not preview and current_name()!='main':
@@ -58,19 +74,20 @@ class Window(QWidget):
             def initialize_voice_profile():
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
-        if harness in ('pi','dsh','codex'):
+        if harness in ('pi','ah','dsh','codex'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
         self.maintenance = WindowMaintenance(self)
         if initialize_voice_profile:self.controller.task(initialize_voice_profile)
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.editing=None
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set();self.editing=None
         self.rendered_messages=None;self.rendered_partial=''
         self.pending_prompt=None;self.submitted_draft=None;self.morphing=False;self.compact=False;self.close_pending=False;self.read_only=False;self.is_saved=False
         self.expanded_size=self.size();self.follow_tail=True;self.rendering=False
+        self.response_progress=None;self.response_progress_rank=0;self.response_progress_active=False
         self.title_text='Augmentor Agent'
-        self.hidden_geometry=None;self.hidden_layout=None;self.hidden_dialogs=[];self.shortcut_dialog=None
-        self.completed.connect(lambda callback,value:callback(value))
+        self.hidden_geometry=None;self.hidden_layout=None;self.hidden_dialogs=[];self.shortcut_dialog=None;self.settings_panel=None;self.chat_geometry=None
+        self.completed.connect(deliver_background)
         self.render_timer=QTimer(self);self.render_timer.setSingleShot(True);self.render_timer.setInterval(33);self.render_timer.timeout.connect(self.render_messages)
         self.copied_message=None;self.copied_code=None
         self.copy_feedback_timer=QTimer(self);self.copy_feedback_timer.setSingleShot(True);self.copy_feedback_timer.setInterval(COPY_FEEDBACK_MS)
@@ -109,7 +126,7 @@ class Window(QWidget):
         self.pin_button=self.icon_button(SURFACE['glyphs']['pin'],'Follow me across all desktops',self.toggle_pin,checkable=True)
         self.pin_button.setChecked(self.preferences.values['pinned'])
         self.compact_button=self.icon_button(SURFACE['glyphs']['compact'],'Circular activity view',self.toggle_compact)
-        self.more_button=self.icon_button(SURFACE['glyphs']['more'],'More options',self.open_menu)
+        self.more_button=self.icon_button(SURFACE['glyphs']['more'],'Settings',self.open_settings)
         self.hide_button=self.icon_button(SURFACE['glyphs']['hide'],'Hide Augmentor',self.hide)
         for button in (self.new_button,self.save_button,self.history_button,self.pin_button,self.compact_button,self.more_button,self.hide_button):header.addWidget(button,0,Qt.AlignmentFlag.AlignVCenter)
         layout.addLayout(header)
@@ -135,6 +152,8 @@ class Window(QWidget):
         self.composer=Composer()
         self.composer.improve_requested.connect(self.improve_prompt)
         self.composer.improvement_changed.connect(self.update_controls)
+        self.prompt_improvement_owners={}
+        self.composer.improvement_cancelled.connect(self.cancel_prompt_improvement)
         self.edit_bar=QFrame();edit_layout=QHBoxLayout(self.edit_bar);scaled(edit_layout).setContentsMargins(2,0,2,0)
         edit_label=QLabel('Editing latest message');edit_layout.addWidget(edit_label,1)
         self.cancel_edit_button=QPushButton('Cancel');self.cancel_edit_button.clicked.connect(self.cancel_edit);edit_layout.addWidget(self.cancel_edit_button)
@@ -175,6 +194,10 @@ class Window(QWidget):
         self.sync_orb()
         self.resize_borders=ResizeBorders(self)
         self.restore_placement()
+        self.voice_status_timer=QTimer(self);self.voice_status_timer.setInterval(15000)
+        self.voice_status_timer.timeout.connect(self.check_voice_configuration)
+        if not preview:
+            self.voice_status_timer.start();QTimer.singleShot(0,self.check_voice_configuration)
         self.touch_layout=None
         if os.environ.get('AUGMENTOR_TOUCH_MODE')=='1':
             from .touch import TouchLayout
@@ -188,26 +211,34 @@ class Window(QWidget):
     def switch_harness(self,harness,reconnect=False):
         if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
-        if harness not in ('pi','dsh','codex') or not self.controller:return
+        if harness not in ('pi','ah','dsh','codex') or not self.controller:return
+        if getattr(getattr(self.controller,'client',None),'custom',False) and harness!='dsh':
+            self.set_status('This named entry uses its selected DSH agent. Choose another entry to use a different harness.');return
         if self.controller.harness==harness and not reconnect:return
         if self.controller.running or self.controller.navigating or self.editing or getattr(self.controller,'repairing',False):
             self.set_status('Finish the current action before switching harness.');return
         if self.composer.improving:self.composer.cancel_improvement()
         old=self.controller;old.close()
-        for signal_name in ('status','models','selection_changed','session_info','busy','event','problem','interaction','sent','page','recovered','connection'):
+        for signal_name in ('status','models','selection_changed','session_info','busy','event','problem','interaction','sent','submission_progress','page','recovered','connection'):
             try:getattr(old,signal_name).disconnect()
             except TypeError:pass
         self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=Controller(self,harness=harness)
         self.messages=[];self.message_events={};self.partial='';self.rendered_messages=None;self.copied_message=None;self.copied_code=None
+        self.clear_response_progress()
         self.read_only=False;self.seen_events=set();self.follow_tail=True
+        self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         self.render_messages();self.set_models({'groups':[]});self.bind_controller()
 
     def bind_controller(self):
+        catalog=self.composer.prompt_menu.catalog
+        catalog.generation+=1;catalog.pending=False;catalog.prompts=[];catalog.loaded=False;catalog.last_read=0
+        catalog.client=self.prompt_client()
         self.controller.status.connect(self.set_status);self.controller.models.connect(self.set_models)
         self.controller.selection_changed.connect(self.set_selection);self.controller.session_info.connect(self.session_changed)
         self.controller.busy.connect(self.set_busy);self.controller.event.connect(self.on_event)
         self.controller.problem.connect(self.on_problem);self.controller.interaction.connect(self.on_interaction)
+        self.controller.submission_progress.connect(self.submission_progress)
         self.controller.sent.connect(self.message_sent)
         self.controller.submission_failed.connect(self.message_not_sent)
         self.controller.queue_changed.connect(self.queue_panel.replace)
@@ -217,6 +248,11 @@ class Window(QWidget):
         self.controller.recovered.connect(self.restore_recovery)
         self.controller.connection.connect(self.connection_changed)
         self.start_connection()
+
+    def prompt_client(self):
+        from .prompt_client import PromptClient
+        client=getattr(self.controller,'client',None)
+        return client.prompt_client() if hasattr(client,'prompt_client') else PromptClient()
 
     def start_connection(self):
         from .managed_setup import needed as managed_setup_needed
@@ -228,10 +264,14 @@ class Window(QWidget):
 
     def connection_changed(self,online):
         self.update_controls()
+        if getattr(self,'response_progress_active',False):
+            if not online:self.response_progress='Connection lost; reconnecting…'
+            elif self.response_progress=='Connection lost; reconnecting…':self.response_progress='Reconnected; waiting for agent output…'
+            self.render_timer.start()
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
-        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','codex'):
+        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','ah','codex'):
             self.setup_offered=True
             available=any(model.get('available') for group in self.model_picker.catalog.get('groups',[]) for model in group.get('models',[]))
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
@@ -242,6 +282,12 @@ class Window(QWidget):
         if self.controller.running or self.controller.navigating:
             self.set_status('Finish the current action before configuring a model.');return
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
+        if self.settings_panel:
+            self.settings_panel.open_setup();return
+        self.setup_dialog=self.make_setup_dialog()
+        self.setup_dialog.show()
+
+    def make_setup_dialog(self):
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
         from .managed_setup import (RuntimeIncompleteDialog, ManagedSetupDialog,
@@ -252,14 +298,14 @@ class Window(QWidget):
         # it would silently fall through to the external-DSH form and read as a
         # demand for a DSH the user does not have.
         problem=runtime_problem() if managed_setup_needed() else ''
-        if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        if self.controller.harness in ('pi','ah'):dialog=SetupDialog(self)
         elif self.controller.harness=='codex':
             from .codex_setup import CodexSetupDialog
-            self.setup_dialog=CodexSetupDialog(self)
-        elif problem:self.setup_dialog=RuntimeIncompleteDialog(self,problem)
-        elif managed_setup_available():self.setup_dialog=ManagedSetupDialog(self)
-        else:self.setup_dialog=DshSetupDialog(self)
-        self.setup_dialog.show()
+            dialog=CodexSetupDialog(self)
+        elif problem:dialog=RuntimeIncompleteDialog(self,problem)
+        elif managed_setup_available():dialog=ManagedSetupDialog(self)
+        else:dialog=DshSetupDialog(self)
+        return dialog
 
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);scaled(button).setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);scaled(button).setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
@@ -292,6 +338,7 @@ class Window(QWidget):
         self.call_in_background(lambda:self.controller.client.call('models.pin',{**model,'pinned':pinned}),self.set_models)
 
     def model_selected(self,selection,persist=True):
+        if self.composer.improving and selection!=getattr(self,'prompt_improvement_context',(None,None,None))[2]:self.composer.cancel_improvement()
         if not selection:return
         if persist and self.controller:self.controller.choose_model(selection)
         self.sync_orb();self.update_controls()
@@ -317,6 +364,23 @@ class Window(QWidget):
 
     def voice_is_hands_free(self):
         return (self.voice_gesture_mode or self.preferences.values.get('voice_mode','manual'))=='hands-free'
+
+    def check_voice_configuration(self):
+        if self.voice_status_check or self.voice_dialog or self.voice_opening or getattr(self,'voice_settings_jobs',0):return
+        if not self.controller or self.controller.closed or self.maintenance.phase()!='ready':return
+        from .maintenance import MaintenanceBusy
+        from .voice_provider import snapshot
+        self.voice_status_check=True
+        def ready(result):
+            self.voice_status_check=False
+            data,error=result
+            if data and not getattr(self,'voice_settings_jobs',0) and not any(d.isVisible() for d in self.findChildren(QDialog)):self.voice_configuration=data
+            self.update_controls()
+        try:self.call_in_background(lambda:(snapshot(),None),ready)
+        except MaintenanceBusy:self.voice_status_check=False
+
+    def voice_needs_setup(self):
+        return bool(self.preferences.persistent and (not self.voice_configuration or not self.voice_configuration.get('configured')))
 
     def start_gesture_hands_free(self):
         # A mode gesture cancels an unfinished manual hold; releasing the same
@@ -349,6 +413,9 @@ class Window(QWidget):
 
     def voice_pressed(self):
         self.refresh_voice_preferences()
+        if self.voice_needs_setup():
+            from .voice_settings import VoiceSettingsDialog
+            self.voice_button.disarm();VoiceSettingsDialog(self).exec();return
         voice=self.voice_dialog
         if self.voice_is_hands_free():
             if voice or self.voice_opening:self.close_voice_panel()
@@ -387,6 +454,8 @@ class Window(QWidget):
             QTimer.singleShot(0,self.begin_voice)
 
     def close_voice_panel(self):
+        cancellation=getattr(self,'voice_preparation_cancel',None)
+        if cancellation:cancellation.set()
         self.voice_epoch+=1;self.voice_opening=False;self.voice_gesture_mode=None
         voice=self.voice_dialog;self.voice_dialog=None
         early=self.voice_input;self.voice_input=None
@@ -395,10 +464,11 @@ class Window(QWidget):
             voice.panel_closed.disconnect(self.close_voice_panel)
             voice.changed.disconnect(self.voice_state_changed)
             voice.recording_progress.disconnect(self.voice_button.set_recording_progress)
-            if self.controller:
+            if self.controller and getattr(voice,'submission_connected',False):
                 try:self.controller.queue_result.disconnect(voice.submission_result)
                 except (RuntimeError,TypeError):pass
             voice.close()
+        if self.controller and hasattr(self.controller,'close_voice'):self.controller.close_voice()
         self.voice_button.recording_available=False
         self.voice_button.set_state('off')
         self.update_controls()
@@ -406,17 +476,25 @@ class Window(QWidget):
     def open_voice(self):
         if getattr(getattr(self,'preferences',None),'persistent',False):self.refresh_voice_preferences()
         if not self.preferences.values.get('resonant_voice',True):
-            self.set_status('Enable Resonant Voice in Settings to use the microphone.');return
+            self.set_status('Enable Voice in Settings to use the microphone.');return
         if self.editing:
             self.set_status('Finish or cancel the message edit before opening Voice.');return
         if self.voice_dialog or not self.controller:return
-        if self.voice_is_hands_free():self.prepare_voice_input()
+        if self.voice_needs_setup():
+            from .voice_settings import VoiceSettingsDialog
+            VoiceSettingsDialog(self).exec();return
+        provider=(self.voice_configuration or {}).get('provider','local')
+        if provider=='local' and self.voice_is_hands_free():self.prepare_voice_input()
         if self.voice_opening:return
         controller=self.controller;selection=self.model_picker.currentData()
+        cancellation=threading.Event();self.voice_preparation_cancel=cancellation
         self.voice_opening=True;self.voice_epoch+=1;epoch=self.voice_epoch
         self.voice_button.set_state('connecting')
         def work():
-            try:return controller.prepare_voice(selection),None
+            try:
+                options={'provider':provider} if provider!='local' else {}
+                if getattr(controller,'harness',None)=='pi':options['cancelled']=cancellation
+                return controller.prepare_voice(selection,**options),None
             except Exception as error:return None,str(error)
         def ready(result):
             # prepare_voice has released its navigation lock. Refresh every control,
@@ -430,10 +508,11 @@ class Window(QWidget):
                 self.set_status('Voice unavailable. '+error);return
             if not self.preferences.values.get('resonant_voice',True) or controller is not self.controller or controller.closed or controller.session!=ticket['sessionId']:
                 self.close_voice_panel();return
-            from .voice import VoiceSession
-            voice=VoiceSession(self,ticket,hands_free=self.voice_is_hands_free(),early_input=self.voice_input);self.voice_dialog=voice
+            from .voice_live import voice_session
+            voice=voice_session(self,ticket,hands_free=self.voice_is_hands_free(),early_input=self.voice_input);self.voice_dialog=voice
             voice.transcript.connect(self.voice_transcript)
             controller.queue_result.connect(voice.submission_result)
+            voice.submission_connected=True
             voice.panel_closed.connect(self.close_voice_panel)
             voice.changed.connect(self.voice_state_changed)
             voice.recording_progress.connect(self.voice_button.set_recording_progress)
@@ -443,10 +522,13 @@ class Window(QWidget):
     def voice_transcript(self,event):
         controller=self.controller
         if not self.voice_dialog or self.voice_dialog.closed or not controller or controller.session!=event['sessionId'] or controller.read_only:return
+        if getattr(controller,'harness',None)=='pi' and event.get('requestId') not in self.voice_dialog.submitted:return
+        request_id=('augmentor-voice:' if event.get('prefix')=='augmentor-voice:' else 'resonant-voice:')+event['requestId']
+        spoken={'input_mode':'voice'} if getattr(controller,'harness',None)=='pi' or event.get('prefix')=='augmentor-voice:' else {}
         if controller.running:
-            accepted=controller.queue_prompt(event['text'],'resonant-voice:'+event['requestId'],mode='steer')
+            accepted=controller.queue_prompt(event['text'],request_id,mode='steer',**spoken)
         else:
-            accepted=controller.send(event['text'],self.model_picker.currentData(),request_id='resonant-voice:'+event['requestId'])
+            accepted=controller.send(event['text'],self.model_picker.currentData(),request_id=request_id,**spoken)
         if not accepted and self.voice_dialog:
             self.voice_dialog.set_status('Message was not submitted. '+event['text'])
             if getattr(self.voice_dialog,'hands_free',False):self.voice_dialog.shutdown()
@@ -471,21 +553,26 @@ class Window(QWidget):
         if self.read_only:self.set_status('History view')
 
     def update_controls(self):
+        if self.composer.improving and (not self.controller or self.controller.running or not self.controller.online or self.read_only):self.composer.cancel_improvement()
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        if not self.voice_dialog and not self.voice_opening and self.voice_needs_setup():self.voice_button.set_state('needs-setup')
+        elif self.voice_button.state=='needs-setup':self.voice_button.set_state('off')
+        cloud=(self.voice_configuration or {}).get('provider')=='openai-live'
+        self.voice_button.setEnabled(self.voice_needs_setup() or bool(self.controller and (cloud or getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and not getattr(self.controller,'voice_closing',0) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
         if self.composer.improving or getattr(self.controller,'repairing',False):self.send_button.setEnabled(False)
-        self.composer.improvement_available=bool(self.controller and hasattr(getattr(self.controller,'client',None),'improve_prompt') and self.model_picker.currentData() and not self.read_only and getattr(self.controller,'online',False))
+        self.composer.improvement_available=bool(self.controller and hasattr(getattr(self.controller,'client',None),'improve_prompt') and (self.controller.harness not in ('pi','ah') or self.controller.client.capabilities.get('promptImprovement') is True) and self.model_picker.currentData() and not self.read_only and getattr(self.controller,'online',False))
         self.composer.refresh_improve_button()
         self.model_picker.setEnabled(not running and not self.read_only)
         self.new_button.setEnabled(bool(self.controller) and not running)
         self.history_button.setEnabled(bool(self.controller) and not running)
         self.save_button.setEnabled(bool(self.controller and self.controller.session) and not self.read_only)
         working=bool(self.controller and self.controller.running)
+        if self.settings_panel:self.settings_panel.update_activity()
         self.stop_button.setVisible(working);self.stop_button.setEnabled(working);self.send_button.setVisible(not working or can_queue)
         self.send_button.setToolTip('Queue prompt · Enter' if working and can_queue else 'Send · Enter (Shift+Enter for a new line)')
         self.queue_panel.online=bool(self.controller and getattr(self.controller,'online',False));self.queue_panel.running=working;self.queue_panel.render()
@@ -493,6 +580,7 @@ class Window(QWidget):
         self.sync_orb()
 
     def set_busy(self,busy):
+        if not busy:self.finish_thinking();self.clear_response_progress()
         self.activity.configure(busy=busy)
         self.update_controls();self.set_status('Working…' if busy else ('History view' if self.read_only else 'Ready'))
         self.cancel_edit_button.setEnabled(not busy)
@@ -501,7 +589,7 @@ class Window(QWidget):
 
     def new_chat(self):
         if self.controller and not self.controller.running and not self.controller.navigating and not self.controller.recovery_lock.locked():
-            self.cancel_edit();self.controller.new_chat();self.rendered_messages=None;self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.transcript.clear();self.composer.clear();self.follow_tail=True;self.set_status('New conversation')
+            self.clear_response_progress();self.cancel_edit();self.controller.new_chat();self.rendered_messages=None;self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set();self.transcript.clear();self.composer.clear();self.follow_tail=True;self.set_status('New conversation')
 
     def improve_prompt(self):
         if not self.controller or self.composer.improving:return
@@ -509,20 +597,41 @@ class Window(QWidget):
         original=self.composer.toPlainText()
         if not original.strip() or not hasattr(adapter,'improve_prompt'):return
         identity=self.composer.begin_improvement()
+        controller=self.controller;session=controller.session;connected=controller.connected
+        self.prompt_improvement_context=(controller,session,selection)
+        if controller.harness in ('pi','ah'):self.prompt_improvement_owners[identity]=adapter
+        def finished(value):
+            if self.composer.improvement_id!=identity:return
+            if self.controller is controller and controller.session==session and self.model_picker.currentData()==selection and controller.online and not self.read_only and not controller.running:
+                self.composer.improvement_result.emit(identity,*value)
+                if controller.harness in ('pi','ah') and value[0] and value[0].get('receipt'):
+                    receipt=value[0]['receipt'];self.set_status('Prompt improved with '+receipt['provider']+'/'+receipt['model']+'. Output tokens: '+str(receipt.get('usage',{}).get('output','unavailable'))+'.')
+            else:self.composer.cancel_improvement()
         def work():
             result=None;error=''
             try:
                 from .prompt_client import PromptClient
-                settings=PromptClient().call('prompts.list').get('improvement')
+                settings=self.prompt_client().call('prompts.list').get('improvement')
                 if not settings:raise ValueError('Restart the prompt service to load Improve prompt settings.')
                 template=settings['content']
-                result=adapter.improve_prompt(original,template,selection)
+                if controller.harness in ('pi','ah'):
+                    result=adapter.improve_prompt(original,template,selection,request_id=identity,expected_revision=settings['revision'],session_id=session if connected else None)
+                else:result=adapter.improve_prompt(original,template,selection)
             except Exception as exc:error=str(exc)
-            try:self.composer.improvement_result.emit(identity,result,error)
+            try:self.completed.emit(finished,(result,error))
             except RuntimeError:pass
         self.controller.task(work)
 
+    def cancel_prompt_improvement(self,identity):
+        adapter=self.prompt_improvement_owners.pop(identity,None)
+        if adapter:
+            def cancel():
+                try:adapter.cancel_improvement(identity)
+                except Exception:pass
+            threading.Thread(target=cancel,daemon=True).start()
+
     def send(self):
+        if self.settings_panel:return
         if self.composer.improving:return
         text=self.composer.toPlainText().strip()
         if self.controller and self.send_button.isEnabled() and text:
@@ -532,13 +641,14 @@ class Window(QWidget):
                 if not self.controller.queue_prompt(text,request_id):
                     self.queue_panel.consumed(request_id);self.composer.setPlainText(text)
                 return
+            self.begin_response_progress('Submitting message…')
             self.submitted_draft=self.composer.toPlainText()
             self.composer.clear()
             self.pending_prompt=text;self.render_messages();self.jump_latest()
             if self.editing and not self.editing.get('prepared'):accepted=self.controller.send(text,self.model_picker.currentData(),edit_from=dict(self.editing))
             else:accepted=self.controller.send(text,self.model_picker.currentData())
             if accepted is False:
-                self.restore_unaccepted_prompt();self.pending_prompt=None;self.rendered_messages=None;self.render_messages()
+                self.clear_response_progress();self.restore_unaccepted_prompt();self.pending_prompt=None;self.rendered_messages=None;self.render_messages()
 
     def restore_unaccepted_prompt(self):
         if self.submitted_draft is None:return
@@ -550,6 +660,7 @@ class Window(QWidget):
         # Idle/history/errors are independent of this particular submission.
         # Only its own failed/cancelled result can restore the submitted draft.
         if self.pending_prompt!=text:return
+        self.clear_response_progress()
         self.restore_unaccepted_prompt()
         self.pending_prompt=None;self.render_timer.start()
 
@@ -685,6 +796,8 @@ class Window(QWidget):
             tail.removeSelectedText()
         if self.pending_prompt:
             tail.insertHtml(self.transcript.scale_html(f'<table width="86%" align="right" border="0" cellspacing="0" cellpadding="10"><tr><td><p align="right" style="color:{accent}"><b>You</b> · Sending…</p><p>'+html.escape(self.pending_prompt).replace('\n','<br>')+'</p></td></tr></table>'))
+        if self.response_progress:
+            tail.insertHtml(self.transcript.scale_html('<p style="color:'+accent+'">'+html.escape(self.response_progress)+'</p>'))
         if self.partial:
             tail.insertHtml(self.transcript.scale_html(f'<p style="color:{accent}"><b>Augmentor</b></p>'+render_markdown(self.partial,self.preferences.values['theme'],accent,tuple(sorted(self.preferences.values.get('format_colours',{}).items())),str(len(self.messages)),self.copied_code[1] if self.copied_code and self.copied_code[0]==self.message_key(len(self.messages)) else None)))
         self.rendered_messages=list(self.messages);self.rendered_partial=self.partial
@@ -698,7 +811,7 @@ class Window(QWidget):
     def restore_recovery(self,events,has_more):
         follow=self.follow_tail
         self.render_timer.stop()
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set()
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         for event in events:self.fold_event(event)
         self.follow_tail=follow;self.render_messages()
 
@@ -706,6 +819,7 @@ class Window(QWidget):
         self.restore_page(events,False,False)
 
     def restore_page(self,events,has_more,older):
+        if not self.controller or not self.controller.running:self.clear_response_progress()
         self.render_timer.stop();bar=self.transcript.verticalScrollBar()
         if bar.isSliderDown():
             controller=self.controller;sid=getattr(controller,'session',None)
@@ -720,7 +834,7 @@ class Window(QWidget):
         anchor=self.transcript.cursorForPosition(QPoint(2,2))
         old_y=self.transcript.cursorRect(anchor).top()
         old_text=self.transcript.toPlainText()
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set()
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         for event in events:self.fold_event(event)
         self.follow_tail=not older;self.render_messages()
         if older:
@@ -744,6 +858,12 @@ class Window(QWidget):
             previous=self.messages[self.reasoning_index][1]
             self.messages[self.reasoning_index]=('Thinking',text if replace else previous+text)
 
+        if not replace and self.active_thinking!=self.reasoning_index:
+            self.active_thinking=self.reasoning_index
+            if self.preferences.values.get('expand_thinking',True):self.expanded_thinking.add(self.reasoning_index)
+            self.rendered_messages=None
+
+
     def fold_event(self,event):
         seq=event.get('seq')
         if seq is not None:
@@ -755,15 +875,17 @@ class Window(QWidget):
             blocks=data.get('message',{}).get('content',[])
             failed=data.get('message',{}).get('isError') is True or any(b.get('isError') for b in blocks if isinstance(b,dict))
             if isinstance(reply,dict) and reply.get('version')==1 and isinstance(reply.get('text'),str) and not failed:
-                self.reasoning_index=None;self.partial=''
+                self.finish_thinking();self.reasoning_index=None;self.partial=''
                 self.messages.append(('Augmentor',reply['text']))
                 return True
         if kind=='user/message':
             if data.get('source',{}).get('kind')!='user':return False
-            self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
-            text='\n'.join(p.get('text','') for p in data.get('content',[]) if p.get('type')=='text')
+            origin=data.get('source',{}).get('sessionId')
+            own_delivery=origin is None or origin==getattr(self.controller,'session',None)
+            if own_delivery:self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
+            text='\n'.join(p.get('text','') for p in data.get('submittedContent',data.get('content',[])) if p.get('type')=='text')
             if text:
-                if text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
+                if own_delivery and text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
                 self.message_events[len(self.messages)]=event
                 self.messages.append(('You',text))
             return bool(text)
@@ -777,12 +899,22 @@ class Window(QWidget):
             # notice visible, including history replay, on every native platform.
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
             return True
+        if kind in ('runtime/notice','runtime/warning'):
+            if data.get('disposition')=='input-handled' and data.get('source',{}).get('sessionId')==getattr(self.controller,'session',None):
+                text='\n'.join(part.get('text','') for part in data.get('submittedContent',[]) if part.get('type')=='text')
+                if text==self.pending_prompt:self.clear_response_progress();self.pending_prompt=None;self.submitted_draft=None
+            self.messages.append(('Status',data.get('message') or 'Runtime status unavailable.'))
+            return True
         if kind=='assistant/chunk':
             chunk=data.get('chunk',{})
-            if chunk.get('type')=='text-delta':self.partial+=chunk.get('text','');return True
+            if chunk.get('type')=='text-delta':
+                self.finish_thinking();self.partial+=chunk.get('text','');return True
+            if chunk.get('type') in ('reasoning-end','tool-call-start','tool-call-delta'):
+                return self.finish_thinking()
             if chunk.get('type')=='reasoning-delta':
                 self.add_reasoning(chunk.get('text',''));self.set_status('Thinking…');return True
         elif kind=='assistant/message':
+            self.finish_thinking()
             if any(p.get('type')=='tool-call' and p.get('name') in ('resonant_voice_reply','resonant_voice_demo') for p in data.get('message',{}).get('content',[])):
                 self.partial='';return True
             reasoning='\n'.join(p.get('text','') for p in data.get('message',{}).get('content',[]) if p.get('type')=='reasoning')
@@ -793,8 +925,11 @@ class Window(QWidget):
                 self.message_events[len(self.messages)]=event
                 self.messages.append(('Augmentor',text))
             self.partial='';return True
-        elif kind=='tool/call':self.set_status('Using '+str(data.get('name','a tool'))[:60])
+        elif kind=='tool/call':
+            self.set_status('Using '+str(data.get('name','a tool'))[:60])
+            return self.finish_thinking()
         elif kind=='turn/end':
+            collapsed=self.finish_thinking()
             self.reasoning_index=None
             reason=data.get('reason',{}).get('kind')
             if reason=='max-tokens':
@@ -803,16 +938,78 @@ class Window(QWidget):
                 return True
             self.set_status('Stopped' if reason=='aborted' else 'Interrupted' if reason=='interrupted' else 'Ready')
             if reason=='interrupted':self.messages.append(('Status',data.get('message','Runtime interrupted.')));return True
+            return collapsed
         elif kind=='session/title':
             title=data.get('title')
             if title:self.title_text=title;self.title.setText(title)
         return False
 
+    def begin_response_progress(self,text):
+        self.response_progress_active=True;self.response_progress_rank=0
+        self.response_progress=text
+        if not self.render_timer.isActive():self.render_timer.start()
+
+
+    def clear_response_progress(self):
+        self.response_progress_active=False;self.response_progress=None
+        if not self.render_timer.isActive():self.render_timer.start()
+
+
+    def submission_progress(self,generation,text,rank):
+        # RPC acknowledgements can arrive after thinking or even completion.
+        if not self.controller or generation is not self.controller.generation:return
+        if not self.response_progress_active or rank<self.response_progress_rank:return
+        self.response_progress=text;self.response_progress_rank=rank
+        if not self.render_timer.isActive():self.render_timer.start()
+
+
+    def observe_response_progress(self,event):
+        kind=event.get('type');data=event.get('data',{})
+        if kind=='turn/start':
+            self.begin_response_progress('Agent started; waiting for next step…')
+            self.response_progress_rank=7
+        elif kind=='step/start':
+            self.begin_response_progress('Building model request…')
+            self.response_progress_rank=8
+        elif kind=='assistant/start':
+            self.begin_response_progress('Waiting for the model’s first output…')
+            self.response_progress_rank=9
+        elif kind=='assistant/chunk':
+            chunk=data.get('chunk',{})
+            if chunk.get('type') in ('text-delta','reasoning-delta') and chunk.get('text'):
+                self.clear_response_progress()
+            elif chunk.get('type') in ('tool-call-start','tool-call-delta','tool-call'):
+                self.begin_response_progress('Receiving a tool request from the model…')
+                self.response_progress_rank=10
+        elif kind in ('assistant/message','tool/call','step/end','turn/end','runtime/error'):
+            self.clear_response_progress()
+
+
+    def set_thinking_visibility(self,expanded):
+        self.preferences.values['expand_thinking']=bool(expanded)
+        self.preferences.save()
+        if self.active_thinking is not None:
+            if expanded:self.expanded_thinking.add(self.active_thinking)
+            else:self.expanded_thinking.discard(self.active_thinking)
+            self.rendered_messages=None;self.render_messages()
+
+
+    def finish_thinking(self):
+        if self.active_thinking is None:return False
+        self.expanded_thinking.discard(self.active_thinking)
+        self.active_thinking=None
+        self.rendered_messages=None
+        return True
+
+
     def on_event(self,event):
+        if event.get('seq') is None or event['seq'] not in self.seen_events:
+            self.observe_response_progress(event)
         if self.voice_dialog and event.get('seq') not in self.seen_events:self.voice_dialog.observe(event)
         if self.fold_event(event) and not self.render_timer.isActive():self.render_timer.start()
 
     def on_problem(self,message):
+        self.clear_response_progress();self.finish_thinking()
         self.update_controls()
         self.rendered_messages=None
         self.set_status('Needs attention');self.messages.append(('Status',message));self.render_messages()
@@ -824,10 +1021,32 @@ class Window(QWidget):
         if self.controller:HistoryDialog(self).exec()
 
     def open_pi(self):
+        # Retain callers of the original menu action.
+        self.open_harness()
+
+    def open_harness(self):
+        controller=self.controller
+        if not controller:return
+        if controller.harness in ('ah','pi'):
+            if getattr(self,'opening_dsh',False):return
+            self.opening_dsh=True
+            def work():
+                try:return controller.client.call('harness.open'),None
+                except Exception as error:return None,str(error)
+            def opened(value):
+                self.opening_dsh=False
+                if self.controller is not controller:return
+                result,error=value
+                if error:self.set_status('Could not open the selected harness: '+error);return
+                url=QUrl(result.get('url',''))
+                if url.scheme()!='http' or url.host()!='127.0.0.1' or not url.fragment().startswith('token='):
+                    self.set_status('The selected harness returned an invalid browser link.');return
+                if not QDesktopServices.openUrl(url):self.set_status('The default browser could not open. Check your default browser settings.')
+            self.call_in_background(work,opened);return
         if self.controller and getattr(self.controller,'harness','pi')=='dsh':
             from .managed_setup import needed, available, runtime_state
             if needed():self.open_setup();return
-            if self.opening_dsh:return
+            if getattr(self,'opening_dsh',False):return
             self.opening_dsh=True
             client=self.controller.client
             managed=available()
@@ -837,6 +1056,7 @@ class Window(QWidget):
                 except Exception:return {'ok':False}
             def opened(result):
                 self.opening_dsh=False
+                if self.controller is not controller:return
                 if result.get('ok') and result.get('browserUrl'):
                     if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
                         self.set_status('The default browser could not open. Check your default browser settings.')
@@ -844,7 +1064,7 @@ class Window(QWidget):
                     self.set_status('DSH could not connect. Open Agent setup to start it.')
                     self.open_setup()
             self.call_in_background(launch_url,opened);return
-        if self.controller:ModelsDialog(self).exec()
+        self.set_status('This connection does not provide a harness browser page.')
 
     def rename_chat(self):
         if not self.controller or not self.controller.session:return
@@ -867,29 +1087,65 @@ class Window(QWidget):
         if self.controller:AccessDialog(self).exec()
 
     def open_settings(self):
-        self.shortcut_dialog=SettingsDialog(self)
-        self.shortcut_dialog.exec()
-        self.shortcut_dialog=None
+        if self.maintenance.phase()!='ready':return
+        if self.settings_panel: return
+        if self.morphing: return
+        if self.compact:
+            self.toggle_compact()
+            if self.morphing:
+                self.morph_animation.finished.connect(self.open_settings,Qt.ConnectionType.SingleShotConnection); return
+        if self.voice_dialog or self.voice_opening:self.close_voice_panel()
+        self.chat_geometry=QRect(self.geometry())
+        self.chat_design_size=(self.width()/factor(self),self.height()/factor(self))
+        self.chat_minimum=(self.minimumWidth()/factor(self),self.minimumHeight()/factor(self))
+        self.chat_maximum=(self.maximumWidth()/factor(self),self.maximumHeight()/factor(self))
+        panel=SettingsDialog(self);self.settings_panel=panel;self.shortcut_dialog=panel
+        panel.closed.connect(self.close_settings)
+        self.stack.addWidget(panel);self.stack.setCurrentWidget(panel)
+        area=self.screen().availableGeometry()
+        self.setFixedSize(panel.frame_size())
+        target=QRect(self.chat_geometry)
+        target.setSize(panel.frame_size())
+        target.moveLeft(max(area.left(),min(target.x(),area.right()-target.width()+1)))
+        target.moveTop(max(area.top(),min(target.y(),area.bottom()-target.height()+1)))
+        self.setGeometry(target);self.hidden_geometry=None;self.resize_borders.update();self.update()
+        QTimer.singleShot(0,panel.request_fit)
+
+
+    def close_settings(self):
+        panel=self.settings_panel
+        if not panel:return
+        target=QRect(self.chat_geometry)
+        self.settings_panel=None;self.shortcut_dialog=None;self.chat_geometry=None
+        self.stack.setCurrentWidget(self.expanded);self.stack.removeWidget(panel);panel.deleteLater()
+        scaled(self).setMinimumSize(*self.chat_minimum)
+        scaled(self).setMaximumSize(*self.chat_maximum)
+        self.setGeometry(target);self.expanded_size=self.size();self.hidden_geometry=None
+        self.design_size=(self.width()/factor(self),self.height()/factor(self))
+        self.last_scaled_size=self.size()
+        self.remember_placement();self.resize_borders.update();self.update();self.focus_composer()
+
 
     def open_menu(self):
-        menu=QMenu(self)
-        menu.addAction('Settings',self.open_settings).setEnabled(bool(self.controller))
-        menu.addAction('Colors & skins',self.open_appearance)
-        menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
-        is_dsh=bool(self.controller and self.controller.harness=='dsh')
-        menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
-        menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
-        if sys.platform == 'win32':
-            from .windows_browser_setup import available, WindowsBrowserSetupDialog as BrowserSetupDialog
-        else:
-            from .macos_browser_setup import available, MacBrowserSetupDialog as BrowserSetupDialog
-        if available():
-            menu.addAction('Set up browser extension',lambda:BrowserSetupDialog(self).exec())
-        menu.addAction('Versions & updates',self.open_updates).setEnabled(bool(self.controller))
-        menu.addAction('Approval mode',self.open_access).setEnabled(bool(self.controller))
-        menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
-        menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
-        menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
+        self.open_settings()
+
+
+    def open_inspector(self):
+        controller=self.controller
+        if not controller or controller.harness not in ('pi','ah') or not controller.online or not controller.session or not controller.capabilities.get('inspection'):return
+        sid=controller.session
+        def work():
+            try:return controller.client.call('inspection.open',{'sessionId':sid}),None
+            except Exception as error:return None,str(error)
+        def opened(value):
+            if self.controller is not controller or controller.session!=sid or not controller.online:return
+            result,error=value
+            if error:self.set_status(error);return
+            url=QUrl(result.get('url',''))
+            if result.get('mode')!='read-only' or result.get('sessionId')!=sid or url.scheme()!='http' or url.host()!='127.0.0.1' or not url.fragment().startswith('token='):
+                self.set_status('The runtime returned an invalid conversation inspector link.');return
+            if not QDesktopServices.openUrl(url):self.set_status('The default browser could not open the conversation inspector.')
+        self.call_in_background(work,opened)
 
     def open_updates(self):
         if self.controller:UpdatesDialog(self).exec()
@@ -917,6 +1173,8 @@ class Window(QWidget):
         # Shared colour changes never replace per-window placement, model or draft.
         if self.preferences_timer.isActive() or (self.appearance_dialog and self.appearance_dialog.isVisible()):return
         latest=Preferences().values
+        if latest['expand_thinking']!=self.preferences.values['expand_thinking']:
+            self.set_thinking_visibility(latest['expand_thinking'])
         keys=('theme','hue','brightness','accent_hue','accent_brightness','format_colours')
         changed={key:latest[key] for key in keys if latest[key]!=self.preferences.values[key]}
         if changed:self.apply_appearance(changed)
@@ -986,6 +1244,7 @@ class Window(QWidget):
         scaled(self.pin_button).setStyleSheet(f'QPushButton {{padding:0;border:0;font-size:15px;}} QPushButton:checked {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
         scaled(self.model_picker).setStyleSheet(f'QPushButton {{text-align:left;border:0;background:transparent;padding:0;font-size:11px;color:{text};}} QPushButton:hover,QPushButton:pressed,QPushButton:focus {{background:transparent;color:{text};}} QPushButton:disabled {{color:rgba(127,150,150,150);}}')
         scaled(self.composer.prompt_menu).setStyleSheet(f'QListWidget {{background:{solid.name()};color:{text};border:1px solid {self.accent.name()};border-radius:10px;padding:4px;}} QListWidget::item {{padding:7px;}} QListWidget::item:selected {{background:{self.accent.name()};color:{solid.name()};border-radius:6px;}}')
+        if self.settings_panel:self.settings_panel.sync_navigation()
         self.composer.fit()
         self.rendered_messages=None
         scaled(self.brand).setStyleSheet('font-size:13px;font-weight:600;padding-left:8px;color:'+self.accent.name())
@@ -1012,6 +1271,8 @@ class Window(QWidget):
         if percent==self.ui_scale.percent:return
         # Keep live widgets, document cursors, undo, controller and response intact.
         ratio=percent/self.ui_scale.percent
+        if self.chat_geometry:
+            self.chat_geometry.setSize(QSize(round(self.chat_design_size[0]*percent/self.ui_scale.base),round(self.chat_design_size[1]*percent/self.ui_scale.base)))
         if self.morphing:self.morph_animation.stop();self.morph_animation.finished.emit()
         size=self.size();expanded=self.expanded_size
         if size!=getattr(self,'last_scaled_size',None):
@@ -1024,7 +1285,8 @@ class Window(QWidget):
         if hasattr(self,'compact_anchor_offset'):
             self.compact_anchor_offset=QPoint(round(self.compact_anchor_offset.x()*ratio),round(self.compact_anchor_offset.y()*ratio))
         area=self.screen().availableGeometry()
-        self.resize(min(round(self.design_size[0]*self.ui_scale.factor),area.width()),min(round(self.design_size[1]*self.ui_scale.factor),area.height()))
+        if self.settings_panel:self.setFixedSize(self.settings_panel.frame_size())
+        else:self.resize(min(round(self.design_size[0]*self.ui_scale.factor),area.width()),min(round(self.design_size[1]*self.ui_scale.factor),area.height()))
         self.last_scaled_size=self.size()
         if self.compact:self.setMask(QRegion(px(self,1),px(self,1),px(self,102),px(self,102),QRegion.RegionType.Ellipse))
         self.composer.fit()
@@ -1078,6 +1340,7 @@ class Window(QWidget):
         if self.hidden_geometry is not None:QTimer.singleShot(100,self.restore_saved_position)
 
     def toggle_compact(self):
+        if self.settings_panel and not self.settings_panel.accept():return
         if self.voice_dialog or self.voice_opening:self.close_voice_panel()
         if self.morphing:return
         start=QRect(self.geometry());was_compact=self.compact
@@ -1193,6 +1456,8 @@ class Window(QWidget):
             self.controller.answer(frame, {'sessionId': payload['sessionId'], 'answer': {'answers': answers}})
 
     def escape(self):
+        if self.settings_panel:
+            self.settings_panel.accept();return
         if (self.voice_dialog or self.voice_opening) and self.voice_is_hands_free():
             self.close_voice_panel();return
         if self.voice_button.isDown() or (self.voice_dialog and self.voice_dialog.capture):
@@ -1252,6 +1517,8 @@ class Window(QWidget):
         phase = self.maintenance.phase()
         if phase=='prepared' or phase=='closing' and self.maintenance_state(include_reservation=False)['busy']:
             event.ignore();return
+        if self.settings_panel and not self.settings_panel.accept():
+            event.ignore();return
         if hasattr(self,'app_tray') and not getattr(self,'quit_requested',False):
             if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
             self.remember_placement();self.hide();event.ignore();return
@@ -1278,8 +1545,8 @@ class Window(QWidget):
     def remember_placement(self):
         self.hidden_layout=self.screen_layout()
         self.hidden_geometry=QRect(self.geometry())
-        rect=self.hidden_geometry
-        expanded=self.expanded_size if self.compact else self.size()
+        rect=self.chat_geometry if self.settings_panel else self.hidden_geometry
+        expanded=rect.size() if self.settings_panel else self.expanded_size if self.compact else self.size()
         self.preferences.values['placement']={'x':rect.x(),'y':rect.y(),'width':rect.width(),'height':rect.height(),'compact':self.compact,'expanded_width':expanded.width(),'expanded_height':expanded.height(),'screen_layout':self.hidden_layout,'halo_margin':self.activity.margin}
         for key in ('width','height','expanded_width','expanded_height'):
             self.preferences.values['placement'][key]=round(self.preferences.values['placement'][key]/self.ui_scale.factor)
@@ -1322,7 +1589,7 @@ class Window(QWidget):
         if getattr(self,'voice_dialog',None) or getattr(self,'voice_opening',False):self.close_voice_panel()
         self.activity.timer.stop()
         self.remember_placement()
-        self.hidden_dialogs=[d for d in self.findChildren(QDialog) if d.isVisible()]
+        self.hidden_dialogs=[d for d in self.findChildren(QDialog) if d.isVisible() and d.isWindow()]
         for dialog in self.hidden_dialogs:dialog.hide()
         super().hideEvent(event)
 
@@ -1340,12 +1607,13 @@ class Window(QWidget):
                 or bool(self.controller and (any(getattr(self.controller,name,False)
                     for name in ('navigating','preparing','repairing','loading_page'))
                     or bool(getattr(self.controller,'recovery_lock',None) and self.controller.recovery_lock.locked())))
-                or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
+                or getattr(self,'voice_settings_jobs',0)>0
+                or self.settings_panel is not None or any(dialog.isVisible() for dialog in self.findChildren(QDialog)))
         if admission['active'] or include_reservation and admission['phase']!='ready':busy=True
         return {'running': running, 'busy': busy, 'draftPresent': draft, 'accepted': not busy}
 
     def focus_composer(self):
-        if not self.isVisible() or self.compact:return
+        if not self.isVisible() or self.compact or self.settings_panel:return
         if QApplication.activeModalWidget() or QApplication.activePopupWidget():return
         if any(dialog.isVisible() for dialog in self.findChildren(QDialog)):return
         self.composer.setFocus(Qt.FocusReason.ShortcutFocusReason)
@@ -1386,7 +1654,7 @@ def _main(startup=None):
     parser.add_argument('--preview', action='store_true', help='Open without connecting to a harness.')
     parser.add_argument('--onboarding-host', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ui-test-control', action='store_true', help=argparse.SUPPRESS)
-    parser.add_argument('--harness', choices=['pi','dsh','codex'], help='Open the shared UI with this harness.')
+    parser.add_argument('--harness', choices=['pi','ah','dsh','codex'], help='Open the shared UI with this harness.')
     parser.add_argument('--instance', type=validate_name, default=current_name(), help='Named independent window (for example secondary); repeated launches toggle that window.')
     args = parser.parse_args()
     configure(args.instance)

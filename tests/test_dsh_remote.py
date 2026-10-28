@@ -16,6 +16,21 @@ class Response:
 
 class RemoteTests(unittest.TestCase):
     def setUp(self):self.remote=Remote('http://127.0.0.1:1234',Path('/tmp/disposable-dsh'))
+    def test_catalogue_description_never_fabricates_backend_version(self):
+        for default in [None,{'provider':'fixture','model':'authored'}, {'version':'FORGED','versionVerified':True,'home':'FORGED'}]:
+            with self.subTest(default=default),patch.object(self.remote,'invoke',return_value={'groups':[],'default':default}) as invoke:
+                value=self.remote.call('host.describe')
+                self.assertIsNone(value['version']);self.assertFalse(value['versionVerified'])
+                self.assertEqual(value['catalogContract'],'dsh-session-model-catalog/1')
+                self.assertEqual(value['home'],str(self.remote.home))
+                invoke.assert_called_once_with('session/modelCatalog')
+                if default and 'provider' in default:self.assertEqual(value['provider'],'fixture')
+
+    def test_unknown_catalogue_shape_does_not_certify_compatibility(self):
+        for value in [None,[],{}, {'groups':{}}, {'groups':[],'default':'wrong'}]:
+            with self.subTest(value=value),patch.object(self.remote,'invoke',return_value=value):
+                with self.assertRaisesRegex(ValueError,'catalogue contract'):self.remote.call('host.describe')
+
     def test_browser_handoff_requests_fresh_auth_after_service_restart(self):
         with patch.object(Path,'read_text',return_value='private-action-token'),patch.object(self.remote,'request',side_effect=[Response(200,{'token':'first'}),Response(200,{'token':'restarted'})]) as request:
             self.assertEqual(self.remote.browser_url(),'http://127.0.0.1:1234/?token=first')

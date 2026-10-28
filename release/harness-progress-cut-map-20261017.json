@@ -1,0 +1,132 @@
+{
+  "schema": "augmentor-harness-progress-and-cut-planning/1",
+  "date": "2026-10-17",
+  "runtimeRef": "889ad6cbe6e0165ff06b8a17f67b279e9cd24be4",
+  "scope": "Retain Native/Browser request stages and thinking; explicit-file data backup coverage and current advisory root/caller map",
+  "sourceQualification": {
+    "pythonPass": 161,
+    "nativeGroupPass": 121,
+    "controllerReadinessRemotePass": 28,
+    "coldBackupPass": 12,
+    "focusedNodePass": 24,
+    "browserUnitPass": 130,
+    "nodeDistinctTotal": 154,
+    "fail": 0,
+    "skip": 0,
+    "typeCheckPass": true,
+    "qtVersion": "6.8.2.1",
+    "managedScratchRealReserveGiB": 64,
+    "ownerProfilesExecuted": false,
+    "newFullAppCopies": 0,
+    "newImmutableArtifact": false,
+    "ownerColdArchiveCaptured": false,
+    "physicalDesktopAcceptance": false
+  },
+  "publicProvenance": {
+    "requestStages": "d943ad299883dad458f854ae7db815cf1eb06348",
+    "thinkingPreference": "d4ab5fd739e33e7fe3c6b1c270b863ced54d84dd",
+    "callbackDispatch": "41e04412678f77e45c85f339161ba7572d6a843c",
+    "githubCommitIdentitiesVerified": true,
+    "privateInstalledMethodsComparedInMemory": true,
+    "privateRepositorySourceCopied": false,
+    "adaptations": [
+      "Preserve current branch/queue/cancellation/maintenance and submitted-content guards",
+      "Bind Browser accepted labels to their originating pending draft",
+      "Handle originating consumed-input receipts without inventing model output",
+      "Keep SDK workspace preference isolation and current shared appearance publication"
+    ]
+  },
+  "coldBackupCoverage": {
+    "additionalMembers": true,
+    "maximumDirectRegularMemberNames": 64,
+    "archiveSchemaUnchanged": true,
+    "directorySymlinkTraversalAndDuplicatesRefused": true,
+    "mixedDeploymentWholeTreeRefused": true,
+    "namedParentAndSeparateNestedProfileSupported": true,
+    "defaultWholeTreeFormRetained": true,
+    "bootstrapSourceDirectoryProtectionsUnchanged": true,
+    "existingPerFileStartupSnapshotsStillRequired": true
+  },
+  "actualOwnerAdvisory": {
+    "knownClientCompanionProcesses": 12,
+    "launcherRegistrationFiles": 35,
+    "originalNativeWindows": 3,
+    "nativeIdleAndNoDraftAtObservation": true,
+    "logicalRoots": 21,
+    "sharedPairs": 2,
+    "additionalRoots": 17,
+    "otherDeploymentFiles": 2,
+    "metadataEntries": 199279,
+    "logicalBytesApprox": 8149223136,
+    "largestFile": 295408944,
+    "specialFilesObserved": 0,
+    "dataFileBodiesReadForSizing": false,
+    "coldCheckpointOrActivationAuthority": false,
+    "activeNativeMessagingOrigins": 1,
+    "matchingChromiumProfileEntries": 1,
+    "extensionOnDiskVersion": "0.2.11",
+    "loadedExtensionVersionVerified": false,
+    "permissionDescriptorExplicitUserStatePresent": true,
+    "permissionWrites": 0
+  },
+  "ownerPreservation": {
+    "mainPilotPidsAnd36ProtectedSetsExact": true,
+    "registryRevision": 18,
+    "sharedStoresEngineSettingsAndMenusExact": true,
+    "modelGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequests": 0,
+    "ownerProjectsTransferred": 0,
+    "installedAppChanged": false,
+    "pilotFeedbackRequiredBeforeMoreProjects": true,
+    "vrRasterStudioStaysDsh": true,
+    "voiceLaterOsDeferred": true
+  },
+  "storage": {
+    "previousUnusedCopiesRemoved": 75,
+    "previousRecoveredGiB": 40.89,
+    "rootFreeGiB": 98.5,
+    "singleScratchRequired": true,
+    "requiredRollbackReviewAndBackupArtifactsRetained": true
+  },
+  "linuxSdk": {
+    "run": 39063815081,
+    "ref": "222ae6e91c4b7575040ed5dec4a89602b615974b",
+    "runtimeRef": "889ad6cbe6e0165ff06b8a17f67b279e9cd24be4",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39063815081",
+    "jobSteps": 58
+  },
+  "remaining": [
+    "Preserve the existing saved Native voice-provider choice through the matching-client update; current candidate lacks that configured-provider path. Use verified public compatibility source, no provider/service changes or voice expansion.",
+    "Bind exact real bootstrap writes and all caller quiescence; do not infer it from the advisory map",
+    "Couple one actual cold archive to matching-client selection and durable finalization/reverse, then one combined immutable qualification",
+    "Adopt/reload the matching Browser extension without spoofing versions or losing existing settings",
+    "Actual owner continuation and pilot feedback; preserve current reviews and exclude further transfers until accepted",
+    "Existing public Office packaging and later-platform/voice gates remain separate"
+  ],
+  "privateEvidenceSha256": {
+    "harness-native-progress-and-cut-final-python-20261017.log": "84a31e9ae3aa258da481d283b4dcf2f1a880d17fe15e1b605e2c3475c5dd46ab",
+    "harness-native-progress-and-cut-final-node-20261017.log": "a7b3bdb0196b9c041cc8be79fc115c59e3d568d1b049e9814f897c6308c0d8b2",
+    "harness-progress-browser-all-20261017.log": "cca201718710b0ac4b1159fa8c3eb9c3c58be33760f1d2bab984fe9fc911d039",
+    "harness-native-progress-and-cut-check-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-progress-cut-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-native-progress-public-methods-private-20261017.json": "1a4354221b83406e28359cb8b8a46469d7a60bbee9c7ac351eb243850328f7cf",
+    "harness-current-cold-cut-map-private-20261017.json": "c42528e8caef1966fdda4a226f7ea79bf64ea857ba7204cde855b28d41c7eae4",
+    "harness-current-browser-extension-map-private-20261017.json": "eb93a36a413b536fb902fd94137721756539a98e607e6f7ceb67a849a35b6eac",
+    "harness-native-permission-parity-private-20261017.json": "78d2ae7a39eb111e0ab7e64a0c6c8303dbcc08b242ff6749b9f339b76f7b2451",
+    "harness-progress-cut-ci-39063562845-failed-20261017.log": "26b4a54628511eb72947dfeae652ae4a044c455ade016281caa721e4f3e2d1f8",
+    "harness-progress-cut-ci-terminal-private-20261017.json": "a6a88183982b06c9588cc116aea3048eb87f0db5b1a98881528e003bb1767e8a",
+    "harness-current-voice-selection-metadata-private-20261017.json": "5739d41da62e3f271e8b9b74ffb4edba66cf80a52607caea220489ad8b34205a",
+    "harness-storage-current-recheck-private-20261017.json": "b3cd00f6e2e1bcada1dbf69a7efdcdbedb6f7947ccb89888205ee820af4fc31e"
+  },
+  "priorLinuxSdk": {
+    "run": 39063562845,
+    "ref": "889ad6cbe6e0165ff06b8a17f67b279e9cd24be4",
+    "status": "completed",
+    "conclusion": "failure",
+    "nativePass": 121,
+    "browserTransportPass": 4,
+    "reason": "SDK workflow omitted the separate locked Browser test dependencies; jsdom could not import. Existing validation install recipe adopted, no test suppressed."
+  }
+}

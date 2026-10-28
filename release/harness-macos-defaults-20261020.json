@@ -1,0 +1,51 @@
+{
+  "schema": "augmentor-harness-macos-defaults-evidence/1",
+  "date": "2026-10-20",
+  "runtimeSourceRef": "38fabc4d8643a12994151c9f60b1406baaaa0809",
+  "version": "0.2.13",
+  "platform": "darwin-arm64",
+  "memoryGiB": 32,
+  "nodeVersion": "24.19.0",
+  "pythonVersion": "3.12.13",
+  "applicationInventorySha256": "7e16b745b1e2ba8d88452431406db8dbff212a65f3c3b5d16370984463c9a299",
+  "selectedAndRunning": true,
+  "qualification": {
+    "macStrictCheckAndFullBuild": true,
+    "macFocusedPass": 53,
+    "linuxStrictCheckAndFullBuild": true,
+    "linuxFocusedPass": 52,
+    "linuxNativePromptProof": "not counted; available Python lacks PySide6.QtTest",
+    "macSdkNativePromptProof": "passes",
+    "broaderMacAdapterBaseline": "three browser/desktop leaf failures reproduce with both old and candidate runtimes; not qualified by this change",
+    "liveMacSearch": "public Bing source results",
+    "liveMacFetch": "public HTTP response completed",
+    "existingLocalProviderConnections": "both advertised their configured model and returned a real reply from the Mac",
+    "actualOwnerUi": [
+      "New meta folder",
+      "Web search On; keyless",
+      "Workspace folders On",
+      "Prompt library and Improve prompt built in",
+      "both local models pinned; original model still selected"
+    ]
+  },
+  "adoption": {
+    "guardedShutdown": true,
+    "ownerClearedDraftBeforeAdoption": true,
+    "coldPrivateBackup": true,
+    "sqliteSnapshots": true,
+    "previousReleaseRetained": true,
+    "conversationCountPreserved": 2,
+    "projectFilesPreserved": 25,
+    "browserAddressAndLoginPreserved": true,
+    "selectedModelPreserved": true,
+    "graphicalLoginAndKeepAliveConfigured": true,
+    "newPhysicalRebootTest": false,
+    "linuxOwnerSelectionChanged": false
+  },
+  "remaining": [
+    "Wiki filesystem/receipt adapter remains Linux-only",
+    "broader platform, native desktop/browser-extension and physical voice qualification",
+    "public release/binary promotion is separate"
+  ],
+  "privacy": "No credentials, private endpoints, source conversations, knowledge content or owner filesystem paths are included."
+}

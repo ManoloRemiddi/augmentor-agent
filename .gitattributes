@@ -12,4 +12,11 @@
 *.icns -text
 # Preserve reviewed supplier bytes and checksum-pinned notices on every OS.
 components/handy/** -text
+# Original supplier notices include whitespace covered by the artifact hashes.
+vendor/quickjs-engine/** -text -whitespace
 LICENSE -text
+# Preserve published Wiki supplier source and original notice bytes, including CRLF.
+packages/runtime/vendor/dsh-plugin-wiki-tools/** -text -whitespace
+packages/runtime/vendor/dsh-plugin-wiki-skills/** -text -whitespace
+# An empty source line has one required context space in a unified patch.
+release/office-rebuild/thin-linker-resources.patch whitespace=-blank-at-eol

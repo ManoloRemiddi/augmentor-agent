@@ -1,0 +1,349 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {existsSync,chmodSync,lstatSync,realpathSync,mkdirSync,readFileSync,writeFileSync,renameSync,rmSync,openSync,closeSync,fsyncSync,constants} from 'node:fs';
+import {dirname,isAbsolute,join,resolve} from 'node:path';
+import {createHash,randomUUID} from 'node:crypto';
+import {loadDshProjectArchive,copyDshProjectArchive,dshAttachmentBytes,dshFileBytes,DSH_BUNDLE_BYTES} from './dsh-project-archive.js';
+import {historicalSettlementCatalogue,historicalInheritedSettlement} from './dsh-historical-project.js';
+import {dshArgumentErrorIndex} from './dsh-argument-errors.js';
+import {recognizeDshToolRecovery,recoveryCode} from './dsh-tool-recovery.js';
+import {dshHistorySurface,type DshSurface} from './dsh-history-surface.js';
+import {SessionManager,CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
+import {PiAttachments,promptAttachments,IMAGE_LIMITS,FILE_LIMIT} from './attachments.js';
+import {fileLeafName} from '../vendor/dsh-attachment/file-store.js';
+import {DSH_MEDIA_TYPE,DSH_MEDIA_SCHEMA} from './dsh-history-media.js';
+import {atomicJson,privateDir} from './storage.js';
+import {identifier,type Data,type DisplayEvent} from '../../protocol/src/index.js';
+
+const digest=(bytes:string|Buffer)=>createHash('sha256').update(bytes).digest('hex');
+const MAX_EXPORT=32*1024*1024;
+const present=(path:string)=>{try{lstatSync(path);return true;}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return false;throw error;}};
+const messageTypes=new Set(['assistant/message','tool/result','user/message']);
+const omittedSources=new Set(['agent-instructions','runtime-context','skill-catalog','repeat-tool-reminder']);
+const supportedParts=new Set(['text','reasoning','image','file','tool-call']);
+const setupEvents=new Set('permission/preset sandbox/mode approval/policy agent-preset/selected model/selection working-directory/change session/title session/end-seed agent/inbox/spliced subagent/model-selection-policy'.split(' '));
+/** Current-format setup metadata is a saved conversation even before its first
+ * human message. No turn, action, goal, workflow or context message qualifies. */
+function setupOnlyHistory(session:Data,events:Data[]){return session.opening.header.version===4&&events.length>0&&events.every(e=>setupEvents.has(e.type));}
+function fail(message:string):never{throw Error('DSH pilot import: '+message);}
+function checkedContent(content:Data[]):Data[]{
+ return content.map(p=>{
+  if(['text','reasoning'].includes(p?.type))return {type:p.type,text:p.text};
+  if(p?.type==='tool-call')return {type:p.type,id:p.id,name:p.name,arguments:p.arguments};
+  if(p?.type==='file'){
+   const a=p.attachment;promptAttachments([p]);
+   if(Object.keys(p).sort().join(',')!=='attachment,type'||Object.keys(a).sort().join(',')!=='attachmentId,bytes,name'||typeof a.name!=='string'||a.name!==fileLeafName(a.name))fail('unsupported file attachment metadata.');
+   return {type:'file',attachment:{attachmentId:a.attachmentId,name:a.name,bytes:a.bytes}};
+  }
+  if(p?.type!=='image')fail('unsupported historical content.');
+  const a=p.attachment;
+  promptAttachments([p]);
+  if(a.originalAttachmentId!==undefined||Object.keys(a).some(key=>!['attachmentId','bytes','mediaType','width','height','name','originalDimensions'].includes(key)))fail('unsupported image attachment metadata.');
+  if(p.offloaded!==undefined&&p.offloaded!==true)fail('invalid image offload marker.');
+  if(a.bytes>IMAGE_LIMITS.maxImageBytes||a.width*a.height>IMAGE_LIMITS.maxImagePixels)fail('image attachment exceeds its admission bounds.');
+  const dimensions=a.originalDimensions;
+  if(dimensions!==undefined&&(!dimensions||![dimensions.width,dimensions.height].every(n=>Number.isSafeInteger(n)&&n>0&&n<=32768)))fail('invalid original image dimensions.');
+  return {type:'image',attachment:{attachmentId:a.attachmentId,mediaType:a.mediaType,bytes:a.bytes,width:a.width,height:a.height,...(a.name===undefined?{}:{name:a.name}),...(dimensions?{originalDimensions:{width:dimensions.width,height:dimensions.height}}:{})},...(p.offloaded?{offloaded:true}:{})};
+ });
+}
+/** Older DSH settlement producers forwarded the child's complete closing blocks
+ * in a manager-owned user-role notice. Admit plaintext only with an earlier
+ * recorded child catalogue, or the complete v3 archive's checked direct-child
+ * evidence when migration placed the catalogue later. Never turn it into human
+ * or provider reasoning, or inject that future catalogue into a source cut. */
+const settlementCatalogues=new WeakMap<Data,Data>(),inheritedSettlements=new WeakMap<Data,Data>();
+const inheritedSettlementCount=(events:Data[])=>events.filter(e=>inheritedSettlements.has(e)).length;
+const deferredSettlementCount=(events:Data[])=>events.filter(e=>settlementCatalogues.has(e)).length;
+const settlementClosingCalls=new WeakMap<Data,number>();
+const settlementClosingCallCount=(events:Data[])=>events.reduce((n,e)=>n+(settlementClosingCalls.get(e)??0),0);
+function recordedSettlement(session:Data,e:Data,children:Set<string>,historicalScope:Data){
+ const m=e.data,s=m?.source;
+ if(session.opening.header.version!==4||e.type!=='user/message'||m.role!=='user'||s?.kind!=='subagent-settled'||s.form!=='notice'||typeof s.summary!=='string'||!s.summary.trim()||Object.keys(s).sort().join(',')!=='form,kind,senderSessionId,summary'||typeof s.senderSessionId!=='string'||s.senderSessionId===session.opening.header.id)return false;
+ identifier(s.senderSessionId);if(children.has(s.senderSessionId))return true;
+ const fact=historicalSettlementCatalogue(historicalScope,session.opening.header.id,s.senderSessionId);if(fact&&fact.catalogueSeq>e.seq){settlementCatalogues.set(e,{...fact,policy:'catalogue follows the recorded notice; only notice content through this cut enters context'});return true;}
+ const inherited=historicalInheritedSettlement(historicalScope,session.opening.header.id,s.senderSessionId,e.seq);if(!inherited)return false;inheritedSettlements.set(e,inherited);return true;
+}
+function legacySettlementReasoning(session:Data,e:Data,part:Data,children:Set<string>,scope:Data){return Object.keys(part).sort().join(',')==='text,type'&&recordedSettlement(session,e,children,scope);}
+function settlementClosingCall(session:Data,e:Data,part:Data,children:Set<string>,scope:Data){return Object.keys(part).sort().join(',')==='arguments,id,name,type'&&typeof part.id==='string'&&!!part.id&&typeof part.name==='string'&&!!part.name&&typeof part.arguments==='string'&&recordedSettlement(session,e,children,scope);}
+const settlementReasoningCount=(events:Data[])=>events.reduce((n,e)=>n+(e.type==='user/message'&&e.data.source?.kind==='subagent-settled'?e.data.content.filter((p:Data)=>p.type==='reasoning').length:0),0);
+function historicalMessage(message:Data){const s=message.source;return {role:message.role,...(message.role==='user'&&s?.kind==='subagent-settled'?{source:{kind:s.kind,form:s.form,summary:s.summary,senderSessionId:s.senderSessionId}}:{}),content:message.content};}
+const toolRecoveries=new WeakMap<Data,Data>(),argumentErrors=new WeakMap<Data,Map<string,Data>>();
+const argumentError=(e:Data,id:string)=>argumentErrors.get(e)?.get(id);
+const argumentErrorCount=(events:Data[])=>events.filter(e=>e.type==='tool/result'&&argumentError(e,e.data.message.toolCallId)?.sourceResultSeq===e.seq).length;
+const emptyArgumentCount=(events:Data[])=>events.reduce((n,e)=>n+(e.type==='assistant/message'?e.data.message.content.filter((p:Data)=>p.type==='tool-call'&&p.arguments==='').length:0),0);
+function toolRecoveryCounts(events:Data[]){let notStarted=0,unknownOutcome=0;for(const e of events){const r=toolRecoveries.get(e);if(!r||r.sourceResultSeq!==e.seq)continue;if(r.code==='TOOL_NOT_STARTED')notStarted++;else unknownOutcome++;}return {notStarted,unknownOutcome};}
+function records(session:Data,cut=false,historicalScope:Data=session){
+ const rows=session.records,opening=session.opening;
+ if(!opening?.header?.id||!Array.isArray(rows)||(!rows.length&&!cut)||rows.length>30000)fail('missing bounded complete session.');
+ identifier(opening.header.id);
+ const argumentIndex=dshArgumentErrorIndex(opening.header.version,rows.map((row:Data)=>row?.event));
+ if(opening.header.version!==undefined&&opening.header.version!==4)fail('unsupported source session format version.');
+ if(opening.header.isSeeded!==undefined&&typeof opening.header.isSeeded!=='boolean')fail('invalid source lineage marker.');
+ let previous=-1;const children=new Set<string>(),calls=new Map<string,string>(),pending=new Set<string>(),dispatched=new Set<string>(),notStarted=new Set<string>(),activeProposals=new Set<string>(),proposals=new Map<string,Data>(),callEvents=new Map<string,Data>(),results=new Map<string,Data>();
+ let human=false;const effective:Data[]=[],bySeq=new Map<number,Data>();
+ for(const row of rows){
+  const e=structuredClone(row?.event);
+  if(row?.type!=='event'||!e||!Number.isSafeInteger(e.seq)||e.seq!==previous+1||typeof e.type!=='string'||e.type.length>128||!e.data||!Number.isSafeInteger(e.time))fail('history has a gap or unsupported record.');
+  previous=e.seq;if(argumentIndex.has(e.seq))argumentErrors.set(e,argumentIndex.get(e.seq)!);
+  if(['turn/start','turn/end','step/end','session/end-seed'].includes(e.type))activeProposals.clear();
+  if(e.type==='subagent/catalog'&&typeof e.data.childId==='string'&&typeof e.data.mode==='string'&&e.data.mode&&e.data.mode.length<=128)children.add(e.data.childId);
+  if(/compact|context\/edit|message\/edit|branch|fork/.test(e.type)&&!['compaction/start','compaction/summary','compaction/prune','compaction/end'].includes(e.type))fail('edited, compacted or branched history needs a separate converter.');
+  if(messageTypes.has(e.type)){
+   const m=e.type==='user/message'?e.data:e.data.message;
+   if(!m||!Array.isArray(m.content))fail('message content is unavailable.');
+   for(const p of m.content){
+    if(!supportedParts.has(p?.type))fail('attachment/reasoning content needs a separate converter; originals are preserved.');
+    if(['text','reasoning'].includes(p.type)&&typeof p.text!=='string')fail('invalid text/reasoning content.');
+    if(p.type==='reasoning'&&e.type!=='assistant/message'&&!legacySettlementReasoning(session,e,p,children,historicalScope))fail('reasoning is only supported on historical assistant messages.');
+    if(p.type==='tool-call'){
+     // A child's forwarded closing proposal is quoted manager data. It does
+     // not register a parent proposal/dispatch/result or parse executable args.
+     if(e.type==='user/message'&&settlementClosingCall(session,e,p,children,historicalScope)){settlementClosingCalls.set(e,(settlementClosingCalls.get(e)??0)+1);continue;}
+     if(e.type!=='assistant/message'||typeof p.id!=='string'||typeof p.name!=='string'||typeof p.arguments!=='string')fail('unsupported tool proposal.');
+     let args;try{args=opening.header.version===4&&p.arguments===''?{}:JSON.parse(p.arguments);}catch{if(!argumentError(e,p.id))fail('malformed tool arguments.');}
+     if((!args||typeof args!=='object'||Array.isArray(args))&&!argumentError(e,p.id)||calls.has(p.id))fail('ambiguous tool proposal.');
+     calls.set(p.id,p.name);proposals.set(p.id,{seq:e.seq,turn:e.data.turn,step:e.data.step});activeProposals.add(p.id);
+    }
+   }
+   const checked=checkedContent(m.content);
+   // Summary correlation compares original checkpoint blocks, before the
+   // ordinary display/context normalization can discard additional fields.
+   if(e.type!=='user/message'||m.source?.kind!=='compact-checkpoint')m.content=checked;
+   if(e.type==='user/message'&&m.source?.kind==='user')human=true;
+   if(e.type==='tool/result'){
+    const id=m.toolCallId,replacement=e.surfaceOp?.op==='replace',prior=results.get(id),inherited=prior&&toolRecoveries.get(prior);
+    const recovery=replacement?inherited:recognizeDshToolRecovery(opening.header.version,row.event,proposals.get(id),callEvents.get(id),activeProposals.has(id));
+    if(!replacement&&recoveryCode(e.data.error?.code)&&!recovery)fail('historical tool recovery does not match its exact source protocol.');
+    if(!calls.has(id))fail('tool result has no matching historical call.');
+    if(!replacement){
+     if(prior)fail('historical tool result is duplicated.');
+     if(!pending.delete(id)){if(recovery?.code!=='TOOL_NOT_STARTED'||dispatched.has(id))fail('tool result has no matching historical call.');notStarted.add(id);}
+     activeProposals.delete(id);
+    }
+    if(recovery)toolRecoveries.set(e,recovery);const inheritedArgument=prior&&argumentError(prior,id);if(replacement&&inheritedArgument)argumentErrors.set(e,new Map([[id,inheritedArgument]]));results.set(id,e);
+   }
+  }
+  if(e.type==='image/offload'){
+   const targets=e.data.targets;
+   if(Object.keys(e.data).length!==1||!Array.isArray(targets)||!targets.length)fail('invalid image offload event.');
+   const seen=new Set<number>();
+   for(const target of targets){
+    if(!target||Object.keys(target).sort().join(',')!=='imageIndexes,seq'||!Number.isSafeInteger(target.seq)||seen.has(target.seq)||!Array.isArray(target.imageIndexes)||!target.imageIndexes.length)fail('invalid image offload target.');
+    seen.add(target.seq);const original=bySeq.get(target.seq);
+    if(!original||!['user/message','tool/result'].includes(original.type))fail('image offload target is unavailable.');
+    const images=(original.type==='user/message'?original.data:original.data.message).content.filter((p:Data)=>p.type==='image');let before=-1;
+    for(const index of target.imageIndexes){if(!Number.isSafeInteger(index)||index<=before||!images[index]||images[index].offloaded)fail('image offload index is invalid or repeated.');before=index;images[index].offloaded=true;}
+   }
+  }
+  effective.push(e);bySeq.set(e.seq,e);
+  if(e.type==='tool/call'){
+   if(calls.get(e.data.callId)!==e.data.name||dispatched.has(e.data.callId)||notStarted.has(e.data.callId))fail('tool dispatch is ambiguous.');
+   pending.add(e.data.callId);dispatched.add(e.data.callId);callEvents.set(e.data.callId,e);
+  }
+ }
+ const setupOnly=setupOnlyHistory(session,effective);
+ if(previous!==opening.cursor||pending.size||calls.size!==dispatched.size+notStarted.size||(!human&&!cut&&!setupOnly))fail('history is incomplete or has unresolved actions.');
+ const turn=rows.map((r:Data)=>r.event).filter((e:Data)=>e.type==='turn/start'||e.type==='turn/end').at(-1);
+ if(!cut&&!setupOnly&&turn?.type!=='turn/end')fail('finish the source conversation before importing it.');
+ const surface=dshHistorySurface(effective,opening.header.version===4,cut);
+ const parent=opening.header.parentSession;if(parent!==undefined){identifier(parent);if(parent===opening.header.id)fail('source lineage cannot name itself.');}
+ if(!cut&&opening.header.isSeeded===true&&!surface.seedCuts.length)fail('seeded source is missing its inherited boundary.');
+ return {events:effective,surface};
+}
+
+type ModelSelection={provider:string;model:string};
+export type ImportOptions={selection:ModelSelection;sessionSelections?:Record<string,ModelSelection>;sourceSha256:string};
+const MAX_PROJECT_SESSIONS=128;
+function checkedSelection(value:unknown):ModelSelection{
+ const row=value as ModelSelection;
+ if(!row||typeof row!=='object'||Array.isArray(row)||Object.keys(row).some(key=>!['provider','model'].includes(key))||typeof row.provider!=='string'||!row.provider.trim()||typeof row.model!=='string'||!row.model.trim())fail('choose the current continuation model explicitly.');
+ return {provider:row.provider,model:row.model};
+}
+/** Shared full-import and source-cut projection. This only appends labelled
+ * history through the public SDK; it never restores old provider/tool actions. */
+function appendDshTranscript(manager:ReturnType<typeof SessionManager.inMemory>,original:Data,events:Data[],surface:DshSurface,source:Data,sha256:string,targetState:string){
+  const sourceToolArgumentErrors=argumentErrorCount(events),sourceEmptyToolArguments=emptyArgumentCount(events);
+  const sourceToolRecoveries=toolRecoveryCounts(events),hasToolRecovery=sourceToolRecoveries.notStarted+sourceToolRecoveries.unknownOutcome>0;
+  manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',...(sourceToolArgumentErrors?{sourceToolArgumentErrors}:{}),...(sourceEmptyToolArguments?{sourceEmptyToolArguments}:{}),...(hasToolRecovery?{sourceToolRecoveries}:{}),...(settlementReasoningCount(events)?{legacySettlementReasoningBlocks:settlementReasoningCount(events)}:{}),...(deferredSettlementCount(events)?{deferredSettlementCatalogueNotices:deferredSettlementCount(events)}:{}),...(inheritedSettlementCount(events)?{inheritedSettlementNotices:inheritedSettlementCount(events)}:{}),...(settlementClosingCallCount(events)?{settlementClosingToolProposals:settlementClosingCallCount(events)}:{}),...(setupOnlyHistory(original,events)?{sourceHistoryKind:'setup-only'}:{}),...(surface.endedSeedCompactions.length?{historicalInterruptedCompactions:surface.endedSeedCompactions}:{}),...(source.historicalDerivation?{historicalDerivation:source.historicalDerivation,originalCompressedSource:original.historicalOriginal}:{}),context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
+  const contextEvents=surface.nodes.map(seq=>events[seq]),activeSeqs=new Set(surface.nodes),endedCompactions=new Set(surface.endedSeedCompactions),replacements=new Map(surface.replacements.map(row=>[row.seq,row]));
+  const sourceLineage={parentSession:original.opening.header.parentSession??null,isSeeded:original.opening.header.isSeeded??null,seedCuts:surface.seedCuts};
+  manager.appendCustomEntry('augmentor.dsh-surface.v1',{...surface,sourceLineage,contextPolicy:'source message membership/order; current Augmentor instructions; bounded historical tool excerpts; no provider replay'});
+  const toolExcerpts=new Map<number,string>();let toolContextLeft=16384,toolPayloadChars=0;
+  for(const e of [...contextEvents].reverse())if(e.type==='tool/result'){const m=e.data.message,raw=JSON.stringify({role:m.role,toolCallId:m.toolCallId,isError:m.isError===true,content:m.content});toolPayloadChars+=raw.length;const take=Math.min(toolContextLeft,256,raw.length);toolExcerpts.set(e.seq,take===raw.length?raw:take?raw.slice(0,Math.ceil(take*3/4))+'\n[excerpt cut; full record archived]\n'+raw.slice(-Math.floor(take/4)):'');toolContextLeft-=take;}
+  let contextEntries=0,skippedInstructionMessages=0,archivedToolProposalMessages=0;const display:DisplayEvent[]=[],calls=new Map<string,string>();
+  const provenance=(e:Data)=>({system:'DSH',...(source.historicalDerivation?{coordinates:source.historicalDerivation.coordinates,originalCompressedSha256:original.historicalOriginal.sourceSha256}:{}),sourceSessionId:original.opening.header.id,sourceSeq:e.seq,sourceTime:e.time,...(inheritedSettlements.has(e)?{sourceInheritedSettlement:inheritedSettlements.get(e)}:{}),...(settlementCatalogues.has(e)?{sourceSettlementCatalogue:settlementCatalogues.get(e)}:{}),archiveSha256:sha256,...(e.surfaceOp===undefined?{}:{sourceSurfaceOp:e.surfaceOp}),...(e.sourceEventSeqs===undefined?{}:{sourceEventSeqs:e.sourceEventSeqs})});
+  for(const e of events){
+   const d=structuredClone(e.data),sourceToolRecovery=toolRecoveries.get(e),seq=e.seq+1,turnId='dsh-import:'+String(d.turn??'seed');let type=e.type,data=d;
+   if(e.type==='assistant/message')for(const p of d.message.content)if(p.type==='tool-call')calls.set(p.id,p.name);
+   if(e.type==='tool/call'){calls.set(d.callId,d.name);data={toolCallId:d.callId,name:d.name,arguments:d.arguments,...(argumentError(e,d.callId)?{sourceArgumentError:argumentError(e,d.callId)}:{}),...(original.opening.header.version===4&&d.arguments===''?{sourceEmptyArguments:true}:{})};}
+   if(e.type==='tool/result')data={toolCallId:d.message.toolCallId,name:calls.get(d.message.toolCallId),...(argumentError(e,d.message.toolCallId)?{sourceArgumentError:argumentError(e,d.message.toolCallId)}:{}),...(sourceToolRecovery?{sourceToolRecovery}:{}),isError:d.message.isError===true,result:{content:d.message.content}};
+   if(e.type==='assistant/message')data={message:{content:d.message.content.map((p:Data)=>p.type==='tool-call'?{type:'toolCall',id:p.id,name:p.name,...(argumentError(e,p.id)?{argumentsRaw:p.arguments,sourceArgumentError:argumentError(e,p.id)}:{arguments:original.opening.header.version===4&&p.arguments===''?{}:JSON.parse(p.arguments),...(original.opening.header.version===4&&p.arguments===''?{sourceEmptyArguments:true,argumentsRaw:''}:{})})}:p),timestamp:e.time,stopReason:d.message.source?.replayState?.response?.stopReason??'stop'}};
+   if(e.type==='user/message'&&d.source?.kind!=='user'){type='dsh/history';data={originalType:e.type,original:d};}
+   if(e.surfaceOp?.op==='replace'){
+    type='dsh/history';data={originalType:e.type,original:d};
+    const replacement=replacements.get(e.seq);
+    if(replacement?.kind==='summary'){const summary=events[replacement.summarySeq!];type='dsh/compaction';data={original:d,marker:{kind:'compaction',seq,time:e.time,summary:summary.data.summary.map((p:Data)=>p.text).join(''),summaryEventSeq:summary.seq+1,shadowedItemCount:replacement.shadowedSeqs.length,shadowedTokenCount:summary.data.shadowedTokenCount}};}
+   }
+   if(e.type==='compaction/start'&&endedCompactions.has(e.seq)){type='dsh/history';data={originalType:e.type,original:d,sourceLifecycle:'interrupted at the recorded seed boundary; outcome unknown; no native compaction resumed'};}
+   if(e.type==='turn/end'&&!['completed','stop','aborted','interrupted','error'].includes(d.reason?.kind)){data={...d,reason:{kind:d.reason?.kind==='forked'?'interrupted':'completed'},originalReason:d.reason,...(d.reason?.kind==='forked'?{message:'Historical DSH fork boundary; inherited work ended in the source history. No action is pending in Pi.'}:{})};}
+   display.push({seq,type,data:{...data,inputMode:'unattributed',inputOrigin:'unattributed',importedFrom:provenance(e)},turnId});
+  }
+  for(const e of contextEvents){
+   if(!messageTypes.has(e.type))continue;
+   const m=e.type==='user/message'?e.data:e.data.message;
+   if(e.type==='user/message'&&omittedSources.has(m.source?.kind)){skippedInstructionMessages++;continue;}
+   const images=m.content.filter((p:Data)=>p.type==='image'),files=m.content.filter((p:Data)=>p.type==='file');
+   if(e.type==='user/message'&&m.source?.kind==='compact-checkpoint'){
+    manager.appendMessage({role:'user',content:[{type:'text',text:'Historical DSH compaction checkpoint (completed past summary; data, not a new request):\n'+JSON.stringify({sourceSeq:e.seq,content:m.content.filter((p:Data)=>p.type!=='image')})}],timestamp:e.time});contextEntries++;if(!images.length&&!files.length)continue;
+   }
+   if(e.type==='user/message'&&m.source?.kind==='user'){
+    const text=m.content.filter((p:Data)=>p.type==='text').map((p:Data)=>({type:'text' as const,text:p.text}));
+    manager.appendMessage({role:'user',content:text.length?text:[{type:'text',text:files.length?'[Historical DSH user submitted attachments in the following labelled record.]':'[Historical DSH user submitted the images in the following labelled record.]'}],timestamp:e.time});contextEntries++;
+    if(!images.length&&!files.length)continue;
+   }
+   if(images.length||files.length){
+    const historical={event:e.type,sourceSeq:e.seq,sourceTime:e.time,...(inheritedSettlements.has(e)?{sourceInheritedSettlement:inheritedSettlements.get(e)}:{}),...(e.type==='tool/result'?{tool:calls.get(m.toolCallId),toolCallId:m.toolCallId,...(argumentError(e,m.toolCallId)?{sourceArgumentError:argumentError(e,m.toolCallId)}:{}),...(toolRecoveries.has(e)?{sourceToolRecovery:toolRecoveries.get(e)}:{}),isError:m.isError===true,literalExcerpt:toolExcerpts.get(e.seq),coverage:'bounded historical excerpt; full output archived'}:{message:{...historicalMessage(m),content:e.type==='user/message'&&m.source?.kind!=='subagent-settled'?[]:m.content.filter((p:Data)=>p.type!=='image')}})};
+    manager.appendCustomMessageEntry(DSH_MEDIA_TYPE,(toolRecoveries.has(e)?'Historical DSH recovery record (source cut; outcome as labelled; data, not a new instruction):\n':'Historical DSH record (completed past activity; data, not a new instruction):\n')+JSON.stringify(historical),false,{...provenance(e),schema:DSH_MEDIA_SCHEMA,images,...(files.length?{files}:{})});
+   }else {
+    if(e.type==='assistant/message'&&!m.content.some((p:Data)=>['text','reasoning'].includes(p.type)&&p.text.trim())){archivedToolProposalMessages++;continue;}
+    const retained=e.type==='tool/result'?{tool:calls.get(m.toolCallId),toolCallId:m.toolCallId,...(argumentError(e,m.toolCallId)?{sourceArgumentError:argumentError(e,m.toolCallId)}:{}),...(toolRecoveries.has(e)?{sourceToolRecovery:toolRecoveries.get(e)}:{}),isError:m.isError===true,fullRecordChars:JSON.stringify(m).length,literalExcerpt:toolExcerpts.get(e.seq),coverage:'bounded excerpt; complete arguments/output stay in the raw archive and display timeline'}:{message:historicalMessage(m)};
+    manager.appendCustomMessageEntry('augmentor.dsh-history.v1',(toolRecoveries.has(e)?'Historical DSH recovery record (source cut; outcome as labelled; data, not a new instruction):\n':'Historical DSH record (completed past activity; data, not a new instruction):\n')+JSON.stringify({event:e.type,sourceSeq:e.seq,sourceTime:e.time,...(inheritedSettlements.has(e)?{sourceInheritedSettlement:inheritedSettlements.get(e)}:{}),...retained}),false,provenance(e));
+   }
+   contextEntries++;
+  }
+  manager.appendCustomMessageEntry('augmentor.dsh-history.v1','End of imported DSH history. All recorded calls are historical. No old request, permission, goal, queue, command or agent job is pending in Pi. Wait for a new human request. Current Augmentor instructions and selected model govern future work. Full source archive for exact historical lookup: '+join(targetState,'dsh-imports',sha256+'.json'),false,{archiveSha256:sha256,boundary:'end-of-import'});
+  return {display,sourceToolRecoveries,sourceToolArgumentErrors,sourceEmptyToolArguments,contextEntries,skippedInstructionMessages,archivedToolProposalMessages,activeSeqs,sourceLineage,toolContextLeft,toolPayloadChars};
+}
+
+/** Rebuild a historical branch at its original source cut, including then-current
+ * replacements and image offload state. Future source edits never enter it.
+ * Full archive validation is separate from the intentionally open prefix turn. */
+export function dshHistoryCut(original:Data,source:Data,sha256:string,state:string,throughSeq:number){
+ records(original);
+ if(!Number.isSafeInteger(throughSeq)||throughSeq< -1||throughSeq>original.opening.cursor)fail('invalid historical branch cut.');
+ const prefix={...original,opening:{...original.opening,cursor:throughSeq},records:original.records.slice(0,throughSeq+1)};
+ const {events,surface}=records(prefix,true,original),manager=SessionManager.inMemory(source.workspace.path);
+ const title=original.opening.projections?.values?.title??source.workspace.title;manager.appendSessionInfo(typeof title==='string'?title:'Imported DSH branch');
+ const projected=appendDshTranscript(manager,original,events,surface,source,sha256,state);
+ manager.appendCustomEntry('augmentor.dsh-cut.v1',{archiveSha256:sha256,sourceSessionId:original.opening.header.id,throughSeq,fullSourceThroughSeq:original.opening.cursor,policy:'explicit source prefix; current Augmentor instructions; no historical action replay'});
+ return {manager,display:projected.display};
+}
+
+/** One native conversation; historical calls never become executable Pi proposals. */
+function writeSession(original:Data,events:Data[],surface:DshSurface,stage:string,targetState:string,source:Data,selection:ModelSelection,sha256:string,now:number){
+ const workspace=source.workspace,cwd=workspace.path,sid='dsh-import-'+digest(original.opening.header.id).slice(0,24);
+ const sessions=privateDir(join(stage,'sessions')),nativeDir=privateDir(join(sessions,sid));
+  const manager=SessionManager.create(cwd,nativeDir),title=original.opening.projections?.values?.title??workspace.title;
+  manager.appendSessionInfo(typeof title==='string'?title:workspace.title);
+  const {display,sourceToolRecoveries,sourceToolArgumentErrors,sourceEmptyToolArguments,contextEntries,skippedInstructionMessages,archivedToolProposalMessages,activeSeqs,sourceLineage,toolContextLeft,toolPayloadChars}=appendDshTranscript(manager,original,events,surface,source,sha256,targetState);
+  const nativeFile=manager.getSessionFile(),setupOnly=setupOnlyHistory(original,events);
+  if(nativeFile&&setupOnly&&!existsSync(nativeFile)){
+   // Like custom-only native branches, the SDK deliberately defers setup-only
+   // files. Save its exact public snapshot in this unpublished private stage;
+   // do not invent a user/assistant message or run an agent just to flush it.
+   const header=manager.getHeader();if(!header||header.version!==CURRENT_SESSION_VERSION)fail('Pi setup snapshot is unavailable.');
+   const fd=openSync(nativeFile,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);
+   try{for(const entry of [header,...manager.getEntries()])writeFileSync(fd,JSON.stringify(entry)+'\n');fsyncSync(fd);}finally{closeSync(fd);}
+   if(process.platform!=='win32'){const fd=openSync(nativeDir,constants.O_RDONLY|(constants.O_DIRECTORY??0)|(constants.O_NOFOLLOW??0));try{fsyncSync(fd);}finally{closeSync(fd);}}
+  }
+  if(!nativeFile||!existsSync(nativeFile))fail('Pi did not persist the imported context.');
+  chmodSync(nativeFile,0o600);const reopened=SessionManager.open(nativeFile);if(reopened.buildSessionContext().messages.length!==contextEntries+1)fail('native cold-open context does not match.');
+  const hasToolRecovery=sourceToolRecoveries.notStarted+sourceToolRecoveries.unknownOutcome>0;
+  const notice=(inheritedSettlementCount(events)?'Some settlement content was inherited from a verified ancestor-owned child. No child ownership or running job is added to this conversation. ':'')+(surface.endedSeedCompactions.length?'An interrupted historical compaction ended at the recorded seed boundary. No completion or result is inferred, and no compaction job is resumed. ':'')+(deferredSettlementCount(events)?'Recorded settlement content remains manager-owned historical data; its verified child catalogue occurs later in this archive. No child job is resumed. ':'')+(source.historicalDerivation?'Recovered historical DSH view: displayed sequence numbers are derived v4 coordinates. Exact compressed original logs are retained separately; there is no one-to-one physical-row mapping. ':'')+(hasToolRecovery?'Imported historical recovery records: some calls were not recorded as started, or their outcomes were unknown at this source cut. Original errors remain preserved. No old operation was retried. Continue only with a new human request; verify external state before choosing any new action.':setupOnly?'Imported conversation. Send your first message to start working here.':'Imported DSH history. Past calls are completed records; continuation uses a labelled transcript. Exact source and two-way sequence provenance are retained in the private import archive. Old tool outputs use bounded excerpts in continuation context; the full display/archive is preserved. Historical subagent logs stay archived, not live Fleet jobs. Plaintext reasoning is historical data, never signed provider replay. Imported images retain the exact stored bytes; original camera uploads are not reconstructed. Source replacements determine continuation context; original append-only records stay inspectable.');
+  display.push({seq:display.length+1,type:'runtime/notice',data:{message:notice,importedFrom:{archiveSha256:sha256}}});
+  const displayFile=openSync(join(sessions,sid+'.events.jsonl'),constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);
+  try{for(const event of display)writeFileSync(displayFile,JSON.stringify(event)+'\n');fsyncSync(displayFile);}finally{closeSync(displayFile);}
+  const finalNative=join(targetState,'sessions',sid,nativeFile.split(/[\\/]/).at(-1)!);
+  atomicJson(join(sessions,sid+'.meta.json'),{id:sid,cwd,file:finalNative,selection,title:typeof title==='string'?title:workspace.title,saved:true,policy:'read-only',surface:'linux',updatedAt:now,requests:[],running:false});
+  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,...(sourceToolArgumentErrors?{sourceToolArgumentErrors}:{}),...(sourceEmptyToolArguments?{sourceEmptyToolArguments}:{}),...(source.historicalDerivation?{historicalDerivation:source.historicalDerivation,originalCompressedSource:original.historicalOriginal}:{}),sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,...(hasToolRecovery?{sourceToolRecoveries}:{}),...(settlementReasoningCount(events)?{legacySettlementReasoningBlocks:settlementReasoningCount(events)}:{}),...(deferredSettlementCount(events)?{deferredSettlementCatalogueNotices:deferredSettlementCount(events)}:{}),...(inheritedSettlementCount(events)?{inheritedSettlementNotices:inheritedSettlementCount(events)}:{}),...(settlementClosingCallCount(events)?{settlementClosingToolProposals:settlementClosingCallCount(events)}:{}),...(setupOnly?{sourceHistoryKind:'setup-only'}:{}),...(surface.endedSeedCompactions.length?{historicalInterruptedCompactions:surface.endedSeedCompactions}:{}),contextEntries,sourceEvents:events.length,effectiveSourceSeqs:surface.nodes,sourceReplacements:surface.replacements.length,shadowedSourceMessages:events.filter(e=>messageTypes.has(e.type)&&!activeSeqs.has(e.seq)).length,sourceLineage,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadCoverage:'effective source tool results only; shadowed originals remain archived',toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+ return receipt;
+}
+
+/** Offline project import. Never opens a runtime/provider or modifies an existing target.
+ * All parents validate before staging; the whole project is published by one rename.
+ * The single-conversation receipt stays compatible with the earlier pilot. */
+/** Prepare a bounded export without touching a destination or model. */
+export function prepareDshProject(sourceFile:string,options:ImportOptions,maxExpandedBytes=DSH_BUNDLE_BYTES){
+ const info=lstatSync(sourceFile);if(!info.isFile()||info.isSymbolicLink()||info.size>MAX_EXPORT)fail('source must be a bounded regular export.');
+ const archive=loadDshProjectArchive(sourceFile,options.sourceSha256),{bytes,sha256,source}=archive;
+ if(archive.expandedBytes>maxExpandedBytes)throw Error('Combined exports exceed their 256 MiB expanded bound.');
+ for(const ref of archive.objects.values())archive.readObject(ref);
+ if(!['augmentor-dsh-project-export/1','augmentor-dsh-project-export/2','augmentor-dsh-project-export/3'].includes(source.schema)||!source.workspace||!Array.isArray(source.sessions)||source.sessions.length>MAX_PROJECT_SESSIONS)fail('choose a project with at most 128 conversations.');
+ const workspace=source.workspace,cwd=workspace.path;
+ if(typeof cwd!=='string'||!isAbsolute(cwd)||resolve(cwd)!==cwd||!lstatSync(cwd).isDirectory()||typeof workspace.title!=='string'||!workspace.title.trim())fail('workspace folder/name is unavailable.');
+ const ids=workspace.sessionIds;
+ if(!Array.isArray(ids)||ids.length!==source.sessions.length||new Set(ids).size!==ids.length||ids.some(id=>typeof id!=='string'))fail('workspace membership differs from the export.');
+ const byId=new Map<string,Data>();
+ for(const session of source.sessions){const id=session?.opening?.header?.id;if(typeof id!=='string'||!ids.includes(id)||byId.has(id))fail('workspace membership differs from the export.');byId.set(id,session);}
+ const fallback=checkedSelection(options.selection),selected=new Map<string,ModelSelection>();
+ if(options.sessionSelections!==undefined){
+  if(!options.sessionSelections||typeof options.sessionSelections!=='object'||Array.isArray(options.sessionSelections))fail('session model choices must be keyed by source conversation.');
+  for(const [id,value] of Object.entries(options.sessionSelections)){if(!byId.has(id))fail('session model choice belongs to another project.');selected.set(id,checkedSelection(value));}
+ }
+ const prepared=ids.map(id=>{const original=byId.get(id)!;if(original.opening.header.cwd!==cwd)fail('source conversation belongs to another workspace.');records(original);return {original};});
+ const organization=(key:string)=>{const value=source[key]??[];if(!Array.isArray(value)||new Set(value).size!==value.length||value.some(id=>typeof id!=='string'||!byId.has(id)))fail('session organization differs from project membership.');return new Set<string>(value);};
+ const archived=organization('archivedSessionIds'),pinned=organization('pinnedSessionIds');
+ if(source.relatedSessions!==undefined&&(!Array.isArray(source.relatedSessions)||source.relatedSessions.length>32))fail('related-session archive exceeds its project bound.');
+ const attachmentRows=source.attachments??[],bundle=source.schema!=='augmentor-dsh-project-export/1';
+ if(!Array.isArray(attachmentRows)||attachmentRows.length>10000)fail('invalid image attachment bundle.');
+ const blobs=new Map<string,{bytes:number}>();
+ for(const row of attachmentRows){
+  if(!row||Object.keys(row).sort().join(',')!==(source.schema==='augmentor-dsh-project-export/3'?'attachmentId,bytes,chunks':bundle?'attachmentId,bytes,sha256':'attachmentId,bytes,data')||!/^sha256:[a-f0-9]{64}$/.test(row.attachmentId)||blobs.has(row.attachmentId)||!Number.isSafeInteger(row.bytes)||row.bytes<1||row.bytes>IMAGE_LIMITS.maxImageBytes||!bundle&&(typeof row.data!=='string'||row.data.length>Math.ceil(IMAGE_LIMITS.maxImageBytes/3)*4))fail('invalid image attachment bundle entry.');
+  const data=dshAttachmentBytes(source,row);
+  if(!bundle&&data.toString('base64')!==row.data||data.length!==row.bytes||'sha256:'+digest(data)!==row.attachmentId)fail('image attachment checksum or encoding differs.');
+  blobs.set(row.attachmentId,{bytes:row.bytes});
+ }
+
+ const fileRows=source.files??[];if(!Array.isArray(fileRows)||fileRows.length>10000)fail('invalid file attachment bundle.');
+ const fileBlobs=new Map<string,Data>();for(const row of fileRows){
+  if(!row||Object.keys(row).sort().join(',')!==(bundle?'attachmentId,bytes,chunks':'attachmentId,bytes,data')||!/^sha256:[a-f0-9]{64}$/.test(row.attachmentId)||fileBlobs.has(row.attachmentId)||!Number.isSafeInteger(row.bytes)||row.bytes<0||row.bytes>FILE_LIMIT)fail('invalid file attachment bundle entry.');
+  dshFileBytes(source,row);fileBlobs.set(row.attachmentId,row);
+ }
+ const fileUsed=new Set<string>();for(const row of [...source.sessions,...(source.relatedSessions??[])])for(const record of Array.isArray(row?.records)?row.records:[]){
+  const e=record?.event;if(!e)continue;if(!messageTypes.has(e.type))continue;const m=e.type==='user/message'?e.data:e.data.message;
+  for(const p of Array.isArray(m?.content)?m.content:[])if(p?.type==='file'){const [part]=checkedContent([p]),stored=fileBlobs.get(part.attachment.attachmentId);if(!stored||stored.bytes!==part.attachment.bytes)fail('file attachment bytes are unavailable.');fileUsed.add(part.attachment.attachmentId);}
+ }
+ if([...fileBlobs.keys()].some(id=>!fileUsed.has(id)))fail('file attachment bundle contains an unreferenced object.');
+
+ const used=new Set<string>();
+ for(const {original} of prepared)for(const row of original.records){const e=row.event;if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'){
+  const bytes=blobs.get(p.attachment.attachmentId);if(!bytes||bytes.bytes!==p.attachment.bytes)fail('image attachment bytes are unavailable.');used.add(p.attachment.attachmentId);
+ }}
+ // Child-only objects remain in the exact archive, never a parent's receipts.
+ for(const child of source.relatedSessions??[])for(const row of child?.records??[]){const e=row?.event,m=e?.type==='user/message'?e.data:['assistant/message','tool/result'].includes(e?.type)?e.data?.message:undefined;for(const p of m?.content??[])if(p?.type==='image'){const [part]=checkedContent([p]);const b=blobs.get(part.attachment.attachmentId);if(!b||b.bytes!==part.attachment.bytes)fail('archived child image bytes are unavailable.');used.add(part.attachment.attachmentId);}}
+ if([...blobs.keys()].some(id=>!used.has(id)))fail('image attachment bundle contains an unreferenced object.');
+ return {cwd,source,sha256,bytes,expandedBytes:archive.expandedBytes,ids,pinned,archived,
+  sourceCut:(id:string)=>prepared.find(row=>row.original.opening.header.id===id)?.original,
+  async write(stage:string,targetState:string,includeIds:Set<string>=new Set(ids)){
+  privateDir(join(stage,'sessions'));const frozen=copyDshProjectArchive(archive,join(stage,'dsh-imports')),source=frozen.source;
+  const attachments=new PiAttachments(stage),receipts:ReturnType<typeof writeSession>[]=[],imageRows=new Map<string,Data>((source.attachments??[]).map((row:Data)=>[row.attachmentId,row])),fileRows=new Map<string,Data>((source.files??[]).map((row:Data)=>[row.attachmentId,row]));
+  const frozenById=new Map<string,Data>(source.sessions.map((row:Data)=>[row.opening.header.id,row]));
+  for(const id of ids){if(!includeIds.has(id))continue;const original=frozenById.get(id)!;
+   const {events,surface}=records(original),sid='dsh-import-'+digest(original.opening.header.id).slice(0,24),seen=new Set<string>();
+   for(const e of events)if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'||p.type==='file'){
+    const key=JSON.stringify(p);if(seen.has(key))continue;seen.add(key);
+    if(p.type==='image'){const row=imageRows.get(p.attachment.attachmentId);if(!row)fail('image attachment bytes are unavailable.');await attachments.importStoredImage(sid,p.attachment,dshAttachmentBytes(source,row));}
+    else{const row=fileRows.get(p.attachment.attachmentId);if(!row)fail('file attachment bytes are unavailable.');await attachments.importStoredFile(sid,p.attachment,dshFileBytes(source,row));}
+   }
+   receipts.push(writeSession(original,events,surface,stage,targetState,source,selected.get(original.opening.header.id)??fallback,sha256,Date.now()));
+  }
+  const receipt=receipts.length===1?receipts[0]:{schema:'augmentor-dsh-project-import/2',sourceSha256:sha256,cwd,sessions:receipts,sourceEvents:receipts.reduce((sum,row)=>sum+row.sourceEvents,0),displayEvents:receipts.reduce((sum,row)=>sum+row.displayEvents,0),contextEntries:receipts.reduce((sum,row)=>sum+row.contextEntries,0),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+   return {receipt,receipts};
+  }};
+}
+
+/** Backwards-compatible one-project import into a new private destination. */
+export async function importDshProject(sourceFile:string,targetState:string,options:ImportOptions){
+ const project=prepareDshProject(sourceFile,options),{cwd,ids,pinned,archived,sha256}=project;
+ if(!isAbsolute(targetState)||present(targetState))fail('destination state must be a new absolute path; existing profiles are never merged.');
+ const parent=dirname(targetState),parentInfo=lstatSync(parent);if(realpathSync(parent)!==resolve(parent)||!parentInfo.isDirectory()||parentInfo.isSymbolicLink()||process.platform!=='win32'&&(parentInfo.uid!==process.getuid!()||(parentInfo.mode&0o077)!==0))fail('destination needs a private operator-owned parent.');
+ const stage=join(parent,'.dsh-import-'+randomUUID());privateDir(stage);let published=false;
+ try{
+  const {receipt,receipts}=await project.write(stage,targetState);
+  atomicJson(join(stage,'workspaces.json'),{schema:'augmentor-workspaces/1',revision:1,items:[{workspaceId:cwd,cwd,title:project.source.workspace.title}],removed:[]});
+  const mapped=new Map(receipts.map(row=>[row.sourceSessionId,row.sessionId]));
+  atomicJson(join(stage,'session-organization.json'),{schema:'augmentor-session-organization/1',revision:1,pinnedSessionIds:[...pinned].filter(id=>!archived.has(id)).map(id=>mapped.get(id)!),archivedSessionIds:[...archived].map(id=>mapped.get(id)!)});
+  atomicJson(join(stage,'dsh-imports','receipt.json'),receipt);
+  if(present(targetState))fail('destination appeared during staging; nothing was merged.');
+  renameSync(stage,targetState);published=true;return receipt;
+ }finally{if(!published)rmSync(stage,{recursive:true,force:true});}
+}

@@ -1,0 +1,169 @@
+{
+  "schema": "augmentor-office-linux-managed-seat-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Explicit uninstalled MX Linux x64 systemd-user/cgroup-v2 candidate; no filesystem/network sandbox or public redistribution claim",
+  "sourceEvidenceBaseRef": "7ebeec65a16e48930d3653c90fc4130b2e6e1a44",
+  "sourceFilesSha256": {
+    "packages/runtime/src/host.ts": "da3ae7f4901053d1fe6abb3cea0ac95531dcaf435894002118f92dbf1b19deff",
+    "packages/runtime/src/office-process-linux.py": "ec74aeeaec80d20a114ece2b79f72a4aff3bc6026b92b221eac0e94c63f6afef",
+    "packages/runtime/src/office-process-linux.ts": "a96ffb53a72e0a783afa507ec2149461b672db2532e063364f69fbb526d7c0e8",
+    "packages/runtime/src/office-process-scope.ts": "733c905bf0ebd13fcf7f50bb4686c1ac5dcc4184bfc301b7f419bf581230646f",
+    "scripts/harness-ui-proof.mjs": "137009263ee028e7641aa68548608f70435de7f11be37c7099d98070cbe65c4f",
+    "tests/fixtures/office-process-owner.mjs": "bb7c3fa55afc6a69230ed32257145755d1933209d76d838f9d70c1b4162b0ab0",
+    "tests/harness-office-managed-chromium.test.mjs": "8b78032cb7b367ccf2a2efe4532592fe2818f8e2b9d8dcfaa5dff79ef7452de1",
+    "tests/office-process-managed.test.mjs": "6616a4fbcd48c269c66cfcff775e82bf15c8c8d12809ad665d051a8f2855cc0a"
+  },
+  "backend": "linux-managed-wasm",
+  "defaultBackendUnchanged": "pinned-kit",
+  "platform": {
+    "systemdVersion": "systemd 257 (257.13-1~deb13u1)",
+    "userManager": "existing private local /run/user/UID/bus; no system service or root permission",
+    "cgroup": "unified v2",
+    "missingOrRejectedControls": "fail conversion before parser admission; no fallback"
+  },
+  "policy": {
+    "memoryMaxBytes": 3221225472,
+    "swapMaxBytes": 0,
+    "tasksMax": 128,
+    "cpuQuotaPercent": 100,
+    "oomPolicy": "kill",
+    "runtimeMaxMs": "conversion timeoutMs + 2000",
+    "stopTimeoutMs": 2000,
+    "killMode": "control-group",
+    "sendSigkill": true,
+    "validation": [
+      "exact scope and cgroup membership",
+      "effective kernel memory/swap/oom-group/cpu/pid files",
+      "manager ControlGroup/kill policy",
+      "raw D-Bus RuntimeMaxUSec and TimeoutStopUSec bounds"
+    ]
+  },
+  "qualification": {
+    "build": true,
+    "typeScriptCheck": true,
+    "sourceNode": {
+      "pass": 288,
+      "fail": 0,
+      "skip": 0,
+      "files": 44,
+      "chromiumFiles": 19,
+      "workers": 2,
+      "managedOptIn": true
+    },
+    "python": {
+      "pass": 43,
+      "skip": 0,
+      "scope": "Office source/runtime inputs, notices, packaging, trace parser, private-source boundary"
+    },
+    "managerCases": 6,
+    "originalGui": {
+      "defaultEnginePass": 1,
+      "thinEnginePass": 1,
+      "originalAssertionsAndDeadlinesUnchanged": true,
+      "scope": "Actual Host and original GUI, authored seed; no subsequent inference"
+    },
+    "managerDiagnostics": [
+      {
+        "case": "admission",
+        "limits": {
+          "memory.max": "3221225472",
+          "memory.swap.max": "0",
+          "memory.oom.group": "1",
+          "cpu.max": "100000 100000",
+          "pids.max": "128"
+        }
+      },
+      {
+        "case": "frozen-supervisor-renderer",
+        "managerResult": "timeout",
+        "successfulTerminalFrames": 0
+      },
+      {
+        "case": "frozen-owner-supervisor-renderer",
+        "ownerStillStoppedAtActorExit": true,
+        "rootAbsentAfterOwnerResume": true
+      },
+      {
+        "case": "lower-cap-kernel-oom",
+        "memoryMaxBytes": 67108864,
+        "managerResult": "oom-kill",
+        "memoryPeakBytes": 67108864
+      }
+    ],
+    "actualWasm": [
+      "active plus queued converter disposal joins/rejects work and removes roots",
+      "fresh converter renders a distinct real DOCX recovery PDF"
+    ],
+    "unboundedAndWrongScope": "refused before actor start",
+    "allOwnedTransientScopesGone": true,
+    "thinPackageVerifiedFiles": 53
+  },
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "installedApplicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+  "installedChanges": 0,
+  "engineRebuilds": 0,
+  "retainedInitialFailures": [
+    "Unsupported MemoryOOMGroup property refused in standalone probe; actual supported OOMPolicy=kill verifies memory.oom.group=1",
+    "Initial test dereferenced an already reaped identity",
+    "Initial test incorrectly required nonzero guard exit after manager SIGTERM; actual guard returned only failure metadata, manager Result=timeout"
+  ],
+  "precedingCi": {
+    "sourceRef": "7ebeec65a16e48930d3653c90fc4130b2e6e1a44",
+    "validateRun": 39020303660,
+    "debianJob": 117360860134,
+    "debianLastObserved": "in_progress; existing run retained",
+    "sdkRun": 39020303629,
+    "linuxSdkJob": 117360611526,
+    "linuxSdkConclusion": "success",
+    "macSdkJob": 117360611534,
+    "macSdkConclusion": "failure; later OS deferred, logs unavailable while whole run is in progress",
+    "wholeWorkflowQualified": false
+  },
+  "remaining": [
+    "Pre-admission bootstrap and simultaneous loss of every cleanup owner",
+    "Durable scratch recovery and additional lifecycle faults",
+    "Exact fresh ordinary/sealed/package/installed adoption and rollback",
+    "Broader fonts/documents/macros/security and preferred-source/rebuild/third-party/public packaging qualification"
+  ],
+  "installedBackendChanged": false,
+  "publicRedistributionQualified": false
+}

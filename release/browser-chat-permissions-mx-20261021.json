@@ -1,0 +1,88 @@
+{
+  "schema": "augmentor-browser-chat-permissions/1",
+  "date": "2026-10-21",
+  "platform": "MX Linux",
+  "clientVersion": "0.2.11",
+  "releaseId": "20261021-110654-8ad67ae5",
+  "artifactSha256": "d38cec41882929a556361b7f2663728f970c90bc2bcb0cb33ac97bbf5e066809",
+  "baseArtifactSha256": "bd7a2cb205353d6c2801ec4d3e414eed81ca448578b58383c89ab49accd357e7",
+  "installedChanges": {
+    "apps/browser/extension/approval-mode.mjs": {
+      "before": null,
+      "after": "0090bbac8b4c428a8d2791aadcc6e8249dd9b72ce50a0aeb07f1b836f7c2fc7f"
+    },
+    "apps/browser/extension/chat-components.css": {
+      "before": "74fb4115306e32e84660a1db85ca383a49ccb4c653566b5b4ab4e56ecd93f5aa",
+      "after": "ef442bd93fd82dcd274718b6b193357af4cbb639d3fa162ec509c89a7a406500"
+    },
+    "apps/browser/extension/panel-api.mjs": {
+      "before": "84f5918b016b56c8a55e2d2fc465a1d369b6a0cc1be0a1d5d72f64cefe8c7635",
+      "after": "3c2d85ff33d6b88da5d5f89cdd7d634dba6f18bcec92b8911359df4d481bb044"
+    },
+    "apps/browser/extension/port.mjs": {
+      "before": "d8aa3a8ea2ccc87b96174caea95db0086ab465456937519281df8006a37046eb",
+      "after": "d3eaed45a5ef8072e8b8ab7941c663e1029e53f9d4b75d09ea71f973fbc97900"
+    },
+    "apps/browser/extension/sidepanel.js": {
+      "before": "d9f55c39024b59e89ff30810fec9ec99dcb7355cc24f237ccedb0d02dad22da6",
+      "after": "9add317ac7d1e7edd2f10349ab01b080c6e62e67e1a26c8abec2fe4d5651e463"
+    },
+    "apps/browser/pi-bridge.mjs": {
+      "before": "c5b98ae2827a348a6fb7ac9aa95f25a5ae3db2164442bc5e663f5978912faf3e",
+      "after": "41bc05ed2d58db8466ce403558ca7c8035724b46845aea387f16593a5c175aef"
+    }
+  },
+  "sourceBase": "eecdb7080b8f58341dad693435814bfdf88be7df",
+  "sourceFiles": {
+    "apps/browser/pi-bridge.mjs": "17ca54ddcb1634db0d115c1fc928b7e358b0a65b441fab1a1394722a5cbb7abd",
+    "apps/browser/extension/approval-mode.mjs": "0090bbac8b4c428a8d2791aadcc6e8249dd9b72ce50a0aeb07f1b836f7c2fc7f",
+    "apps/browser/extension/panel-api.mjs": "83c8f0e4d99d9279969775b16468289d005f8bd855df6ee00233d2ce5873cbc8",
+    "apps/browser/extension/sidepanel.js": "8e3834cf799097033a9648fc11ebe2dfb700428ac78133c72d156866403dc72f",
+    "apps/browser/extension/port.mjs": "f13496c4a5cf8c16f1da9373fcfee1552f5119476226682972ed83ab512789a8",
+    "apps/browser/extension/chat-components.css": "ef442bd93fd82dcd274718b6b193357af4cbb639d3fa162ec509c89a7a406500"
+  },
+  "validation": {
+    "sourceRegressions": 31,
+    "ordinaryCompatibleChromium": true,
+    "compatibleBackendAndSettings": 4,
+    "exactSealedChromium": true,
+    "installedCodeAndBridgeChromium": true,
+    "realNavigationTypingClick": true,
+    "syntheticProviderAndPage": true,
+    "ownerInference": false,
+    "ownerExtensionReloadObserved": false,
+    "macInstalled": false,
+    "customExtensionCandidateChromium": true
+  },
+  "storage": "unchanged immutable files hardlinked; changed inputs independently replaced; standard stage and activate; scratch removed",
+  "customUnpackedExtensionFiles": {
+    "approval-mode.mjs": {
+      "before": null,
+      "after": "0090bbac8b4c428a8d2791aadcc6e8249dd9b72ce50a0aeb07f1b836f7c2fc7f"
+    },
+    "approval-presenters.mjs": {
+      "before": null,
+      "after": "844d5682fbf6d91cbd61cf8c4a9d3bd6b60dcab70471524b5ee0156ea5b75718"
+    },
+    "panel-api.mjs": {
+      "before": "1479333d4f1e60f1bfe23fefdfe6bcf5d1de2e9d577e69645ae57d460521ac5d",
+      "after": "8979646c3b9f6208ece6f9a5f435e97470794117e6c720f3bc271be4550fc935"
+    },
+    "sidepanel.js": {
+      "before": "8012677fb16c9e205b196f1ba5bd5fc2c582d86c871b98bbd9ac300209b44b1f",
+      "after": "769e448a22cfdda5fa53e780ff769d2b93f7a606967fe36dcd6ff1de760b860b"
+    },
+    "port.mjs": {
+      "before": "098fee14594c2a22d1002fd7d44f949e1a9dc7cd17853be79bf1f39b0b21a583",
+      "after": "81791e34dc0d8ecffeb31a30f12163cc43436c2fefc776fee8f5943efe530067"
+    },
+    "sw.js": {
+      "before": "4bcd7d646e4f8f7571d62d86e0fa3f2415624db90f41f9a01a752a800375a028",
+      "after": "7e79f398a7051c45a16e1a957abd4b63bcd018869ab3855b959ba1a2e9602385"
+    },
+    "chat-components.css": {
+      "before": "74fb4115306e32e84660a1db85ca383a49ccb4c653566b5b4ab4e56ecd93f5aa",
+      "after": "ef442bd93fd82dcd274718b6b193357af4cbb639d3fa162ec509c89a7a406500"
+    }
+  }
+}

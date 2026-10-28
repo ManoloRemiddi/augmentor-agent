@@ -4,12 +4,14 @@ import {definitions,control} from '../../dist/desktop/src/index.js'
 import {applyBrowserPolicy} from './browser-policy.mjs'
 import {applyResponsiveSteering} from './steering.mjs'
 import {applyLinuxSupport} from './linux-support.mjs'
+import {applyConnectedBrowser} from './connected-browser.mjs'
 export const name='augmentor-desktop'
 export const inject=['tools','llm','attachments']
 export function apply(ctx){
   applyBrowserPolicy(ctx)
   applyResponsiveSteering(ctx)
   applyLinuxSupport(ctx)
+  applyConnectedBrowser(ctx)
   const owners=new Set()
   for(const d of definitions)ctx.tools.register({name:d.name,description:d.description,parameters:d.parameters,
     output:{schema:{type:'object'},render:(_args,value)=>value.content},

@@ -14,7 +14,7 @@ from platform_adapters.transport import LocalSocket
 
 
 def call(request,start=True):
-    path=runtime_directory()/'augmentor-desktop.sock'
+    path=Path(os.environ['AUGMENTOR_DESKTOP_SOCKET']) if os.environ.get('AUGMENTOR_DESKTOP_SOCKET') else runtime_directory()/'augmentor-desktop.sock'
     client=LocalSocket();client.settimeout(115)
     try:
         try:client.connect(str(path))

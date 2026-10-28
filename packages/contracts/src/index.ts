@@ -1,12 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 /** Product identities and optional adapter contracts; engine protocols stay versioned separately. */
 export const PRODUCT_PROTOCOL='augmentor/1' as const;
-export type HarnessId='pi'|'dsh'|'codex';
+export type HarnessId='pi'|'ah'|'dsh'|'codex';
 export type SurfaceId='linux'|'browser';
 export interface SessionRef {harness:HarnessId;nativeSessionId:string;surface:SurfaceId}
 export interface Capabilities {branch:boolean;edit:boolean;memory:boolean}
 export const HARNESS_CAPABILITIES:Record<HarnessId,Capabilities>={
-  pi:{branch:true,edit:true,memory:true},dsh:{branch:true,edit:true,memory:true},
+  ah:{branch:true,edit:true,memory:true},pi:{branch:true,edit:true,memory:true},dsh:{branch:true,edit:true,memory:true},
   codex:{branch:false,edit:false,memory:false},
 };
 export type MemoryScope='user'|'project';

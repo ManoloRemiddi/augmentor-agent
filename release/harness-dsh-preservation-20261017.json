@@ -1,0 +1,72 @@
+{
+  "schema": "augmentor-harness-dsh-preservation/1",
+  "date": "2026-10-17",
+  "sourceRef": "3777cc92961fc3d21c84cf3a1390970fcea851cb",
+  "scope": "Private output-only configuration preparation; no owner activation or profile execution",
+  "pythonPass": 85,
+  "preservationCases": 11,
+  "modernSetupCases": 9,
+  "caseCountsOverlap85": true,
+  "fail": 0,
+  "skip": 0,
+  "actualStage": {
+    "boundInputs": 28,
+    "moduleReferencesChangedInCandidate": 2,
+    "retainedLiteralModulePaths": 21,
+    "peerSettingsExact": true,
+    "originalPackageProvenanceMatches": true,
+    "activeBrowserCodeMatchesOwnedExpected": true,
+    "ownerFilesChanged": false,
+    "profileExecuted": false,
+    "candidateActivated": false,
+    "scratchRemoved": true,
+    "persistentApplicationCopiesCreated": 0
+  },
+  "safety": {
+    "nodeOnlyYamlNoEvaluation": true,
+    "nonScalarBytesPreserved": true,
+    "privateInputsAndAssetsBound": true,
+    "reviewHashRequiredForVerification": true,
+    "staleChangedAliasedUntrackedInputsRefused": true,
+    "normalSetupRefusesPreservedOwnership": true,
+    "privateSourcePublished": false,
+    "wholeRetainedGraphQualified": false
+  },
+  "priorCi": {
+    "linuxSdk": {
+      "run": 39042645605,
+      "head": "0ca81395",
+      "runtime": "6a82cf82",
+      "conclusion": "success"
+    },
+    "fullValidation": [
+      {
+        "run": 39041187997,
+        "head": "f640ce8c",
+        "applicationChecksPass": true,
+        "conclusion": "failure",
+        "gate": "Office public source/exact engine rebuild packaging"
+      },
+      {
+        "run": 39041724378,
+        "head": "14e3c523",
+        "runtime": "c6653b75",
+        "applicationChecksPass": true,
+        "conclusion": "failure",
+        "gate": "Office public source/exact engine rebuild packaging"
+      }
+    ]
+  },
+  "remaining": [
+    "Qualify retained/dynamic adapter and companion graph and matching installed clients",
+    "Immutable incoming artifact, fresh full cold backups and actual activation/reverse transaction",
+    "Existing-bank/history/budget/busy/restart and live continuation acceptance",
+    "Pilot feedback before further project transfers; voice/later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-dsh-preservation-expanded-python-20261017.log": "090a7035964b2470801d7f391ae061ccd7d1e366d034d0432e684123710fbcdd",
+    "harness-dsh-preservation-actual-summary-20261017.log": "503b72a9367d006e0b45656245b4ff763bec7538c3cd8d87ecb4e03cfd99adad",
+    "harness-dsh-preservation-actual-plan-private-20261017.json": "fe96bf25606f42bf4aca700a57dbac3488175d2febb82cff4550f8034a9b6af8",
+    "harness-dsh-preservation-owner-preservation-private-20261017.json": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  }
+}

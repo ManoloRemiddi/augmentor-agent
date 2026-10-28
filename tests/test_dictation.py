@@ -88,7 +88,11 @@ class DictationTests(unittest.TestCase):
             shutil.copytree(ROOT/'services/platform_adapters',checkout/'services/platform_adapters',ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
         binary=checkout/'components/handy/runtime/bin/handy';binary.parent.mkdir(parents=True)
         receipt=self.base/'enabled.json'
-        binary.write_text('#!'+sys.executable+'\n'+'''import json,os,sys
+        # A shebang splits an interpreter path containing spaces. This fixture
+        # must launch through the workspace's actual qualification interpreter.
+        import shlex
+        program=binary.with_suffix('.py')
+        program.write_text('''import json,os,sys
 from pathlib import Path
 enabled=False
 for line in sys.stdin:
@@ -98,7 +102,8 @@ for line in sys.stdin:
   Path('''+repr(str(receipt))+''').write_text(json.dumps({'pid':os.getpid(),'enabled':enabled}))
  result={'enabled':enabled,'phase':'ready','revision':0,'settings':{'shortcut':'ctrl+space'}} if request['method']=='status' else {}
  print(json.dumps({'id':request['id'],'result':result}),flush=True)
-''');binary.chmod(0o700)
+''')
+        binary.write_text('#!/bin/sh\nexec '+shlex.quote(sys.executable)+' -B '+shlex.quote(str(program))+' "$@"\n');binary.chmod(0o700)
         state=self.base/'login';state.mkdir(mode=0o700)
         original=b'{"enabled": true}\n';(state/'preferences.json').write_bytes(original)
         env={**os.environ,'AUGMENTOR_DICTATION_STATE':str(state),'XDG_SESSION_TYPE':'x11','PYTHONPATH':str(checkout/'apps/native'),'PYTHONDONTWRITEBYTECODE':'1'}

@@ -1,0 +1,21 @@
+{
+  "schema": "augmentor-dsh-session-export-source/1",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "zip.ts",
+      "sha256": "725d790305fbf4c0b2716d6f594362ba8b4ec376b3ab15dc61892bada66a53f5",
+      "upstreamPath": "packages/session-query/session-log-export/src/archive.ts",
+      "upstreamSha256": "258cf53c50cfec9995fca90f98300c8f23860e3ade7774bd39bbf1c3aabc65d7",
+      "adaptation": "Extracted pure bounded ZIP compression section and entry/compression types; replaced DSH service arguments with a caller-supplied entry iterator. Compression, consumer backpressure and abort bodies stay upstream. Added an optional notification after the producer finally settles so the owned snapshot adapter can join cleanup and compressor completion."
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be",
+      "upstreamPath": "LICENSE",
+      "upstreamSha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be"
+    }
+  ]
+}

@@ -153,7 +153,7 @@ try:
     client.call('session.prompt', {'sessionId': 'install-proof', 'content': [{'type': 'text', 'text': 'READ_IMAGE'}]})
     idle('install-proof')
     assert images_received, 'The SDK omitted the image'
-    decoder = '''const fs=require('node:fs');const p=require('/usr/lib/augmentor/node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node');
+    decoder = '''const fs=require('node:fs');const r=require('node:module').createRequire('/usr/lib/augmentor/node_modules/@earendil-works/pi-coding-agent/package.json');const p=r('@silvia-odwyer/photon-node');
 const url=fs.readFileSync(0,'utf8');const im=p.PhotonImage.new_from_byteslice(Buffer.from(url.split(',')[1],'base64'));
 console.log(JSON.stringify({width:im.get_width(),height:im.get_height()}));im.free();'''
     dimensions = json.loads(subprocess.check_output([str(APP / 'node/bin/node'), '-e', decoder], input=images_received[0], text=True))

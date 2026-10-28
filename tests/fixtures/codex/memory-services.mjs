@@ -2,11 +2,11 @@
 import {spawn} from 'node:child_process';
 import {createConnection} from 'node:net';
 import {mkdirSync, existsSync, writeFileSync} from 'node:fs';
-import {join} from 'node:path';
+import {join,resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
 
 /** Real companions in empty state. Never inherit owner config, credentials or model routes. */
-export async function memoryServices(root, configuration) {
+export async function memoryServices(root, configuration, {applicationRoot=process.cwd()}={}) {
   const state = join(root, 's'), data = join(root, 'd');
   mkdirSync(state, {mode: 0o700}); mkdirSync(data, {mode: 0o700});
   if (configuration) writeFileSync(join(data, 'hindsight.json'), JSON.stringify(configuration), {mode:0o600});
@@ -23,7 +23,7 @@ export async function memoryServices(root, configuration) {
   };
   const close = async () => {for (const socket of sockets) socket.destroy(); await Promise.all(processes.map(stop));};
   const start = async (script, endpoint) => {
-    const child = spawn(process.env.AUGMENTOR_PYTHON ?? 'python3', [script], {env, stdio: 'ignore'});
+    const child = spawn(process.env.AUGMENTOR_PYTHON ?? 'python3', [resolve(applicationRoot,script)], {env, stdio: 'ignore'});
     let failed = false;
     const done = new Promise(resolve => {child.once('exit', resolve); child.once('error', () => {failed = true; resolve();});});
     const entry = {child, done}; processes.push(entry);

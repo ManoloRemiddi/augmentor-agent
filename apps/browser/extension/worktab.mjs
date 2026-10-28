@@ -118,15 +118,15 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   recentActive.delete(tabId)
 })
 
-export async function workTab() {
-  if (state.workTabId != null) {
+export async function workTab(context=state) {
+  if (context.workTabId != null) {
     try {
-      const t = await chrome.tabs.get(state.workTabId)
+      const t = await chrome.tabs.get(context.workTabId)
       // A sticky tab the user navigated onto the DSH GUI is the user's
       // session again: drop the stickiness and re-resolve.
       if (!isDshTab(t) && (isWorkTab(t) || isEmptyTab(t))) return t
     } catch { /* tab closed */ }
-    state.workTabId = null
+    context.workTabId = null
   }
   // 1) The tab the user is looking at right now: the active tab of the
   //    last-focused window — including a new tab page (workable via
@@ -150,12 +150,12 @@ export async function workTab() {
     // user is not looking at): navigate's catch is the new-tab path, and
     // the read actions surface a directive error instead.
     if (isDshTab(active)) {
-      state.workTabId = null
+      context.workTabId = null
       throw new Error(
         'the tab the user is on is their DSH session — the agent works in a dedicated tab; call browser_navigate to open a URL',
       )
     }
-    state.workTabId = active.id
+    context.workTabId = active.id
     return active
   }
   // 2) The active tab is a non-workable page (chrome://internal,
@@ -168,13 +168,13 @@ export async function workTab() {
   if (!usable.length) throw new Error('no usable browser tab')
   const byRecency = [...usable].sort((a, b) => (recentActive.get(b.id) ?? 0) - (recentActive.get(a.id) ?? 0))
   const pick = byRecency[0]
-  state.workTabId = pick.id
+  context.workTabId = pick.id
   return pick
 }
 // Read/click/type actions need a real page: fail with an actionable error
 // when the work tab is still a new tab page / blank tab.
-export async function readableWorkTab() {
-  const tab = await workTab()
+export async function readableWorkTab(context=state) {
+  const tab = await workTab(context)
   if (!isWorkTab(tab)) {
     throw new Error(
       'the tab you are on is a new tab page — nothing to read there yet; use navigate to open a URL in it first',

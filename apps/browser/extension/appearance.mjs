@@ -32,7 +32,7 @@ export function formattingDefaults(theme='dark'){
 }
 export function readAppearance() {
   const values = {theme:localStorage.getItem(storageKey('augmentor-theme')) === 'light' ? 'light' : 'dark'}
-  if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)values.expandThinking=localStorage.getItem(storageKey('augmentor-expand-thinking')) !== 'false'
+  values.expandThinking=localStorage.getItem(storageKey('augmentor-expand-thinking')) !== 'false'
   for(const [key,storage,,min,max] of appearanceFields){
     const raw=localStorage.getItem(storageKey(storage)),value=raw===null?T.DEFAULTS[key]:Number(raw)
     values[key]=Number.isFinite(value)?Math.max(min,Math.min(max,value)):T.DEFAULTS[key]
@@ -60,7 +60,7 @@ export async function saveAppearance(value) {
     desktopAppearance=reply.result
   }
   const stored={'augmentor-theme':value.theme,'augmentor-format-colours':JSON.stringify(value.formatColours||{})}
-  if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)stored['augmentor-expand-thinking']=String(typeof value.expandThinking==='boolean'?value.expandThinking:readAppearance().expandThinking)
+  stored['augmentor-expand-thinking']=String(desktopAppearance?.values?.expandThinking ?? (typeof value.expandThinking==='boolean'?value.expandThinking:readAppearance().expandThinking))
   for(const [key,storage] of appearanceFields)stored[storage]=value[key]
   if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)await chrome.storage.local.set(stored)
   for(const [key,v] of Object.entries(stored))localStorage.setItem(storageKey(key),String(v))

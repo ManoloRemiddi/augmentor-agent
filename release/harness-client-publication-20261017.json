@@ -1,0 +1,90 @@
+{
+  "schema": "augmentor-harness-client-publication-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Internal matching-client publication/source recovery; no owner activation",
+  "configurationSchema": "augmentor-dsh-configuration-transaction/3",
+  "publicationSchema": "augmentor-dsh-client-publication/1",
+  "sourceQualification": {
+    "pythonPass": 92,
+    "publicationCases": 22,
+    "reviewGateCases": 5,
+    "nodePass": 10,
+    "fail": 0,
+    "skip": 0,
+    "realChildDeathForwardWritePoints": 7,
+    "realChildDeathReverseWritePoints": 7,
+    "realChildDeathMarkerRemovalPoints": 3,
+    "publicationBackendRepliesSynthetic": true,
+    "backendProbeBoundaryCasesSeparate": 9,
+    "actualSdkReviewWarmCold": true,
+    "authoredModelRequests": 2,
+    "ownerModelRequests": 0,
+    "ownerColdArchiveCaptured": false
+  },
+  "publication": {
+    "archiveBoundBeforeConfigurationFence": true,
+    "configurationOnlyMutationsBlockedWhenLinked": true,
+    "primaryPairPreserved": true,
+    "allDeclaredDeploymentGatesHeld": true,
+    "generatedIncomingArtifactSelectors": true,
+    "bootstrapImagesMaxFiles": 128,
+    "bootstrapImagesMaxBytes": 67108864,
+    "bootstrapImageMaxBytes": 4194304,
+    "exactPreFinalizationReverse": true,
+    "partialFinalizationForwardRecovery": true,
+    "afterFinalizingReverseRequiresNewReviewedCut": true,
+    "automaticDataRestore": false,
+    "ordinaryClientRestartImplementedHere": false,
+    "ownerContinuationVerified": false
+  },
+  "startup": {
+    "pureRenderer": true,
+    "normalInstallerSelectionGuardRetained": true,
+    "legacyManagedReviewsHonorFence": true,
+    "installedLegacyHelpersAlreadyAdopted": false
+  },
+  "storage": {
+    "managedWorkspaceReserveGiB": 64,
+    "clientImageReserveGiB": 64,
+    "hostedSmallArchiveFixturesSimulateCapacity": true,
+    "temporarySdkApplicationAssemblies": 1,
+    "temporarySdkApplicationAssembliesRetained": 0,
+    "newInstalledRelease": false,
+    "rootFreeGiB": 98.48
+  },
+  "ownerPreservation": {
+    "mainPilotPidsAnd36ProtectedSetsExact": true,
+    "registryRevision": 18,
+    "storesSettingsMenusServicesUnchanged": true,
+    "ownerProjectsTransferred": 0,
+    "installedAppChanged": false
+  },
+  "remaining": [
+    "Bind the approved Native/Harness shared-data merge or target receipt; current publication migrates no databases and preserves the existing primary pair",
+    "Adopt the legacy preview launcher to accept mutable shared binding and enforce its startup fence before changing its selector",
+    "One combined immutable candidate qualification against actual retained integration",
+    "Exact real launcher/registry/bootstrap binding and pre-adoption before owner cold cut",
+    "Matching loaded Browser adoption",
+    "One actual cold capture, publication and ordinary client reopening/continuation",
+    "Pilot feedback before further project transfers; VR-RasterStudio stays DSH",
+    "Voice expansion and later OS remain deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-client-publication-final-20261017.log": "9738e6563bdf96382b19beb6e4e7976bb148cb833e2c7306484708dc28dc687b",
+    "harness-client-publication-review-runtime-20261017.log": "2f9b4f08321f0670dcd0bba51a844fb2e06f078522313af8a71e25a2e6f2eb3b",
+    "harness-client-publication-owner-preservation-private-20261017.json": "acf53d4011a65907df767aa48a21ec466940a61979f0c42523bf54c0322b4730",
+    "harness-client-publication-ci-terminal-private-20261017.json": "740fa891d32bcf203eeea295de1b51c78e3612edb3c066caa4d26d446a7e7dbb",
+    "harness-client-publication-ci-focused-private-20261017.log": "985e002eac1ae024416186f7798127df1107508fa6d0107250353301dfa7400c",
+    "harness-client-publication-bootstrap-findings-private-20261017.json": "a18e0797ac97824c79c56ab0292a4c21a50eba399c7dd1a3a9e92a277620e348"
+  },
+  "runtimeRef": "eca4c7faebd7dc0f4e7e9ddbc4489218d329045e",
+  "linuxSdk": {
+    "run": 39067753095,
+    "ref": "eca4c7faebd7dc0f4e7e9ddbc4489218d329045e",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39067753095",
+    "publicationCases": 22,
+    "actualRegisteredReviewPassed": true
+  }
+}

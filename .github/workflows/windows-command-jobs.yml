@@ -1,0 +1,93 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Windows Pi command jobs
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/windows-command-jobs.yml'
+      - 'packages/**'
+      - 'services/platform_adapters/**'
+      - 'tests/**'
+      - 'scripts/bootstrap-windows.py'
+      - 'package*.json'
+      - 'release/windows/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-command-jobs-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  command-jobs:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          architecture: ${{ matrix.arch }}
+          cache: npm
+      - name: Stage hash-locked component runtime
+        id: bootstrap
+        run: python -Xutf8 scripts/bootstrap-windows.py --arch ${{ matrix.arch }} --out outputs/runtime
+      - name: Build the shared source
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Exercise real kernel containment
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          New-Item -ItemType Directory -Force outputs/evidence | Out-Null
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
+          & outputs/runtime/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_shell_job.py -v 2>&1 | Tee-Object -FilePath outputs/evidence/kernel.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/runtime/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_pipe_server_relay.py -v 2>&1 | Tee-Object -FilePath outputs/evidence/pipe-relay.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify the private Host before command admission
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
+          & outputs/runtime/node/node.exe tests/fixtures/windows-record-latency.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/record-latency.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/runtime/node/node.exe --test --test-reporter=tap tests/pi-scheduling.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/scheduling.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-name-pattern='read-only Windows parent' tests/pi-windows-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-baseline.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify streaming job progress and parent Stop
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
+          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-name-pattern='parent Stop cancels idle-parent' tests/pi-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/streaming-stop.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Exercise Host SDK command jobs and durable delegation
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
+          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-concurrency=1 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-jobs.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-command-jobs-${{ matrix.arch }}
+          path: outputs/evidence/**
+          retention-days: 14
+          if-no-files-found: warn

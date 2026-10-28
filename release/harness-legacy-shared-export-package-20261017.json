@@ -1,0 +1,166 @@
+{
+  "schema": "augmentor-harness-legacy-shared-export-package/1",
+  "date": "2026-10-17",
+  "applicationRef": "aaf7af4ca30f26c7e0038eab355830cc30408a20",
+  "releaseId": "20261017-140650-7496bf2d",
+  "artifactSha256": "abba662e06ec8c711d89605fa969f39c9318f088436123ea6163729faecd36ce",
+  "inventoryEntriesVerified": 24755,
+  "compiledFilesVerified": 1143,
+  "scope": "Private unselected MX application/tool artifact. Real owner stores are not exported or adopted.",
+  "qualification": {
+    "sourceNodePass": 27,
+    "ordinaryNodePass": 27,
+    "exactSealedNodePass": 27,
+    "eachFail": 0,
+    "eachSkip": 0,
+    "workers": 2,
+    "nodeFiles": 6,
+    "chromiumFiles": 2,
+    "sourceSharedPythonPass": 20,
+    "ordinaryPackagingPythonPass": 41,
+    "exactSealedPythonPass": 61,
+    "exactSealedPythonGroups": {
+      "packaging": 41,
+      "sharedLease": 3,
+      "hindsight": 17
+    },
+    "exactSealedDeclaredInterpreterExportPass": 7,
+    "declaredInterpreterCasesOverlapNodeCohort": true,
+    "testsAndAuthoredFixturesOutsideSealedArtifact": true,
+    "sealedBytesUnchangedAfterTests": true,
+    "actualWritingScreenshotsInspected": true,
+    "coverage": [
+      "Exact mixed-layout export and subsequent review consolidation preserving production authority",
+      "Owner/schema/link/journal/source-change and source/destination race refusal",
+      "Interrupted new-root publication, startup fence and explicit verified recovery",
+      "Actual Native/Browser/original Harness edits and managed shared-service restart",
+      "Populated cached-bank identity, actual Native transport, synthetic search 503s, jobs/charges and restart",
+      "Existing state transaction, two real private SDK owners and interruption/carryover contracts"
+    ],
+    "notFullSuiteOrLiveOwnerAcceptance": true
+  },
+  "olderBrowserHandshake": {
+    "olderArtifactVersion": "0.2.11",
+    "olderManifestVersionRefused": true,
+    "matchedArtifactVersion": "0.2.13",
+    "matchedManifestVersionAccepted": true,
+    "actualSealedNativeMessagingHostUsed": true,
+    "olderClientSendsOwnManifestVersionReadInPlace": true,
+    "ipNetworkSyscalls": 0,
+    "companionConnections": 0,
+    "noHarnessSelectionOrModelRequest": true,
+    "loadedOwnerExtensionIdentityEstablished": false,
+    "otherLegacyExtensionBehaviorQualified": false,
+    "interpretation": "Exact product-version handshake is a proven sufficient blocker for the older packaged extension. Matching extension and host must be deployed/reloaded together; no compatibility guard is bypassed."
+  },
+  "launchBindingFinding": {
+    "linuxDesktopLauncherInheritsSharedEnvironment": true,
+    "linuxDesktopLauncherReadsPersistedSharedPairFromSelection": false,
+    "sourceBrowserRegistrarUsesItsFixedSourceRoot": true,
+    "sourceBrowserRegistrarMustNotRunInsideSealedRelease": true,
+    "remaining": "Prepare one explicit managed launch mapping for all Native entrypoints, Browser host and review registrations; changing only the primary service environment is insufficient."
+  },
+  "newSourceCi": {
+    "run": 39031629464,
+    "head": "aaf7af4ca30f26c7e0038eab355830cc30408a20",
+    "workflow": "validate.yml",
+    "event": "workflow_dispatch",
+    "statusAtDispatch": "queued",
+    "notUnchangedSourceRerun": true,
+    "precedingPrRunPreserved": 39030296212,
+    "precedingPrHead": "6abfee80f8e6ada14780021d2724c4a176e60274",
+    "concurrencyRefsDistinct": true,
+    "conclusionUnproven": true
+  },
+  "priorUnselectedOfficeCandidateRetained": {
+    "applicationRef": "248828e69010a6b9e58ec9ad06294d8acffc6675",
+    "releaseId": "20261017-124857-6306bf21",
+    "artifactSha256": "c35084df299213de94fec5bd23717c67d7af54dc689978e2f591e7368d796057"
+  },
+  "activated": false,
+  "ownerStoresExported": 0,
+  "ownerModelRequests": 0,
+  "ownerProjectsTransferred": 0,
+  "ownerDataCopiedToArtifact": false,
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "privateEvidenceLogSha256": {
+    "harness-legacy-export-ordinary-package-python-20261017.log": "9bffe0c6869211177cb28f48d05cdfee486775b3a52bed82824e94d5f864e0ce",
+    "harness-legacy-export-exact-sealed-node-20261017.log": "edb27eb8e4f173e19b6e79dd1bcf5961ba8cc082f33976cc78622500ed603f12",
+    "harness-legacy-export-exact-sealed-python-20261017.log": "5551c9ba474c3080f43a6d4af0659a44c25d8dfdbdbc98494ea2b4627706e35a",
+    "harness-legacy-export-exact-sealed-declared-python-node-20261017.log": "b3795e6c041ddd82bc34776bd9e94fa6567a9e18f35f99b6c7d2064dad5f75da",
+    "harness-legacy-export-sealed-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-legacy-export-package-final-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "remaining": [
+    "Finish new source normal CI; preceding PR CI remains an independent live run",
+    "Managed version-matched Native/Browser launch binding for one explicit dedicated shared pair and all review entries",
+    "Fresh full cold backups and guarded stop of all known old callers/companions before any real export",
+    "Actual existing-bank/person/settings/history and busy-work/rollback qualification during eventual immutable deployment",
+    "Owner pilot feedback before any further real project transfer; excluded projects stay in DSH",
+    "Full accepted migration/parity and public distribution remain open; voice/later OS deferred"
+  ],
+  "precedingHostedTerminal": {
+    "ref": "6abfee80f8e6ada14780021d2724c4a176e60274",
+    "validateRun": 39030296212,
+    "debianJob": 117389472178,
+    "status": "completed",
+    "conclusion": "failure at existing Office public source/rebuild packaging gate",
+    "root": {
+      "tests": 2188,
+      "pass": 2135,
+      "fail": 0,
+      "skip": 53
+    },
+    "browser": {
+      "pass": 128,
+      "fail": 0,
+      "skip": 0
+    },
+    "publicPackagingStep": "Build Debian packages with binary notices",
+    "guardMessage": "Office public source/rebuild qualification remains open: the exact engine rebuild is not qualified. Private-preview identity is not public redistribution approval.",
+    "previousFleetFailureNotReproducedHere": true,
+    "previousFleetFailureCauseResolved": false,
+    "newExportSourceIncluded": false,
+    "wholeWorkflowPass": false,
+    "privateTerminalLogSha256": "2dd112809ecc0f684093dc4cd24a0123a597cfd3f16ee26cf1996c0e06045d67"
+  }
+}

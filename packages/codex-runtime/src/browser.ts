@@ -17,7 +17,7 @@ const plain = (value: unknown): value is Record<string, any> => Boolean(value) &
 
 /** Browser executor binding plus durable call admission; Codex still owns the agent loop. */
 export class CodexBrowser {
-  readonly broker = new BrowserBroker();
+  readonly broker = new BrowserBroker('codex');
   private readable = new Map<string, {tabId: number; url: string; documentEpoch: number; selectors: string[]}>();
   private busy = new Set<string>();
   constructor(readonly timeoutMs = 20000) {}

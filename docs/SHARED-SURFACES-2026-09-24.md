@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi Native/Browser source binding](PI-VOICE.md#native-and-browser-controls--october-16-2026)
+now reuses these controls and the shared audio engine with explicit input mode,
+scoped opening/close identities and joined cleanup. Existing gestures, layout,
+DSH/Codex behavior and installed versions remain unchanged. Independent synthetic
+speech/PCM proofs pass; the real Pi companion, physical audio, installed adoption,
+separate Harness voice UI and later platform qualification remain open.
+
 # One personal agent, two presentations
 
 The September 24 user direction supersedes the earlier browser-only role policy.

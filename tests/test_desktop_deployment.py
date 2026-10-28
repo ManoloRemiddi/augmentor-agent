@@ -20,7 +20,7 @@ class DeploymentTests(unittest.TestCase):
         self.addCleanup(self.folder.cleanup)
         self.home=Path(self.folder.name)
         self.tool=load('scripts/desktop-deployment.py')
-        self.tool.DATA=self.home/'data/augmentor';self.tool.DATA.mkdir(parents=True)
+        self.tool.DATA=self.home/'data/augmentor';self.tool.DATA.mkdir(parents=True,mode=0o700)
         self.source=self.home/'candidate'
         (self.source/'apps/native/augmentor_linux').mkdir(parents=True)
         (self.source/'apps/native/augmentor_linux/window.py').write_text('--ensure-running')

@@ -1,5 +1,69 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Initial toolbar work-document qualification](PI-PLAN-MODE.md#repeat-the-local-model--original-gui-proof)
+retains source/ordinary 6bc2b0d failures where the work-tab URL is absent before
+model submission. The fixture now starts its blank target explicitly, dispatches
+one navigation, then reads committed URL/document/input and extension tab identity
+before the original selection/toolbar action. A held response reproduces the
+exact old absence before the barrier; releasing it through readiness passes the
+complete existing flow. Permission denial/grant, image/model/queue checks and the
+45-second case remain. No product permission or execution change follows; the
+old original interleaving/sole cause remains unproven. At 24b53b9 the complete
+source/fresh ordinary cohorts each pass 450/two optional skips/zero failures,
+91 files and unchanged bounds. [Portable qualification](../release/harness-plan-native-title-qualification.json).
+
+## Verified fixture toolbar selection — October 15
+
+Paired isolated Chromium runs reproduce the missing image with an actual
+`activeTab` permission denial. A private diagnostic retains Chrome's original
+permission error; this is not an image serialization failure in those runs.
+The original full-cohort failure did not retain its tool body, so its exact cause
+remains unproven.
+
+The pinned [Chromium toolbar command](https://chromium.googlesource.com/chromium/src/+/155.0.8059.39/chrome/browser/devtools/protocol/extensions_handler.cc)
+finds the target's browser window; its
+[action implementation](https://chromium.googlesource.com/chromium/src/+/155.0.8059.39/chrome/browser/ui/extensions/extension_action_view_model.cc)
+then uses that window's active tab. The target ID does not select the tab.
+A controlled fixture first selects the extension panel tab, invokes the command
+with the work tab's target ID, then restores the work tab: the unchanged image
+assertion fails with the permission denial. Explicitly selecting the work tab
+before the same command makes the complete case pass, including actual JPEG
+input, DOM typing/one click, queue, Stop and memory checks.
+
+`codex-browser-chromium.test.mjs` now selects its exact authored work tab with
+`chrome.tabs.update` and verifies the returned URL and active state before the
+toolbar action. Four paired ordinary runs pass all eight cases. Capture still
+fails before that action. Production extension/runtime/GUI code, permissions,
+image assertions, two-worker bounds and deadlines are unchanged. Source and
+ordinary full cohorts at fixture **14224cb3e165a6f1bfd5f5efd33709836bd89eeb**
+now each pass **388 checks/two existing optional skips/zero failures** across
+81 files/all 45 Harness Chromium files. They ran concurrently with two workers
+per cohort and unchanged deadlines. All 1,013 compiled application files match
+ordinary and remain at product d8520d5; the selected/review inventories, four
+processes and Qwen catalog verify unchanged. The
+[portable checkpoint](../release/harness-browser-toolbar-qualification.json)
+records hashes, failed controls, scope and remaining gates.
+This synthetic fixture correction does not qualify live accounts or installed
+rollout; the earlier failure remains historical evidence.
+
+## Retained ordinary screenshot failure — October 15
+
+The [question/plan follow-up](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
+qualifies its new controls, but the final ordinary 81-file cohort at product
+**d8520d5** retains one existing loaded-Chromium/Codex case failure: after six
+provider requests and five function-call outputs, no `input_image` is present in
+the last provider input. The broader source cohort passes; the ordinary result
+is 387 pass/one failure/two existing optional skips. The first failure's tool body
+was not retained, so target/permission/transport cause remains unproven. Six
+private isolated diagnostic passes plus subsequent unchanged source/ordinary
+image cases do not resolve it or qualify promotion.
+
+The image-forwarding assertion now includes authored tool outputs in its failure
+message, omitting image data. No production code, action, permission,
+provider selection, worker bound, timeout or retry policy changes. The fixture
+uses only its independently authored page/provider and exact external pinned CLI;
+no owner browser or account is involved. [Portable scope and remaining gates](../release/harness-question-batches-qualification.json).
+
 # Codex integration: implementation and evidence
 
 Status: in development on `feat/codex-integration`, based on canonical main
@@ -1740,3 +1804,11 @@ completed receipt before closing voice and shutting down the fixture. Exact
 request identity, one provider request, PCM delivery and completed status assertions
 remain unchanged. This corrects test ordering only; it changes no installed voice
 or runtime behavior. The failure is recorded in hosted run 37119919501.
+
+
+## October 10 invalid compatibility-probe termination
+
+The Harness regression suite exposed a race in the existing Codex synthetic compatibility check: replying with a rejection for a wrong probe nonce could allow a second provider request before shutdown. `agent-check.ts` now terminates the isolated ephemeral runtime without sending that invalid tool result. Correct probes still receive their receipt and finish normally; wrong/skipped probes, cancellation and maintenance remain refused without validation or replay. The existing `codex-agent-check.test.mjs` one-request assertion is preserved. [The Harness qualification](AUGMENTOR-HARNESS.md#indexed-display-history-with-original-compaction-semantics) records source/focused evidence and its boundary; Pi staged cases do not constitute staged/installed Codex acceptance. No owner account, provider, GPU/model settings or installed application changes.
+
+
+Invalid-probe correction source is `bce7f07dc69d1b1a1dd147e1436b1becb89110fc`; final focused compatibility/cancellation/maintenance checks and the complete 654-case source Node run pass with the existing one-request refusal assertion unchanged. Pi's 62 staged cases test Pi contracts, not staged Codex compatibility. Exact compiled Codex-check bytes match the refreshed unselected tree; owner-installed adoption remains separate.

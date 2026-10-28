@@ -1,0 +1,465 @@
+{
+  "schema": "augmentor-office-public-source-review/1",
+  "reviewDate": "2026-10-13",
+  "npmVersion": "0.1.5",
+  "repository": "https://github.com/deepseek-ai/dsh-libreoffice-kit",
+  "publicCommit": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "publicRefsInspected": [
+    "refs/heads/master"
+  ],
+  "publicArchiveUrl": "https://codeload.github.com/deepseek-ai/dsh-libreoffice-kit/tar.gz/b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "publicArchiveSha256": "33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036",
+  "publicEntryVersion": "0.1.3",
+  "npmGitHeadPresent": false,
+  "matchingEngineSourceFiles": [
+    "engine/build-identity.mjs",
+    "engine/core-source.mjs",
+    "engine/document-operations.hxx",
+    "engine/wasm-source/autogen.input",
+    "engine/wasm-source/build.mjs",
+    "engine/wasm-source/lok.cxx",
+    "engine/wasm-source/patches/0001-macos-build-tools.patch",
+    "engine/wasm-source/patches/0002-system-font-demand.patch",
+    "engine/wasm-source/patches/0003-node-runtime.patch",
+    "engine/wasm-source/patches/0004-system-fonts-only.patch",
+    "engine/wasm-source/patches/0005-cross-build-rules.patch",
+    "engine/wasm-source/patches/0006-wasm-external-platforms.patch",
+    "engine/wasm-source/patches/0008-disable-link-updates.patch",
+    "engine/wasm-source/patches/0009-disable-optional-curl.patch",
+    "engine/wasm-source/patches/0010-refresh-component-registry.patch",
+    "engine/wasm-source/patches/0011-preserve-optimization-with-prefix-maps.patch",
+    "engine/wasm-source/patches/0012-anonymize-explicit-source-paths.patch",
+    "engine/wasm-source/patches/0023-pdfium-for-embedded-graphics.patch",
+    "engine/wasm-source/patches/0024-pdfium-emscripten-platform.patch",
+    "engine/wasm-source/patches/0025-browser-editing.patch",
+    "engine/wasm-source/patches/0028-synchronous-workbook-calculation.patch",
+    "engine/wasm-source/patches/0029-unloaded-external-blip.patch",
+    "engine/wasm-source/patches/0030-no-password-strength-ui.patch",
+    "engine/wasm-source/patches/0031-size-optimization-lto.patch",
+    "engine/wasm-source/slim.mjs",
+    "engine/wasm-source/source.json",
+    "engine/wasm-source/source.mjs",
+    "engine/wasm-source/stage.mjs",
+    "scripts/checkout-wasm.mjs",
+    "scripts/core-checkout.mjs",
+    "scripts/minimize-ui-resources.py",
+    "scripts/pack-utils.mjs",
+    "scripts/platform-matrix.mjs",
+    "scripts/verify-artifacts.mjs"
+  ],
+  "differentEngineSourceFiles": [
+    {
+      "path": "docs/ui-resources.md",
+      "npmSha256": "0bd35571ca3cc57c6e9b927402b0bb789cedf8755dce7e3e9de00ff3226d9c07",
+      "publicCheckoutSha256": "b0a7613d440ffb675b8ac0465f88cb2a84fc4876b264ee95138b5c9a17ede743"
+    },
+    {
+      "path": "engine/ui-resource-policy.mjs",
+      "npmSha256": "be3dfc3dcf102e9da060ea0c6564a781e81ff8413de1696e0c099e05fd29431b",
+      "publicCheckoutSha256": "5e6aa316bc63e94ae11394ebdb59a2f82120d15e60d36c4ab7c38880a8140967"
+    }
+  ],
+  "generatedEngineFilesAbsentFromCheckout": [
+    {
+      "path": "build-autogen.input",
+      "npmSha256": "d3b017df5f5daade84df90ae94f628b29a902aae3f6bbab58d12b54a2ade46f8"
+    },
+    {
+      "path": "core-source.json",
+      "npmSha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0"
+    },
+    {
+      "path": "source-changes.patch",
+      "npmSha256": "d91124546ab0502728693e537c9570b0290c8bbc2bf06d063551a0960da459cc"
+    }
+  ],
+  "entryPreferredSourceBundled": false,
+  "correspondingSourceQualified": false,
+  "scope": "Comparison of the public branch at this date with the pinned npm 0.1.5 payload. A differing package version is not by itself proof of different compiled code. This comparison does not qualify the exact entry source or an engine rebuild; it does not establish that no other source can exist.",
+  "entryRebuildComparison": {
+    "schema": "augmentor-office-entry-rebuild-comparison/1",
+    "date": "2026-10-14",
+    "publicCommit": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+    "publicArchiveSha256": "33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036",
+    "toolchain": {
+      "node": "24.19.0",
+      "pnpm": "11.7.0",
+      "typescript": "6.0.3",
+      "tsdown": "0.22.14"
+    },
+    "frozenLockSha256": "b5cef3d8e30ee7948f70192f0c9b4fb5a3ae90e466dfa01faeabd225a1efbbaf",
+    "installFlags": [
+      "--frozen-lockfile",
+      "--ignore-scripts"
+    ],
+    "buildCommand": "pnpm run build:adapter",
+    "buildExitCode": 0,
+    "sourceVersion": "0.1.3",
+    "pinnedNpmVersion": "0.1.5",
+    "matchedFiles": 28,
+    "comparedFiles": 36,
+    "files": [
+      {
+        "file": "lib/cli.js",
+        "present": true,
+        "equal": false,
+        "buildBytes": 83488,
+        "installedBytes": 89535,
+        "builtSha256": "466fff3462d8bd3f170ded416ee7be90e3a881b320a55239255f3332a5bb24d2",
+        "pinnedNpmSha256": "15acbf344b5f23265d6cb50f613d1f8262bf088a6c8f4999bcef8d0448fe6045"
+      },
+      {
+        "file": "lib/font-snapshot-worker.js",
+        "present": true,
+        "equal": true,
+        "buildBytes": 16895,
+        "installedBytes": 16895,
+        "builtSha256": "d9b1830baab80a06101c13e50c3b9ee4e67f75d402566ce0a6fc04a8836e673a",
+        "pinnedNpmSha256": "d9b1830baab80a06101c13e50c3b9ee4e67f75d402566ce0a6fc04a8836e673a"
+      },
+      {
+        "file": "lib/index.js",
+        "present": true,
+        "equal": false,
+        "buildBytes": 78581,
+        "installedBytes": 84628,
+        "builtSha256": "64c2f6ceea150d077623167eff8ebc0b5c55416f879d0decbfbd573aafd556c9",
+        "pinnedNpmSha256": "5583ce1754084cb63be913e67821282f484a14b43744f777fd10731af67e3c60"
+      },
+      {
+        "file": "lib/types/cli.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 64,
+        "installedBytes": 64,
+        "builtSha256": "6f77e82bfb5dd3b1015dd92c63e427d505f9bbbdaa041cad6c704f41c553a536",
+        "pinnedNpmSha256": "6f77e82bfb5dd3b1015dd92c63e427d505f9bbbdaa041cad6c704f41c553a536"
+      },
+      {
+        "file": "lib/types/document.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 979,
+        "installedBytes": 979,
+        "builtSha256": "6159a43a731b6d9313994672cca729f652d914dba7a36715c1b8a95c7608c00f",
+        "pinnedNpmSha256": "6159a43a731b6d9313994672cca729f652d914dba7a36715c1b8a95c7608c00f"
+      },
+      {
+        "file": "lib/types/engine-rendering.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 1173,
+        "installedBytes": 1173,
+        "builtSha256": "dcd667581a67a25758175cd2a2b36404beac9db8a4306bb54c02ca1021c73c7a",
+        "pinnedNpmSha256": "dcd667581a67a25758175cd2a2b36404beac9db8a4306bb54c02ca1021c73c7a"
+      },
+      {
+        "file": "lib/types/engine.d.ts",
+        "present": true,
+        "equal": false,
+        "buildBytes": 3115,
+        "installedBytes": 3115,
+        "builtSha256": "6d8be875143f86d07aa29dd6fc5ff71a3989e7bacf8d118f60655293588666cf",
+        "pinnedNpmSha256": "99a35b23dde79c2b47fd3a8888188e4cccd4dd931b4ce42d5585638faca66fbd"
+      },
+      {
+        "file": "lib/types/errors.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 1354,
+        "installedBytes": 1354,
+        "builtSha256": "52b257ce931dfb47fa22af76cfc604f11046e9eddb5f935ee909fe4e39b8117f",
+        "pinnedNpmSha256": "52b257ce931dfb47fa22af76cfc604f11046e9eddb5f935ee909fe4e39b8117f"
+      },
+      {
+        "file": "lib/types/font-file-identity.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 612,
+        "installedBytes": 612,
+        "builtSha256": "d25e5ab247594f1483a9d057e3b3ee26ceca60dad3e6da445e20040d384b1613",
+        "pinnedNpmSha256": "d25e5ab247594f1483a9d057e3b3ee26ceca60dad3e6da445e20040d384b1613"
+      },
+      {
+        "file": "lib/types/font-full.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 754,
+        "installedBytes": 754,
+        "builtSha256": "559d238feea9407403b62e79c727856e398bedaa5c72f4bd8b6ea056149eab0f",
+        "pinnedNpmSha256": "559d238feea9407403b62e79c727856e398bedaa5c72f4bd8b6ea056149eab0f"
+      },
+      {
+        "file": "lib/types/font-loader.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 2062,
+        "installedBytes": 2062,
+        "builtSha256": "906dc942ddb87e446c77c70486f0e7be3382bee5d9828841ca7c580da9bf57c3",
+        "pinnedNpmSha256": "906dc942ddb87e446c77c70486f0e7be3382bee5d9828841ca7c580da9bf57c3"
+      },
+      {
+        "file": "lib/types/font-metadata-cache.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 906,
+        "installedBytes": 906,
+        "builtSha256": "f23141ac08f387b1bf1341130050d0ff01bf5a0e264992a5aac2bdc221dc620e",
+        "pinnedNpmSha256": "f23141ac08f387b1bf1341130050d0ff01bf5a0e264992a5aac2bdc221dc620e"
+      },
+      {
+        "file": "lib/types/font-snapshot-state.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 934,
+        "installedBytes": 934,
+        "builtSha256": "230b0dca36de3af7745a2e20ff38f3e3d82d05fe9520d66acffc3bdb10465093",
+        "pinnedNpmSha256": "230b0dca36de3af7745a2e20ff38f3e3d82d05fe9520d66acffc3bdb10465093"
+      },
+      {
+        "file": "lib/types/font-snapshot-validation.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 282,
+        "installedBytes": 282,
+        "builtSha256": "65f6b8f4ea72a29610a0de09049932d478756de5f5c5cb8100bfa4ace1f0cead",
+        "pinnedNpmSha256": "65f6b8f4ea72a29610a0de09049932d478756de5f5c5cb8100bfa4ace1f0cead"
+      },
+      {
+        "file": "lib/types/font-snapshot-worker.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 380,
+        "installedBytes": 380,
+        "builtSha256": "92e2f2e35736436d3f5d225394df28409b45d304c5cebbda875d96741d9ca27e",
+        "pinnedNpmSha256": "92e2f2e35736436d3f5d225394df28409b45d304c5cebbda875d96741d9ca27e"
+      },
+      {
+        "file": "lib/types/font-snapshot.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 610,
+        "installedBytes": 610,
+        "builtSha256": "c7d5893b6a9509a4e283c354220811ebf253da9b16bdf10f4d515809dcb3fb83",
+        "pinnedNpmSha256": "c7d5893b6a9509a4e283c354220811ebf253da9b16bdf10f4d515809dcb3fb83"
+      },
+      {
+        "file": "lib/types/fonts.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 7127,
+        "installedBytes": 7127,
+        "builtSha256": "e83ca2d3f19e5ec1c435efeb866fbee511e83469a1e1e710eb81e39dbc2051c7",
+        "pinnedNpmSha256": "e83ca2d3f19e5ec1c435efeb866fbee511e83469a1e1e710eb81e39dbc2051c7"
+      },
+      {
+        "file": "lib/types/image-operations.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 2596,
+        "installedBytes": 2596,
+        "builtSha256": "4cc5ba82fbbfadd300a6fa292e1609216bdaff19d32d2e0a6d79a23145b3dec4",
+        "pinnedNpmSha256": "4cc5ba82fbbfadd300a6fa292e1609216bdaff19d32d2e0a6d79a23145b3dec4"
+      },
+      {
+        "file": "lib/types/image-renderer.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 351,
+        "installedBytes": 351,
+        "builtSha256": "4573d0a2340cc6db93d8a431ba709d5871e1e9099f32ab0d7fd564509cb6f5ce",
+        "pinnedNpmSha256": "4573d0a2340cc6db93d8a431ba709d5871e1e9099f32ab0d7fd564509cb6f5ce"
+      },
+      {
+        "file": "lib/types/index.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 5782,
+        "installedBytes": 5782,
+        "builtSha256": "1b2e3b13334a31ee46326c83bb357491c9d13888c333b208ec48626fb0ad9194",
+        "pinnedNpmSha256": "1b2e3b13334a31ee46326c83bb357491c9d13888c333b208ec48626fb0ad9194"
+      },
+      {
+        "file": "lib/types/native-font-names.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 200,
+        "installedBytes": 200,
+        "builtSha256": "5c7b88642936b75acdb9057eecd33e12ba7680561787d10f77485f6d4e2f8eed",
+        "pinnedNpmSha256": "5c7b88642936b75acdb9057eecd33e12ba7680561787d10f77485f6d4e2f8eed"
+      },
+      {
+        "file": "lib/types/native-image-renderer.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 891,
+        "installedBytes": 891,
+        "builtSha256": "956f4e02cad5dfd2c23a5f6714d352d59ebf275f454026e7fe26db79908af798",
+        "pinnedNpmSha256": "956f4e02cad5dfd2c23a5f6714d352d59ebf275f454026e7fe26db79908af798"
+      },
+      {
+        "file": "lib/types/native-process.d.ts",
+        "present": false,
+        "equal": false,
+        "buildBytes": null,
+        "installedBytes": 918,
+        "builtSha256": null,
+        "pinnedNpmSha256": "a5154e2bc11f011bb1ff2a04d8b119f98f1744cf8099b3f1aa31a92d215b7ddc"
+      },
+      {
+        "file": "lib/types/native.d.ts",
+        "present": true,
+        "equal": false,
+        "buildBytes": 3074,
+        "installedBytes": 3173,
+        "builtSha256": "6b2b8454f3b5994db47560788920133ed11164658182a48941d23fb466bf4007",
+        "pinnedNpmSha256": "daf83e1322ac0b9527bbe1f27760943945f1a697a23c5a69fd5feaf71b1ac4ac"
+      },
+      {
+        "file": "lib/types/office-fonts.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 506,
+        "installedBytes": 506,
+        "builtSha256": "499313f154976f69db1920d80357bae904a36809e886dfa986cc7b8d83071ea4",
+        "pinnedNpmSha256": "499313f154976f69db1920d80357bae904a36809e886dfa986cc7b8d83071ea4"
+      },
+      {
+        "file": "lib/types/ooxml.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 1025,
+        "installedBytes": 1025,
+        "builtSha256": "8f1e4e62a5c7690329470a988fa6ade24b491609b32a888e8dcd1555b3828169",
+        "pinnedNpmSha256": "8f1e4e62a5c7690329470a988fa6ade24b491609b32a888e8dcd1555b3828169"
+      },
+      {
+        "file": "lib/types/operations.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 1771,
+        "installedBytes": 1771,
+        "builtSha256": "8ab9e3ebcd6c9b829e17f8d918b4212f7faee329d8d4babeff8941d34680f913",
+        "pinnedNpmSha256": "8ab9e3ebcd6c9b829e17f8d918b4212f7faee329d8d4babeff8941d34680f913"
+      },
+      {
+        "file": "lib/types/options.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 1570,
+        "installedBytes": 1570,
+        "builtSha256": "54ba0213a7b7e16f4fdc78e00c8a8bf2a767ee2311229e359c60a59337d14f4e",
+        "pinnedNpmSha256": "54ba0213a7b7e16f4fdc78e00c8a8bf2a767ee2311229e359c60a59337d14f4e"
+      },
+      {
+        "file": "lib/types/png.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 149,
+        "installedBytes": 149,
+        "builtSha256": "eb887f2e26c20a7a642aaeba5a07e4414e83a14baf43829ed910d428a65ff875",
+        "pinnedNpmSha256": "eb887f2e26c20a7a642aaeba5a07e4414e83a14baf43829ed910d428a65ff875"
+      },
+      {
+        "file": "lib/types/profile.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 465,
+        "installedBytes": 465,
+        "builtSha256": "4e373c7805d8edf1ad37652bcb2b4a443e35d2b7ca474d6f3227dc0430b3d73d",
+        "pinnedNpmSha256": "4e373c7805d8edf1ad37652bcb2b4a443e35d2b7ca474d6f3227dc0430b3d73d"
+      },
+      {
+        "file": "lib/types/rendering.d.ts",
+        "present": true,
+        "equal": false,
+        "buildBytes": 1619,
+        "installedBytes": 1811,
+        "builtSha256": "d5f4c3ef321100e27b8df43cc8a9f091d422f59b21a29025557f253598b7b1a9",
+        "pinnedNpmSha256": "eccde0f904ac6de9d34a2cb578f7991d41558baea15aeccd947084a63d0ab925"
+      },
+      {
+        "file": "lib/types/runtime.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 609,
+        "installedBytes": 609,
+        "builtSha256": "55830bc7befbc27ca75bcb4500e1f2b1b9ab8e2cecc547f452e0cae843f631e4",
+        "pinnedNpmSha256": "55830bc7befbc27ca75bcb4500e1f2b1b9ab8e2cecc547f452e0cae843f631e4"
+      },
+      {
+        "file": "lib/types/sheet-geometry.d.ts",
+        "present": true,
+        "equal": false,
+        "buildBytes": 1421,
+        "installedBytes": 1420,
+        "builtSha256": "7b78907f01948f90f94dace35eb3f979e0da6f86f07120a82cedca8cfd6c20f6",
+        "pinnedNpmSha256": "3717b85d2155b16fdb79febe4a4585d7f142bb50b54f4fb2c3cd1cf165a0cc63"
+      },
+      {
+        "file": "lib/types/wasm.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 4026,
+        "installedBytes": 4026,
+        "builtSha256": "bf61171ec708b30d9d8c91c7522f6c53aa341e3c8e1693fa3fadd282b0e8cf77",
+        "pinnedNpmSha256": "bf61171ec708b30d9d8c91c7522f6c53aa341e3c8e1693fa3fadd282b0e8cf77"
+      },
+      {
+        "file": "lib/types/worker.d.ts",
+        "present": true,
+        "equal": true,
+        "buildBytes": 900,
+        "installedBytes": 900,
+        "builtSha256": "011eb8f80486e0671ccd41b7c20807dd83fe8ffdf53e7d41b808bf49a36c1323",
+        "pinnedNpmSha256": "011eb8f80486e0671ccd41b7c20807dd83fe8ffdf53e7d41b808bf49a36c1323"
+      },
+      {
+        "file": "lib/worker.js",
+        "present": true,
+        "equal": false,
+        "buildBytes": 59760,
+        "installedBytes": 60303,
+        "builtSha256": "baf81f9fa7f4805bcb77fe0b77c52d35a5497218eb08b2f9bc45867a0de186a0",
+        "pinnedNpmSha256": "03920e4616cc44adcf30d5f81ed07261889ed6f9956f7c5bde92747184c33137"
+      }
+    ],
+    "publicHistoryCommitsInspected": 190,
+    "nativeProcessPreferredSourceInPublicHistory": false,
+    "rtlTileCorrectionInPublicHistory": false,
+    "alternateDeclaredRepository": "https://github.com/deepseek-harness/libreoffice-kit",
+    "alternatePublicAccess": "404 / repository not found",
+    "exactEntrySourceQualified": false,
+    "engineRebuildPerformed": false,
+    "scope": "Actual locked build of the public master revision compared to all pinned entry JavaScript/declaration bytes. Twenty-eight matches do not qualify the eight differences or the missing native-process preferred source; all available public history was checked for that module and RTL tile correction. No supplier payload, package pin, GUI, runtime or public-redistribution gate changes."
+  },
+  "latestEntryInspection": {
+    "date": "2026-10-14",
+    "package": "@deepseek-ai/libreoffice-kit",
+    "version": "0.2.0",
+    "registryTarball": "https://registry.npmjs.org/@deepseek-ai/libreoffice-kit/-/libreoffice-kit-0.2.0.tgz",
+    "registryIntegrity": "sha512-RhmxJgrOi8wWBfV+5V8CDijyqKqmS0f5GNM48ceuHuCYiTVaP5r9deSTlUo/8Hrsvq74hsc7N2RsljHHGdTnrw==",
+    "archiveSha256": "80f0f27ed610da2505bfdc36e0430a78f144ceb7afff6946e84752b1baf3bd91",
+    "fileCount": 105,
+    "entryPreferredTypescriptPaths": [],
+    "sourceScope": "Native frame-forwarding C++ sources are shipped, but no entry TypeScript preferred source is included. This is a package inventory, not semantic compatibility or an engine rebuild. No upgrade or source/redistribution qualification is inferred.",
+    "optionalKoffiVersion": "3.1.1",
+    "pinnedDependenciesChanged": false
+  },
+  "sourceLocationRecheck": {
+    "date": "2026-10-14",
+    "publicHead": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+    "branches": [
+      "master"
+    ],
+    "tags": [],
+    "pinnedNpmVersion": "0.1.5",
+    "latestNpmVersion": "0.2.0",
+    "pinnedAndLatestNpmGitHeadPresent": false,
+    "pinnedAndLatestNpmAttestationPresent": false,
+    "dshTreeRef": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "dshTreeTruncated": false,
+    "dshEntryPackageSourceDirectoryPresent": false,
+    "scope": "Checked public branch/tags, package metadata and the pinned DSH tree. No corresponding entry source is established; this does not prove no other source exists."
+  }
+}

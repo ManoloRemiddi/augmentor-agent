@@ -1,0 +1,30 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+.augmentor-agent {--dsh-content-font-size:16px;--dsh-content-font-delta:2px;}
+.augmentor-agent button {touch-action:manipulation;}
+.augmentor-agent-composer{display:flex;flex-direction:column;gap:8px;padding-bottom:env(safe-area-inset-bottom);}
+.augmentor-agent-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 12px 8px;}
+.augmentor-agent-actions>button,.augmentor-agent-talk{position:relative;min-height:52px;border:1px solid var(--dsw-alias-border-l2,#365257);border-radius:12px;background:var(--dsw-specific-input-major,#20343a);color:var(--dsw-alias-label-primary,#dceae8);font:inherit;display:grid;place-items:center;}
+.augmentor-agent-actions>button:disabled{opacity:.4}.augmentor-agent-actions .augmentor-improve-draft{position:static;width:100%;height:100%;min-height:52px;font:inherit;}
+.augmentor-agent-talk>div{width:100%;display:grid;place-items:center}.augmentor-agent-talk button{min-width:48px;min-height:48px;}.augmentor-agent-talk span.agent-label{pointer-events:none;font-size:12px;}
+.augmentor-agent-composer [data-composer-card] button[aria-label="Send message"],.augmentor-agent-composer [data-composer-card] button[aria-label="Queue message"]{display:none;}
+.augmentor-agent-connection{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:6px 12px;color:var(--dsw-alias-label-secondary);font-size:12px;overflow-wrap:anywhere;}
+.augmentor-agent-connection button{min-height:44px;min-width:44px;border:0;background:transparent;color:inherit;}
+.augmentor-agent [contenteditable]{font-size:16px!important;min-height:64px;}
+@media(max-width:600px){.augmentor-agent button[aria-haspopup],.augmentor-agent button[aria-label="Open sidebar"],.augmentor-agent button[aria-label="New session"],.augmentor-agent button[aria-label="Search sessions"]{min-width:44px;min-height:44px;}.augmentor-agent [role=tab]{min-height:44px;}.augmentor-agent [role=tablist]{overflow-x:auto;}}
+
+html:has(body.augmentor-agent),body.augmentor-agent,body.augmentor-agent #root {height:var(--agent-height,100dvh);min-height:0;overflow:hidden;}
+.augmentor-agent [data-composer-seat]{flex-shrink:0;}
+.augmentor-agent-composer{background:var(--dsw-alias-bg-base);}
+.augmentor-agent-connection [data-agent-session]{font-size:10px;}
+
+.augmentor-agent-actions .augmentor-improve-status:empty{display:none}.augmentor-agent-actions .augmentor-improve-status{grid-column:1/-1;font-size:12px}.augmentor-agent-actions .augmentor-agent-talk{touch-action:none}.augmentor-agent [data-composer-card] .augmentor-improve-draft{display:none}
+
+.augmentor-audio-status{font-size:12px;padding:0 12px 4px;color:var(--dsw-alias-label-secondary);overflow-wrap:anywhere}.augmentor-audio-status button{margin-left:12px;background:transparent;border:0;color:inherit;text-decoration:underline;min-height:36px}.augmentor-agent-talk[aria-pressed=true]{color:#b8f2d8;border-color:#71cba8}.augmentor-agent [data-composer-card] button[aria-label="Stop generating"]{display:none}
+
+.augmentor-ungrouped-label{font-size:14px;color:var(--dsw-alias-label-secondary);padding:8px 0}
+
+.augmentor-agent div:has(>.augmentor-ungrouped-label)>button{display:none}
+/* Keep the original input card and its three controls in one bottom composer,
+   including an empty chat. Focusing never floats or relocates its children. */
+.augmentor-agent [data-conversation-content][data-content-phase=hero]>[data-conversation-scroll]{justify-content:flex-end;}
+.augmentor-agent [data-conversation-content][data-content-phase=hero] [data-composer-seat]>div{padding-bottom:0;}

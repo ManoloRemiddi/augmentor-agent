@@ -1,8 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {randomUUID} from 'node:crypto';
 import {Type} from 'typebox';
+import {connectedBrowser} from '../../../apps/browser/shared/connected-executor.mjs';
+import {browserControlDefinitions} from '../../../apps/browser/shared/control-tools.mjs';
 import type {ExtensionAPI} from '@earendil-works/pi-coding-agent';
 export const browserDefinitions=[
+ ...browserControlDefinitions.map(definition=>({...definition,parameters:Type.Object(Object.fromEntries(Object.entries(definition.parameters.properties).map(([key,value])=>[key,definition.parameters.required.includes(key)?Type.Unsafe(value as any):Type.Optional(Type.Unsafe(value as any))])),{additionalProperties:false})})),
       {name:'browser_screenshot',action:'screenshot',description:'Capture the visible work tab as an image when DOM reads are incomplete. Requires an image-capable model and browser capture permission. Supply a tabId from browser_tabs_list to select the exact target.',parameters:Type.Object({tabId:Type.Optional(Type.Number())})},
       {name:'browser_tabs_list',action:'tabs_list',description:'List tabs in the connected visible browser.',parameters:Type.Object({})},
       {name:'browser_snapshot',action:'snapshot',description:'Read the work tab with bounded DOM recovery. tabId reads an exact tab without changing the action target. For long pages use the returned nextOffset, nextControlOffset or nextLinkOffset with the same tabId and scope. Default scope main prioritizes the visible main landmark; document includes all page text. Confirm the returned URL.',parameters:Type.Object({tabId:Type.Optional(Type.Number()),offset:Type.Optional(Type.Integer({minimum:0})),controlOffset:Type.Optional(Type.Integer({minimum:0})),linkOffset:Type.Optional(Type.Integer({minimum:0})),scope:Type.Optional(Type.Union([Type.Literal('main'),Type.Literal('document')]))})},
@@ -11,7 +14,10 @@ export const browserDefinitions=[
       {name:'browser_type',action:'type',description:'Replace the contents of an input in the current work tab using its CSS selector.',parameters:Type.Object({selector:Type.String(),text:Type.String()})},
     ];
 
+for(const definition of browserDefinitions)(definition.parameters.properties as Record<string,unknown>).executorId??=Type.Optional(Type.String({description:'Connected executorId from browser_tabs_list; use it when several browser profiles are connected.'}));
+
 export class BrowserBroker {
+  constructor(readonly harness='pi'){}
   owners=new Map<string,{owner:object;send:(message:unknown)=>void}>();
   pending=new Map<string,{sid:string;owner:object;finish:(error:Error|null,value?:unknown)=>void}>();
   attach(sid:string,owner:object,send:(message:unknown)=>void){
@@ -27,24 +33,26 @@ export class BrowserBroker {
     row.finish(error?new Error(error):null,value);
   }
   execute(sid:string,params:unknown,signal?:AbortSignal):Promise<unknown>{
-    const client=this.owners.get(sid);if(!client)return Promise.reject(new Error('Open this chat in the Augmentor browser extension first.'));
+    const client=this.owners.get(sid);if(!client)return connectedBrowser(this.harness+':'+sid,params as Record<string,unknown>,signal);
     if(signal?.aborted)return Promise.reject(new Error('Cancelled'));
     return new Promise((resolve,reject)=>{
       const id='browser-'+randomUUID();let settled=false;
       const finish=(error:Error|null,value?:unknown)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);this.pending.delete(id);error?reject(error):resolve(value);};
-      const abort=()=>finish(new Error('Browser action cancelled; verify its outcome before retrying.'));
+      const abort=()=>{if((params as any)?.action!=='stop')void this.execute(sid,{action:'stop'}).catch(()=>{});finish(new Error('Browser action cancelled; verify its outcome before retrying.'));};
       const timer=setTimeout(()=>finish(new Error('Browser action timed out; outcome may be unknown.')),20000);
       this.pending.set(id,{sid,owner:client.owner,finish});signal?.addEventListener('abort',abort,{once:true});
-      try{client.send({id,method:'browser/execute',params});}catch(error){finish(error as Error);}
+      try{client.send({id,method:'browser/execute',params:{...(params as Record<string,unknown>),owner:this.harness+':'+sid}});}catch(error){finish(error as Error);}
     });
   }
   package(sid:string){return (pi:ExtensionAPI)=>{
-    let unreadable=false;
+    let unreadable=false,usedTrusted=false;
+    pi.on?.('agent_end',async()=>{if(usedTrusted){usedTrusted=false;await this.execute(sid,{action:'stop'}).catch(()=>{});}});
     for(const d of browserDefinitions)pi.registerTool({name:d.name,label:d.name,description:d.description,parameters:d.parameters,
       execute:async(_id,args,signal,_update,ctx)=>{
         if(unreadable&&['click','type'].includes(d.action))throw Error('A fresh readable snapshot or screenshot is required before acting on an unobserved page.');
         if(d.action==='screenshot'&&!ctx.model?.input.includes('image'))throw Error('Select a model configured for image input before capturing the browser.');
-        const value=await this.execute(sid,{action:d.action,...args},signal) as {ok?:boolean;error?:string;observation?:string;url?:string;image?:{data:string;mimeType:string}};
+        usedTrusted=true;
+        const value=await this.execute(sid,{action:d.action,...(args as Record<string,unknown>)},signal) as {ok?:boolean;error?:string;observation?:string;url?:string;image?:{data:string;mimeType:string}};
         if(d.action==='snapshot')unreadable=!value?.url||value?.ok===false||value?.observation==='empty';
         if(value?.ok===false)throw Error(value.error??'Browser observation or action failed; inspect before retrying.');
         if(!value||(['click','type'].includes(d.action)&&value.ok!==true))throw Error('No action acknowledgement returned. Outcome unknown; observe before retrying.');

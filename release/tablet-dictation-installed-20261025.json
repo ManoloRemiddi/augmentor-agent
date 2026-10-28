@@ -1,0 +1,94 @@
+{
+  "schema": "augmentor-tablet-dictation-evidence/1",
+  "date": "2026-10-25",
+  "sourceRef": "c456a14e",
+  "supersedesInteractionIn": "tablet-harness-installed-20261025.json",
+  "productVersion": "0.2.13",
+  "installed": {
+    "review": "pilot",
+    "releaseId": "20261025-145912-84d5c835",
+    "artifactSha256": "e5ffeb33bdf8c214c217081a77b5f6c81bb51f1c954a61c00d1916c712b46e01",
+    "baseArtifactSha256": "640f28b87cca94ccb5eefceb9eb1f1cf159dccf7846ab6ad87d2f9af8514ea36",
+    "selectedAndRunningMatch": true,
+    "editableDraftCapability": 1,
+    "matchingPrivateMobileAssetsSelected": true,
+    "freshColdBackupCreated": true,
+    "priorConversationsRetained": 134,
+    "currentConversations": 135,
+    "labelledVerificationChatsAdded": 1
+  },
+  "behavior": {
+    "holdTalkToRecord": true,
+    "releaseInsertsEditableDraft": true,
+    "existingDraftAndSelectionPreserved": true,
+    "conflictingTranscriptRetainedForExplicitInsertion": true,
+    "audioRelayCanSubmitConversationalWork": false,
+    "explicitSendUsesNormalDurableDraftRequest": true,
+    "speechObserverRetainedForExplicitlySentReply": true,
+    "releaseBeforeMicrophoneReadyPreventsLateCapture": true,
+    "olderOwnerRefusesCaptureWithoutDraftCapability": true
+  },
+  "validation": {
+    "buildCohort": {
+      "passed": 82,
+      "failed": 0,
+      "skipped": 0
+    },
+    "exactSealedPackage": {
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0
+    },
+    "realChromiumHostAndSdk": {
+      "audio": "fake browser devices and independently authored scripted speech peer",
+      "mouseLandscapeRelease": "persisted editable transcript; zero model requests",
+      "touchPortraitRelease": "persisted editable transcript; zero model requests",
+      "editedExplicitSend": "one text-mode human message and one model request; reply reaches scoped speech observer",
+      "focusedLandscapeSidebar": "all three controls and editor right edge receive hit tests"
+    },
+    "physicalLenovo": {
+      "wifiAdbConnected": true,
+      "newPageLoadedOnTablet": true,
+      "portraitHoldRelease": "actual microphone recognition persisted as editable draft",
+      "landscapeHoldRelease": "actual microphone recognition appended while preserving existing draft",
+      "authoredDesktopSpeakerClipRecognized": true,
+      "allThreeFocusedControlsReceiveTouchBothOrientations": true,
+      "draftCanBeEdited": true,
+      "unsentEditSurvivedRotation": true,
+      "humanMessagesDuringVerification": 0,
+      "conversationalTurnsDuringVerification": 0,
+      "testDraftClearedAfterVerification": true,
+      "voiceClosedAtFinish": true,
+      "chargingAndRotationPreferencesRestored": true,
+      "taskInspectionForwardRemoved": true
+    },
+    "localScreenshots": {
+      "lenovo-hold-portrait-final.png": "0dd4e9cf367372e7c7607dec3afd0ede9586cf69697db70f95112aedb788f1b5",
+      "lenovo-hold-landscape-final.png": "c3094336b368548da6f022c70723d2c6acbc76ac376307709f300f34b300965c"
+    }
+  },
+  "preserved": [
+    "original Desktop/DSH speech companion",
+    "CPU recognizer and VAD",
+    "Handy",
+    "Qwen and Breeze GPU/model settings",
+    "saved chats and histories",
+    "installed provisioning and macOS Search/Wiki overlays"
+  ],
+  "retention": {
+    "obsoleteArtifactsRemoved": 4,
+    "additionalMobileCandidatesRetained": 2,
+    "managedScratchRetained": false
+  },
+  "remainingQualification": [
+    "fresh owner feedback on conversational speech/reply smoothness",
+    "installed macOS/Windows",
+    "on-device recognizer",
+    "background and locked-screen speech"
+  ],
+  "dictationFeatureRef": "d62f9e40",
+  "initialInstalledRelease": {
+    "releaseId": "20261025-132556-b39f82c2",
+    "artifactSha256": "c387ce36cf5ceb48956d67fb93d01e2e0a31916a856fc53d03ff628324080ac2"
+  }
+}

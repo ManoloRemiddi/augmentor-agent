@@ -1,0 +1,8 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+/* Keep the supplier's wide row; fit its same controls in a narrow Settings column. */
+.augmentor-permission-default { container-type: inline-size; }
+@container (max-width: 360px) {
+  .augmentor-permission-default > div:first-child { flex-direction: column; align-items: stretch; }
+  .augmentor-permission-default > div:first-child > div:first-child { padding-right: 0; }
+  .augmentor-permission-default > div:first-child button { align-self: flex-start; white-space: nowrap; }
+}

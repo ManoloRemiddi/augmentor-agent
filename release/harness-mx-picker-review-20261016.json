@@ -1,0 +1,60 @@
+{
+  "schema": "augmentor-mx-review/1",
+  "date": "2026-10-16",
+  "publicArtifactSourceRef": "1f050f03410272611944158bb3dde9f4eccf79c9",
+  "testedApplicationSourceRef": "1f050f03410272611944158bb3dde9f4eccf79c9",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "scope": "Private unselected MX model-picker/composer feedback review; no public binary release",
+  "review": {
+    "releaseId": "20261016-102350-38ccb6f8",
+    "artifactSha256": "a67bb9f8048b8902058004c87782a508ca10202831bcf71f84cb6653d3db1123",
+    "inventoryEntries": 24546,
+    "compiledFiles": 1069,
+    "ownerQaPassed": true,
+    "profile": "Separate current-review configuration; no imported conversations or production profile",
+    "defaultLocalModelPinned": true,
+    "previousReviewPreserved": true,
+    "selectedInstallationChanged": false
+  },
+  "qualification": {
+    "source": {
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "skip": 0,
+      "cancelled": 0,
+      "files": 7,
+      "workers": 2
+    },
+    "sealedTarget": {
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "skip": 0,
+      "cancelled": 0,
+      "files": 7,
+      "workers": 2
+    },
+    "licenceAndPrivateBoundary": {
+      "tests": 16,
+      "pass": 16
+    },
+    "browserWidths": [
+      1440,
+      666,
+      420
+    ],
+    "providerEvidence": "Authored deterministic seed; picker changes and successful/rejected selection make no further provider requests; not live Qwen inference",
+    "ownerEvidence": "Connected original GUI, top-first unique local pin, readable curation controls, empty composer; zero console warnings/errors and zero prompts/audio",
+    "dependenciesAndComponents": "Unchanged verified production baseline",
+    "preservedFailures": "Initial pointer helper, empty-context seed, unavailable network observer, expected HTTP log assertion and Models-page curation placement failures retained; no bound or assertion weakening",
+    "initialAssemblyFailure": "Unsealed candidate omitted existing preferred runtime supplier source; preserved then assembled with the original source and strict notice checks"
+  },
+  "remaining": [
+    "Owner MX feedback on the corrected build",
+    "Existing broader MX workflow and migration acceptance",
+    "Voice and other platforms deferred",
+    "Public redistribution and full-release CI gates remain separate"
+  ]
+}

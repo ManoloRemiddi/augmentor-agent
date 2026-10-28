@@ -25,6 +25,7 @@ from platform_adapters.paths import private_directory
 from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint
 from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
 from lifecycle.idle import IdleServerMixin
+from lifecycle.shared_profile import SharedProfile
 
 PROTOCOL='augmentor-prompts/1'
 LIMIT=1024*1024
@@ -50,6 +51,7 @@ class Library:
                 CREATE TABLE IF NOT EXISTS prompts (id TEXT PRIMARY KEY, name TEXT UNIQUE NOT NULL, content TEXT NOT NULL, revision INTEGER NOT NULL, updatedAt TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS imports (source TEXT NOT NULL, sourceId TEXT NOT NULL, digest TEXT NOT NULL, promptId TEXT NOT NULL, PRIMARY KEY(source,sourceId,digest));
                 CREATE TABLE IF NOT EXISTS requests (id TEXT PRIMARY KEY, digest TEXT NOT NULL, result TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS retired_prompt_requests (id TEXT PRIMARY KEY, digest TEXT NOT NULL);
             ''')
             original=db.execute("SELECT content FROM prompts WHERE lower(name)='prompt'").fetchone()
             seed=original['content'] if original and len(original['content'])<=8000 else DEFAULT_IMPROVEMENT
@@ -135,6 +137,7 @@ class Library:
                 return result
             digest=hashlib.sha256(json.dumps([method,p],sort_keys=True).encode()).hexdigest()
             db.execute('BEGIN IMMEDIATE')
+            if db.execute('SELECT 1 FROM retired_prompt_requests WHERE id=?',(request_id,)).fetchone():raise Conflict('This request belongs to a consolidated source library. Refresh the shared library; nothing was replayed.')
             existing=db.execute('SELECT * FROM requests WHERE id=?',(request_id,)).fetchone()
             if existing:
                 if existing['digest']!=digest:raise Conflict('Request ID reused with different data.')
@@ -189,7 +192,10 @@ if __name__=='__main__':
     from lease import hold
     hold('runtime')
     os.umask(0o077);state,data=paths()
-    for directory in (state,data):private_directory(directory)
+    private_directory(state)
+    try: shared_profile = SharedProfile(data, 'prompts')
+    except BlockingIOError: raise SystemExit(0)
+    private_directory(data)
     lock=(state/'prompts.lock').open('a')
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:raise SystemExit(0)

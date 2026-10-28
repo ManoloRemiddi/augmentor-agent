@@ -25,7 +25,7 @@ class KWin:
     def read(self,cancel=None,windows=False):
         source='''function rect(r){return {x:r.x,y:r.y,width:r.width,height:r.height}};
 var w=workspace.activeWindow; var order=workspace.stackingOrder; var above=w?order.slice(order.indexOf(w)+1).filter(a=>!a.minimized&&!a.hidden&&!a.deleted&&(!a.desktops.length||a.desktops.indexOf(workspace.currentDesktop)>=0)&&(!a.activities.length||a.activities.indexOf(workspace.currentActivity)>=0)):[];
-callDBus(SERVICE,'/com/augmentor/Desktop','com.augmentor.Desktop','Report',TOKEN,JSON.stringify({window:w?{id:String(w.internalId),pid:w.pid,application:w.resourceClass,title:w.caption,geometry:rect(w.frameGeometry)}:null,above:above.map(a=>({id:String(a.internalId),pid:a.pid,geometry:rect(a.frameGeometry)})),screens:workspace.screens.map(s=>({name:s.name,geometry:rect(s.geometry)}))}));
+callDBus(SERVICE,'/com/augmentor/Desktop','com.augmentor.Desktop','Report',TOKEN,JSON.stringify({window:w?{id:String(w.internalId),pid:w.pid,application:w.resourceClass,title:w.caption,geometry:rect(w.frameGeometry)}:null,above:above.map(a=>({id:String(a.internalId),pid:a.pid,geometry:rect(a.frameGeometry)})),screens:workspace.screens.map(s=>({name:s.name,geometry:rect(s.geometry),scale:s.devicePixelRatio}))}));
 '''
         if windows:source=source.replace('JSON.stringify({window:', 'JSON.stringify({windows:order.map(a=>({id:String(a.internalId),title:a.caption,geometry:rect(a.frameGeometry)})),window:')
         return self.execute(source,cancel)

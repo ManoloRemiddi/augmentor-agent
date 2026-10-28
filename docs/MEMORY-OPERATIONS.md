@@ -17,6 +17,23 @@ The installer needs Docker and an existing local compatible model endpoint.
 It does not install or reconfigure the model server. Use `augmentor-update` for installed artifacts; preserve matching DSH integration.
 Fresh package/source sessions can journal text before the engine is configured.
 
+The controlled installer sets `HINDSIGHT_API_LLM_TIMEOUT` to the shared managed
+call ceiling (45 seconds), including Reflect's inherited timeout. This aligns
+pinned Hindsight 0.10.0 with the existing gateway limit; it does not extend batch
+budgets or enable retries. Existing incompatible running engines are refused;
+use deliberate maintenance rather than silently replacing production. See
+[selection and timeout evidence](CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14).
+
+For compatible llama.cpp templates, intentional setup can add
+`--llama-cpp-thinking off`. This changes memory request bodies only; it does not
+change the server or chat/voice. `--llama-cpp-thinking default` returns to the
+server default. Omitting the option preserves a saved choice; fresh setup uses
+default. A different running configuration is refused, so schedule deliberate
+maintenance before the existing stopped-engine backup/replacement procedure.
+This option does not grant a longer processing window or retries. Inspect actual
+load and stopped jobs; [measured request-mode evidence](CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14)
+does not establish that disabling thinking resolves every timeout.
+
 The companion initializes its journal, schema and processing configuration before
 publishing its local endpoint. A client must not connect to an uninitialized
 service and spend its response timeout waiting for durable startup I/O. A gated

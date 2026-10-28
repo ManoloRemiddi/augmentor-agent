@@ -1,0 +1,198 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Original DSH microphone on the Pi Harness
+
+The web composer now selects the original MIT DSH **0.2.1-alpha.2** microphone,
+expanded recording toolbar, waveform, Stop/Cancel, device picker and stale-draft
+feedback from public ref `d743267388641bc76f17c45ce8b4c231aed1d32c`. Its ten
+new supplier inputs are byte-for-byte original and recorded in
+[`SOURCE.json`](../apps/harness/vendor/dsh/SOURCE.json), bringing that manifest
+to 625 inputs. The existing MIT notice is retained. The source audit in
+[Pi voice](PI-VOICE.md#original-dsh-web-microphone--october-16-2026) remains dated
+read-only evidence; this guide owns the subsequent implementation.
+
+The microphone creates **editable draft text**. It never presses Send, starts an
+agent/session, commits a chat message or enables response playback. Ordinary Send
+keeps its typed-input semantics. This also works before the first chat turn and
+while an existing Pi turn is running. Full conversational Native/Browser voice
+remains separate and required; dictation does not replace it.
+
+## Recognition and UI ownership
+
+[`dsh-dictation.jsx`](../apps/harness/dsh-dictation.jsx) injects readiness and
+microphone actions into the original components; it keeps the original activity
+slot between model selection and Send. The existing Plugins settings page exposes
+the original device picker and its input meter. The adapter reports only the
+configured cached English CPU Whisper path. It offers no SenseVoice installation,
+automatic download, alternative model/provider or pretend preparation progress.
+Cached availability maps to standby; it does not mean a decoder or microphone is
+already running. Browser microphone selection uses the original local preference.
+
+At recording/preview start, the browser reserves a private Host recognition
+operation **before** acquiring its microphone. The Host requires a companion
+advertising `dictation: 1` and scoped Pi support. The privately qualified candidate
+is Resonant Voice **0.1.22**, component `1e1e6880`, archive SHA-256
+`5f0e2f8ac79ef7d32aa3cb13ea873563e622dca985a3af7e3bf1a1ec0d6e56c9`.
+Shared application dependency pins remain **0.1.19**; this source is not an installed
+upgrade. The companion source/archive/fixtures and audition assets remain private
+and are absent from public application/tests/CI.
+
+The browser receives only an opaque capture ID and public limits. Service token,
+ticket, bridge ID and WebSocket stay in the trusted Host. Its recognition-only
+lease skips Breeze and TTS profile creation and cannot arm synthesis. Pi remains
+the only conversational SDK owner, with no SDK load needed for recognition.
+Qwen/Breeze remain on the RTX 5090 and existing ASR/VAD remain on CPU. No service,
+model context, concurrency, precision, GPU placement or installed profile changes.
+
+## Transport and lifecycle
+
+Authenticated operator-only loopback `POST /api/dictation/` operations are:
+
+| Operation | Input / effect |
+| --- | --- |
+| `catalog` | `{}` or `{refresh:true}`; offline cache availability and configured limits |
+| `open` | UUID `clientId`, UUID `captureId`, optional human `sessionId`; reserve and ready the recognition lease |
+| `heartbeat` | Exact client/capture IDs; renew the browser's eight-second ownership observation |
+| `transcribe` | Exact IDs in query; binary `audio/wav`, canonical mono 16 kHz PCM16; one submission only |
+| `close` | Exact IDs; idempotently retire only that capture and join accepted local work |
+
+An optional missing/incompatible companion is a successful readiness observation
+with `connected:false` and a non-sensitive unavailable message; it does not emit
+repeated HTTP failures into unrelated GUI workflows. Opening still strictly
+requires the explicit compatible capability. No readiness/microphone consumer
+mounts before operator access is resolved or inside a read-only inspector.
+
+Read-only inspectors cannot use any of these routes. The general JSON RPC gateway
+still denies private `voice.ticket` and `voice.close`. Existing same-origin,
+loopback host, bearer, no-store and maintenance admission remain in force.
+
+The complete configured budget is retained: up to **600 seconds / 19,200,000 PCM
+bytes plus the 44-byte canonical WAV header**. Binary upload avoids the smaller
+JSON carrier. The Host sends at most 65,536 bytes per private WebSocket chunk and
+waits for the matching utterance/cumulative-byte acknowledgement before the next
+chunk or End. Exact-limit input auto-finishes once. This bounds input buffering;
+an acknowledgement is not recognition completion or measured answer latency.
+
+The original recorder owns tracks, AudioContext, resampling and late permission
+grant disposal. The adapter closes on scope change, pagehide, cancellation or
+transport failure. The browser heartbeats while opening, recording and recognizing;
+lost heartbeats stop the Host from maintaining a private lease indefinitely.
+Client/capture IDs fence stale cancellation. Host shutdown joins accepted setup,
+upload, recognition and local WebSocket/lease retirement. Remote disconnect
+acknowledgement is not proof the decoder process exited: the companion owns its
+retiring worker and keeps maintenance busy until actual worker closure.
+
+Original Lexical detect spans, editor revision and draft/connection scope fence
+caption insertion. A changed draft retains the caption for the original explicit
+Insert action. Captions remain plain text, including markup-looking characters.
+Only ordinary Send creates the normal durable Pi input receipt; no automatic replay.
+
+## Qualification and remaining work
+
+Development checks exercise the actual Host/SDK and original Chromium UI with
+independently authored recognizer/provider peers and fake browser audio. They
+cover the complete audio budget, acknowledgement backpressure, pending setup/
+upload cancellation, stale identities, orphan expiry, compatibility rejection,
+rootless use, running Pi turns, read-only denial, stale-draft recovery, plain text
+and both themes. The initial held-upload driver did not wait for its read to be
+entered; the corrected driver synchronizes that admission. The first Chromium
+assertion assumed an optional rewritten-input field on an ordinary user message;
+it now checks the actual original content fallback. Both failed records remain.
+No implementation bound, worker count or test skip changed to obtain a pass.
+
+The private installed candidate independently recognizes one existing licensed
+synthetic 7.36-second audition offline: 25/25 words, zero edits, no TTS/LLM call,
+joined worker exit. This is no physical microphone/speaker or general accuracy
+claim. Hosted component run **38827292939** passes Linux x64/macOS ARM64 full
+suites; Windows retains its working-FFmpeg prerequisite failure and the overall
+failed result. The application’s existing Windows/Office/distribution gates remain.
+
+The first frozen source cohort **709fdfc4** records 700 passes, 47 failures and
+two existing optional skips. GUI failures exposed optional readiness HTTP errors;
+constructor-bypassing unit fixtures lacked the new inactive dictation field. One
+owned model-account test child was explicitly terminated after that missing field
+prevented its held gate from entering. This failed/interrupted result and original
+copy remain. The expanded read-only browser driver also initially waited for an
+editable composer in an explicitly read-only inspector; its corrected assertion
+uses the existing disabled-composer marker, with the failed record retained.
+The correction exposes unavailable readiness as data, keeps opening
+strict, gates observers by resolved operator access, and supplies inactive state
+to those existing unit fixtures. No bounds, skips or worker counts are relaxed.
+
+Exact corrected frozen public source/ordinary/companion acceptance, an isolated MX review,
+owner microphone feedback and shared distribution/pin/adoption are still required.
+Current review `20261015-211446-7474ddb2` and selected installation remain unchanged
+and do **not** contain this microphone integration. Full voice, physical speech,
+remaining plugin/Home/Office workflows, later OS artifacts and final migration
+remain open. The larger Harness goal is incomplete.
+
+Focused reproduction after the normal build:
+
+```sh
+npm run build
+node --test tests/harness-dictation.test.mjs tests/harness-dictation-host.test.mjs tests/harness-dictation-chromium.test.mjs
+```
+
+Chromium uses fake audio devices for this proof; no owner recording or private
+component is required. Optional screenshots use `AUGMENTOR_DICTATION_PROOF_OUTPUT`.
+
+## Frozen source and ordinary qualification — October 16, 2026
+
+Corrected **159c99f2fc19f24b166a5d388016580fe905f931** source and fresh ordinary
+each pass **748 tests plus two existing optional skips, zero failures/cancellations**,
+across **129 files/all 54 Harness Chromium files**, unchanged two-worker cohort
+and bounds. All **3,389 tracked/1,060 compiled inputs** match before/after; the
+625 supplier inputs, ten new verbatim UI bodies, dependency/license inputs and
+22 notice/packaging/private-source cases verify. The failed initial source and
+ordinary copy remain preserved; the initial ordinary cohort was not run.
+
+The exact public transport/frozen ordinary also works against the privately
+installed 0.1.22 archive and existing cached CPU decoder: 25/25 synthetic words,
+zero edits, no TTS/LLM request and explicitly joined worker exit. No private source,
+archive or audition enters the public application/tests/CI. This does not qualify
+physical audio, general accuracy, installed pins or platform release artifacts.
+Ten sealed inventories/eleven review owners, selected artifact, 38 canonical and
+four original private changes and six service/model configuration files remain
+preserved. Qwen catalog is online; Breeze remains failed with 2,012 MiB free on
+the RTX 5090, below its unchanged 2,828 MiB manager prerequisite. No retry, tuning
+or GPU move occurred. Current MX review is unchanged; a new sealed review is next.
+[Portable qualification](../release/harness-dictation-qualification.json).
+
+## Sealed-artifact fixture correction
+
+The first sealed-target cohort records **745 passes/three failures/two existing
+optional skips**. Only the older Pi Native/Browser surface driver fails: it
+incorrectly looks for `fake_audio` and its Python entrypoint inside the product
+artifact. Those files are test inputs, not product dependencies. The driver now
+resolves its independently authored fixtures beside its test source, while keeping
+actual native modules, Browser worker and SDK owner selected from the artifact.
+The fixture bodies and 1,060 compiled product inputs remain unchanged; the sealed
+artifact is never patched or resealed. Corrected four-case voice-surface checks
+pass against source, frozen ordinary and the exact sealed artifact. No deadline,
+worker count or skip changes. The complete corrected sealed cohort is next.
+
+The common application SDK workflow now runs the 14 recognition-only transport/
+Host cases immediately after build on Linux/macOS/Windows, with explicit source/
+fixture path triggers. [Hosted run 38831002313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38831002313)
+at **bf2c033e** passes the complete SDK jobs on Linux and macOS. Windows is
+cancelled during the recognition/Host step; its log contains a named-pipe
+`FileNotFoundError` from the memory-companion fixture and a pending dictation-host
+promise at cancellation. These observations do not establish the complete cause
+of the hang or a Windows pass. Existing cancellation/deadlines are retained; no
+rerun, worker/skip change or platform acceptance is inferred. The same head's
+Validate job still refuses Office public source/rebuild packaging; the source
+boundary check passes. These hosted results do not qualify a release.
+
+## Current isolated MX review
+
+[20261016-022659-869fe1e8](HARNESS-MX-REVIEW.md#original-dsh-microphone-review--october-16)
+now runs the exact unchanged sealed artifact with a separately installed private
+0.1.22 CPU recognition service. The corrected final sealed cohort passes
+748 plus two existing optional skips; the failed initial staged record is retained.
+Initial owner QA verifies both themes/marks/settings and offline cache readiness
+without creating chats, drafts, login, recording or model/tool work. The 70 private
+package inputs remain unchanged and outside the public artifact/tests/CI. Existing
+review/selection/services and GPU settings stay preserved. Use New Session →
+microphone → Stop → inspect/edit draft → Send. Device choice is in Settings →
+Plugins → Voice input. This is an unselected review; owner physical microphone
+feedback, full voice and installed/distribution adoption remain open.

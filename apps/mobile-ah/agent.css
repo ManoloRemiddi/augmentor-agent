@@ -1,0 +1,21 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+:root { color-scheme:dark; }
+body.pair {margin:0;background:#101b20;color:#dceae8;font:17px/1.5 system-ui;min-height:100dvh;display:grid;place-items:center;}
+.pair main {width:min(90vw,480px);padding:24px;box-sizing:border-box;}.pair h1{color:#a9d8cf}.pair label{display:grid;gap:12px}.pair input,.pair button{box-sizing:border-box;width:100%;padding:16px;font:inherit;border-radius:12px;border:1px solid #506c70;margin:12px 0;background:#20343a;color:inherit}.pair button{background:#a9d8cf;color:#13262b;cursor:pointer;}
+.augmentor-agent {--dsh-content-font-size:16px;--dsh-content-font-delta:2px;}
+.augmentor-agent button {touch-action:manipulation;}
+.augmentor-agent-composer{display:flex;flex-direction:column;gap:8px;padding-bottom:env(safe-area-inset-bottom);}
+.augmentor-agent-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 12px 8px;}
+.augmentor-agent-actions>button,.augmentor-agent-talk{position:relative;min-height:52px;border:1px solid var(--dsw-alias-border-l2,#365257);border-radius:12px;background:var(--dsw-specific-input-major,#20343a);color:var(--dsw-alias-label-primary,#dceae8);font:inherit;display:grid;place-items:center;}
+.augmentor-agent-actions>button:disabled{opacity:.4}.augmentor-agent-actions .augmentor-improve-draft{position:static;width:100%;height:100%;min-height:52px;font:inherit;}
+.augmentor-agent-talk>div{width:100%;display:grid;place-items:center}.augmentor-agent-talk button{min-width:48px;min-height:48px;}.augmentor-agent-talk span.agent-label{pointer-events:none;font-size:12px;}
+.augmentor-agent-composer [data-composer-card] button[aria-label="Send message"],.augmentor-agent-composer [data-composer-card] button[aria-label="Queue message"]{display:none;}
+.augmentor-agent-connection{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:6px 12px;color:var(--dsw-alias-label-secondary);font-size:12px;overflow-wrap:anywhere;}
+.augmentor-agent-connection button{min-height:44px;min-width:44px;border:0;background:transparent;color:inherit;}
+.augmentor-agent [contenteditable]{font-size:16px!important;min-height:64px;}
+@media(max-width:600px){.augmentor-agent button[aria-haspopup],.augmentor-agent button[aria-label="Open sidebar"],.augmentor-agent button[aria-label="New session"],.augmentor-agent button[aria-label="Search sessions"]{min-width:44px;min-height:44px;}.augmentor-agent [role=tab]{min-height:44px;}.augmentor-agent [role=tablist]{overflow-x:auto;}}
+
+html:has(body.augmentor-agent),body.augmentor-agent,body.augmentor-agent #root {height:var(--agent-height,100dvh);min-height:0;overflow:hidden;}
+.augmentor-agent [data-composer-seat]{flex-shrink:0;}
+.augmentor-agent-composer{background:var(--dsw-alias-bg-base);}
+.augmentor-agent-connection [data-agent-session]{font-size:10px;}

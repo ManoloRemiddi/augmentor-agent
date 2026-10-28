@@ -1,0 +1,116 @@
+{
+  "schema": "augmentor-harness-bootstrap-preadoption-qualification/1",
+  "date": "2026-10-18",
+  "scope": "Actual MX stable guard installation against unchanged current apps and stores; no owner cutover",
+  "runtimeRef": "bc2d70167ca2d987a4afb2d175401f78e2db3f9c",
+  "applicationRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+  "artifactSha256": "535ad8e607de7fbd3f4aea707882a94a1ad8a2ba25ad7ebcd19f906137b4f1be",
+  "installed": {
+    "nativeStartupFiles": 29,
+    "nativeContentChanges": 22,
+    "previewFiles": 2,
+    "reviewOpenerUpdated": true,
+    "registryBefore": 18,
+    "registryAfter": 20,
+    "registeredEntriesRemainExact": true,
+    "originalReviewMenusAndIconsExact": true,
+    "nativeVisibleMenuActionsAndShortcutsExact": 6,
+    "dshWebAndOneRegisteredWorkspaceFutureServiceGuards": 2,
+    "serviceDaemonReloads": 1,
+    "serviceRestarts": 0,
+    "originalServiceArgumentsEnvironmentCwdAndSupplierFilesExact": true
+  },
+  "qualification": {
+    "existingLegacyInPlaceNamespaceCases": 6,
+    "actualInstalledPendingFenceNamespaceCases": 9,
+    "fullAppCopiesCreated": 0,
+    "newReleaseArtifactsCreated": 0,
+    "reserveGiB": 64,
+    "namespaceFixturesHostReadOnly": true,
+    "namespaceFixturesNetworkIsolated": true,
+    "actualOwnerFencesWritten": false,
+    "ownerModelRequests": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "preservation": {
+    "nativeAndReviewPidsAndRunningBuildsExact": true,
+    "protectedReviewFiles": 36,
+    "sharedRowsEngineSettingsAndSelectionsExact": true,
+    "gpuVoiceAndUnrelatedServicePidsConfigurationsExact": true,
+    "ownerApplicationActivated": false,
+    "ownerDataMigrated": false
+  },
+  "menuDirectoryCorrection": {
+    "initialRegistrarUsedDefaultDataHome": true,
+    "changedOnlyMainRecordedMenuPath": true,
+    "correctedThroughOwnedRegistrarWithOriginalDataHome": true,
+    "revisionAdvanced18To19To20": true,
+    "noMenuFileRemoved": true,
+    "finalEntryMetadataExact": true
+  },
+  "directoryPreparation": {
+    "sourceDirectories": 4,
+    "beforeMode": "0775",
+    "afterMode": "0755",
+    "onlyGroupWriteRemoved": true,
+    "ownerAccessUnchanged": true,
+    "groupReadExecuteUnchanged": true,
+    "noOtherLocalGroupAccountsObserved": true,
+    "originalModesRecordedPrivately": true,
+    "dataBytesChanged": false
+  },
+  "liveAdvisoryBackupMap": {
+    "roots": 28,
+    "additionalRoots": 23,
+    "sharedPairs": 3,
+    "explicitPartialPairs": 1,
+    "logicalBytesApprox": 8152317540,
+    "entries": 199535,
+    "metadataAllowanceBytes": 77978288,
+    "liveSpecialFiles": 0,
+    "fitsUnchangedArchiveBounds": true,
+    "contentSnapshotCreated": false,
+    "coldAuthority": false,
+    "controllerOutsideArchivedReleaseStore": true,
+    "controllerBodiesMatchIncomingFiles": 15,
+    "unitSymlinkPreservedByTreeCoverage": true
+  },
+  "browserCodePlan": {
+    "oldVersion": "0.2.11",
+    "incomingVersion": "0.2.13",
+    "oldFiles": 55,
+    "incomingFiles": 67,
+    "incomingBytes": 618936,
+    "sameIdentityAndPermissions": true,
+    "codeWritten": false,
+    "loadedBrowserUpdated": false,
+    "publicationStillNeedsTypedCodeRecoveryBinding": true
+  },
+  "storage": {
+    "cleanupCopiesRemovedTotal": 79,
+    "observedGiBRecoveredTotal": 43.06,
+    "freeGiBApprox": 100.95,
+    "singleManagedScratchEmpty": true,
+    "extraCandidatesRetained": 2,
+    "newLargeOwnerArchiveCreated": false
+  },
+  "remaining": [
+    "Bind the small Browser extension code-folder update and recovery to client publication before any actual cold cut",
+    "Coordinate Chromium shutdown/reload; user question pending; browser UI is unavailable to this session",
+    "Quiesce actual Native/mobile/preview/reviews/embedding/registered workspace and DSH-group companions, preserving accepted work",
+    "Capture one fresh full three-pair cold archive; data preparation precedes configuration",
+    "Guarded publication/finalize, actual ordinary reopen and owner continuation",
+    "Pilot feedback gates more project transfers; VR-RasterStudio stays DSH; voice expansion and later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-bootstrap-legacy-compatibility-private-20261018.json": "4691949bd7e075ac42e65b7faea8949005c33933dec7ab484a91a9604c9b8a8b",
+    "harness-bootstrap-installed-fence-private-20261018.json": "ab55cd56e686ccd54af73c69ebb605ab34a97905076935d45a5e1e644f6471d0",
+    "harness-bootstrap-preadoption-owner-private-20261018.json": "a9d3a1c5d83da0c346c781c6aaf83b2341e6f117f7a8b4fe4fb61f47f8d309ba",
+    "harness-bootstrap-service-preadoption-private-20261018.json": "22e4a8b40f249c2523f5c60e2ea8be671174f4cca10de43bfbedab4966fa843e",
+    "harness-bootstrap-directory-modes-private-20261018.json": "35e926f9a3cf1ef917d7b9bbd122173cc094342123b95fd61f8efd102bbafa8a",
+    "harness-bootstrap-owner-preservation-private-20261018.json": "61693aca081d2925b579ab7c6b2558b07dbc806a77ee0ae1be4987b0f9355db5",
+    "harness-bootstrap-current-cut-map-private-20261018.json": "6ecd9b68df360380ec529629dbda0c58df8610bf66d54d57fe6d5347db622fa3",
+    "harness-bootstrap-browser-code-plan-private-20261018.json": "c3a3a2a8ab33a533f8ac1057731f930da54100cea2bfbea649f4282d01db3cca",
+    "harness-bootstrap-controller-bindings-private-20261018.json": "65b741468709c703ad0bc57ac3ba4d4d0c16e1a156eddd69bd3aad1eb887678c"
+  }
+}

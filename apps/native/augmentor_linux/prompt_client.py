@@ -15,8 +15,10 @@ from .platform_runtime import LocalSocket
 PROTOCOL='augmentor-prompts/1'
 
 class PromptClient:
-    def __init__(self):
-        state=Path(os.environ.get('AUGMENTOR_SHARED_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor'))
+    def __init__(self, environment=None, root=None):
+        self.environment = dict(os.environ if environment is None else environment)
+        self.root = root or Path(__file__).resolve().parents[3]
+        state=Path(self.environment.get('AUGMENTOR_SHARED_STATE',Path(self.environment.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor'))
         self.base=str(state/'prompts.sock')
     def call(self,method,payload=None,request_id=None):
         automatic=method.startswith('memory.dual.')
@@ -25,7 +27,7 @@ class PromptClient:
         try:
             try:connection.connect(endpoint)
             except (FileNotFoundError,ConnectionRefusedError):
-                service=Path(__file__).resolve().parents[3]/('services/memory/service.py' if automatic else 'services/prompt-library/service.py')
+                service=self.root/('services/memory/service.py' if automatic else 'services/prompt-library/service.py')
                 if not service.is_file():raise ContractError('Shared prompt service is not installed.')
                 # This client is also used outside the app launcher. Never rely
                 # on inherited environment flags to preserve a sealed bundle.
@@ -34,7 +36,7 @@ class PromptClient:
                     ensure_companion('memory' if automatic else 'prompts')
                 else:
                     child=subprocess.Popen([sys.executable,'-Xutf8','-B',str(service)],stdin=subprocess.DEVNULL,
-                        stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+                        stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True,env=self.environment)
                     threading.Thread(target=child.wait,daemon=True).start()
                 deadline=time.monotonic()+5
                 while True:

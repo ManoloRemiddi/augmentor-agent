@@ -1,0 +1,35 @@
+{
+  "schema": "augmentor-dsh-file-reference-source/1",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "types.ts",
+      "sha256": "9c72ffb7158bc573a3da5d7a1ce1bee0d83ac132883540a4e4e980f326836684",
+      "upstreamPath": "packages/context/file-reference/src/types.ts",
+      "upstreamSha256": "9c72ffb7158bc573a3da5d7a1ce1bee0d83ac132883540a4e4e980f326836684"
+    },
+    {
+      "path": "search.ts",
+      "sha256": "004be5dae327b9009c6d0c2758839e4f165ffbf200e1d7c37c3ffc05a401547d",
+      "upstreamPath": "packages/context/file-reference-local/src/search.ts",
+      "upstreamSha256": "78244bca498177d1c5e889746b8d8b1c0dda1d4e062050ac05469ab7568ac9b5",
+      "adaptation": "Local NodeNext module imports only; discovery/ranking/cancellation unchanged."
+    },
+    {
+      "path": "guidance.ts",
+      "sha256": "e95e7cb075af64d88dc784297b1eed3000ef33850f261914ca55a559d37aef89",
+      "upstreamPath": "packages/context/file-reference/src/index.ts",
+      "upstreamSha256": "cfd2cb19db5d4b09bb7a974ed3c1080c5e77ab4b297a7fcf2a3772547824796f",
+      "adaptation": "Extract the unchanged static guidance; exclude supplier owner/service."
+    },
+    {
+      "path": "grammar.ts",
+      "sha256": "b6b61f5b77978734b76aff10ca644e7e2a787d88e908e98488317b075b9db196",
+      "upstreamPath": "packages/context/file-reference/src/grammar.ts",
+      "upstreamSha256": "de096119435cd32d6e8485f866bc9ef648adb7d6d9c79c3451a76ec74a0e8927",
+      "adaptation": "Local NodeNext type import only; original grammar unchanged."
+    }
+  ]
+}

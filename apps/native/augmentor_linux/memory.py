@@ -19,7 +19,7 @@ class MemoryDialog(QDialog):
     completed=Signal(object,object)
 
     def __init__(self,owner):
-        super().__init__(owner);self.owner=owner;self.client=PromptClient();self.token=None;self.busy=False;self.dismissed=False;self.config={};self.documents=[];self.offset=0;self.total=0
+        super().__init__(owner);self.owner=owner;self.client=owner.prompt_client() if hasattr(owner,'prompt_client') else PromptClient();self.token=None;self.busy=False;self.dismissed=False;self.config={};self.documents=[];self.offset=0;self.total=0
         self.completed.connect(lambda callback,value:callback(value) if not self.dismissed else None)
         self.setWindowTitle('Memory');self.resize(px(self,600),px(self,640))
         layout=QVBoxLayout(self)
