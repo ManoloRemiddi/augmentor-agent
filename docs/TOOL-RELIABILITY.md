@@ -75,8 +75,8 @@ The default installed endpoint remains stable.
 Linux selects the shared stream overlapping the active application, maps portal
 compositor geometry independently of screenshot pixels, and rejects ambiguous
 or changed topology. Missing stream identity is allowed only for one actual
-screen. The first portal grant and mixed-scale live click acceptance still need
-the actual desktop; authored mapping tests are not that proof.
+screen. Actual mixed-scale capture/input acceptance is recorded below; mapping fixtures
+remain distinct from those physical checks.
 
 Windows uses the existing authenticated named pipes and kernel locks. Its new
 adapter observes the physical foreground window/displays, captures its monitor,
@@ -119,9 +119,9 @@ No SDK or model switch is needed for that correction.
 
 ## Personal installed rollout
 
-Linux Native runs the sealed release `20261027-194219-2e1f637c`; its selected and
+Linux Native runs the sealed release `20261027-210702-a9e1b87b`; its selected and
 running roots agree. Its control overlay retains SDK0.85.1 and product0.2.11;
-the modern Harness remains `20261027-170823-bf37ca77`, product0.2.13/SDK1.1.
+the modern Harness runs `20261027-211639-127f8221`, product0.2.13/SDK1.1.
 The Mac Native app remains in `/Applications/Augmentor Agent Desktop.app`, product
 0.2.12 with its existing SDK/UI/dependencies; its source06c22298 timestamp delta
 is separately recorded over the control overlay. The Mac Harness remains
@@ -145,11 +145,37 @@ nine Full records and all22 journals/model settings stayed unchanged. No old too
 or model actions were replayed. Two maintained Linux DSH role pins and the private
 Docs skill were corrected with exact backups, preserving custom presets.
 
-Browser artifacts contain the repaired trusted-input/readback code and expanded
-manifest permissions. Actual owner-browser adoption remains a separate live
-check. macOS still reports Screen Recording disabled; Linux's first portal grant
-and mixed-monitor capture/input acceptance remain pending. Existing Accessibility
-on the Mac remains granted. Real Google Docs saved/style readback is not claimed.
+The actual owner Chromium profile has loaded the updated extension through its
+normal reload control. Trusted accent/CJK/emoji input, independent page readback,
+single-use observation rejection, selection/replacement and Stop pass on an
+authored local page. The existing extension key/version and profile identity are
+retained. Mac Brave and Windows owner-browser adoption remain separate checks;
+real Google Docs saved/style readback is not claimed.
+
+Linux's portal grant is now reusable for all three selected monitors. Actual
+capture and independent Qt-button clicks pass on the HDMI mixed-scale screen and
+DVI screen. The portrait screen captures correctly; its test click was refused
+because existing owner EDGE dock windows cover it. No owner panel received input.
+The selected KDE correction binds size-only portal streams injectively to fresh
+compositor outputs and stops sharing if the topology changes. A subsequent
+optional-accessibility correction is under review/qualification: complete absence
+of field metadata can use an observed active window/title, while partial reads or
+known focus changes refuse. It reports window binding honestly and keeps Stop.
+macOS still reports Screen Recording disabled, with Accessibility granted. The
+owner explicitly deferred those remaining OS grants until the other work finishes.
+
+Windows source06c22298 is installed through the normal preview installer. Both
+independent full payload scans, cold-profile comparisons, same-target junction
+checks and fixed local health passed before canonical update completion. The
+installed registered physical tool chain passes capture, Unicode/emoji, chords,
+replacement, Home, single-use targets, Stop and 256-character input. Models,
+saved harness choice and original sessions are retained. A grouped model-picker
+font bug and missing proactive saved-backend restore were subsequently diagnosed;
+their reviewed replacement build is pending installation. Restore is limited to
+an existing selected managed home and matching service identity, uses the existing
+admission/idempotence checks, and leaves model/profile provisioning unchanged.
+Ordinary native, Browser and background login launch restore that selected DSH
+and voice service once; failures go to private logs while the UI can still open.
 
 The CI matrix is not wholly green: Windows command-job fixtures still report
 memory-lease warnings/timing failures; broader qualification jobs have their own

@@ -85,6 +85,18 @@ def _spawn_owner(root):
     raise ValueError('The Augmentor background owner could not start. Private diagnostics were preserved.')
 
 
+def restore_selected(root=ROOT):
+    """Restore the previously selected owned DSH; never provision a profile."""
+    from dsh.setup import current
+    state=managed_directory()
+    try:selected=current()
+    except AttributeError as error:raise ValueError('Saved DSH selection is invalid; its profile was preserved.') from error
+    if not isinstance(selected,dict):raise ValueError('Saved DSH selection is invalid; its profile was preserved.')
+    if selected.get('home')!=str(state/'home') or not (state/'home').is_dir():return None
+    if not ManagedAgent(root,state).owned():return None
+    return request('start-dsh',root=root)
+
+
 def ensure_companion(name, root=ROOT):
     if sys.platform != 'win32' or name not in COMPANIONS:
         raise ValueError('Unsupported Windows companion startup.')
