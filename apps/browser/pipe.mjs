@@ -516,6 +516,28 @@ function scheduleReconnect(open, key) {
   retryTimers.set(key, timer)
 }
 
+// -------------------------------------------------- orphan guard (idle exit)
+// Field report #1 (609 orphaned hosts, 80.2 GB RSS): under MV3 the extension
+// service worker is torn down and respawned, but stdin 'end' is NOT reliably
+// delivered to this host. cleanup() never runs, and the downlink WebSockets
+// keep the event loop alive, so the host lingers at ~85 MB for the life of the
+// browser — one more per service-worker restart. A host that has heard nothing
+// from the extension for IDLE_EXIT_MS has no client, and the extension spawns
+// a fresh host on next use, so exiting costs nothing.
+const IDLE_EXIT_MS = Number(process.env.PIPE_IDLE_EXIT_MS ?? 90000)
+let idleExitTimer = null
+function armIdleExit() {
+  if (idleExitTimer) { clearTimeout(idleExitTimer); idleExitTimer = null }
+  if (!Number.isFinite(IDLE_EXIT_MS) || IDLE_EXIT_MS <= 0) return // opt-out
+  // Deliberately NOT unref()'d: an orphan's surviving handles are its
+  // WebSockets, so this timer is the only thing that can still end it.
+  idleExitTimer = setTimeout(() => {
+    if (shuttingDown) return
+    log(`no extension traffic for ${IDLE_EXIT_MS}ms — exiting (orphaned pipe)`)
+    void cleanup(0)
+  }, IDLE_EXIT_MS)
+}
+
 // ------------------------------------------------------------ local methods
 // 0.1.30 (Phase 1) ---------------------------------------------------------
 // In-place update plumbing. Division of labor: the PIPE owns
@@ -934,6 +956,16 @@ async function handleExtMessage(msg) {
 }
 
 // ------------------------------------------------------------------ boot
+// Field report #3: boot() retried forever. The retry timers are unref()'d, but
+// process.stdin.resume() keeps the loop alive regardless, so a host whose DSH
+// app never comes up idles at ~50 MB for the life of the browser instead of
+// giving up. Bound the attempts and exit: the extension spawns a fresh host on
+// next use, and an honest exit beats a resident process that has never worked.
+// The bound stays generous — at the ~1s cadence this ladder produces today,
+// 240 attempts is roughly four minutes — because opening the browser well
+// before `dsh web` is a normal habit, not an error.
+const BOOT_MAX_ATTEMPTS = Number(process.env.PIPE_BOOT_MAX_ATTEMPTS ?? 240)
+let bootAttempts = 0
 async function boot() {
   try {
     if(UNIFIED)await productHandshake()
@@ -941,10 +973,17 @@ async function boot() {
     log(`DSH app ready: dsh ${describe.version}, home ${describe.home}, ${describe.attachedSessions} attached session(s)`)
   } catch (e) {
     log('DSH app not reachable yet:', e.message)
+    bootAttempts += 1
+    if (Number.isFinite(BOOT_MAX_ATTEMPTS) && BOOT_MAX_ATTEMPTS > 0 && bootAttempts >= BOOT_MAX_ATTEMPTS) {
+      log(`giving up after ${bootAttempts} boot attempts (PIPE_BOOT_MAX_ATTEMPTS) — exiting; the extension re-spawns on next use`)
+      void cleanup(0)
+      return
+    }
     scheduleReconnect(boot, 'boot')
     return
   }
   if(shuttingDown)return
+  bootAttempts = 0
   remoteDsh.start()
   log('action-channel token source:', WS_TOKEN.source)
   if(!workspaceProfile)void openPluginWs() // Embedded panels do not take the extension browser executor.
@@ -953,6 +992,7 @@ async function boot() {
 // --------------------------------------------------------------- lifecycle
 process.stdin.on('data', (chunk) => {
   if(shuttingDown)return
+  armIdleExit() // the extension is talking to us: we are not an orphan
   stdinBuf = Buffer.concat([stdinBuf, chunk])
   while (stdinBuf.length >= 4) {
     const len = stdinBuf.readUInt32LE(0)
@@ -976,6 +1016,7 @@ function cleanup(code) {
   shuttingDown = true
   acceptedWork.close();process.stdin.destroy()
   clearInterval(pluginHb)
+  if (idleExitTimer) { clearTimeout(idleExitTimer); idleExitTimer = null }
   for(const timer of retryTimers.values())clearTimeout(timer)
   retryTimers.clear()
   voice.close()
@@ -999,6 +1040,7 @@ process.stdin.on('end', () => {
   cleanup(0)
 })
 process.stdin.resume()
+armIdleExit() // armed at startup too: a host that never receives anything still exits
 process.on('SIGTERM', () => cleanup(0))
 process.on('SIGINT', () => cleanup(130))
 process.stdout.on('error',()=>{
