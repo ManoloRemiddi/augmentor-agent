@@ -262,7 +262,11 @@ function scheduleReconnect(message) {
   state.retryCount += 1
   // 1s, 2s, 4s, 8s, 16s, then 30s steady — a dead DSH must not spin the
   // native host, but a recovered one must be picked up without user action.
-  const delay = Math.min(30000, 1000 * 2 ** Math.min(state.retryCount - 1, 4))
+  // Field report #3: the inner cap pinned the exponent at 2**4, so the ladder
+  // stalled at 16s forever and never reached the documented 30s steady state
+  // (measured as a 16-20s spawn cadence). The outer clamp already lands on
+  // 30s; the exponent cap is only there to keep the maths finite.
+  const delay = Math.min(30000, 1000 * 2 ** Math.min(state.retryCount - 1, 30))
   state.error = `${message} — retrying in ${delay / 1000}s`
   broadcast()
   reconnectTimer = setTimeout(() => {
